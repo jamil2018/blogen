@@ -1,8 +1,12 @@
 import express from "express";
 import dotenv from "dotenv";
 import colors from "colors";
+import helmet from "helmet";
+import morgan from "morgan";
 
 import dbConfig from "./src/config/dbConfig.js";
+import userRoute from "./src/routes/usersRoute.js";
+import { errorHandler, notFound } from "./src/middlewares/errorMiddleware.js";
 
 dotenv.config();
 dbConfig();
@@ -12,11 +16,13 @@ const PORT = process.env.PORT;
 
 // middlewares
 app.use(express.json());
+app.use(helmet());
+if (process.env.NODE_ENV === "DEVELOPMENT") app.use(morgan("dev"));
 
 // routes
-app.use("/", (req, res) => {
-  res.status(200).json({ message: "hello world" });
-});
+app.use("/api/users", userRoute);
+app.use(notFound);
+app.use(errorHandler);
 
 // start
 app.listen(PORT, () => {
