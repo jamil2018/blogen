@@ -1,9 +1,19 @@
 import { Router } from "express";
-import { registerUser } from "../controllers/userControllers.js";
+import { protect } from "../middlewares/authMiddleware.js";
+import {
+  authUser,
+  getUserProfile,
+  registerUser,
+  updateUserProfile,
+} from "../controllers/userControllers.js";
 
 const router = Router();
 
-router.route("/").get().post(registerUser);
-router.route("/:id").get().put();
+router.route("/").post(registerUser);
+router.route("/login").post(authUser);
+router
+  .route("/profile")
+  .get(protect, getUserProfile)
+  .put(protect, updateUserProfile);
 
 export default router;

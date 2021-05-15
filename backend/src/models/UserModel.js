@@ -30,5 +30,9 @@ userSchema.pre("save", async function (next) {
   // eslint-disable-next-line no-invalid-this
   this.password = await bcrypt.hash(this.password, salt);
 });
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  const comparisonResult = await bcrypt.compare(enteredPassword, this.password);
+  return comparisonResult;
+};
 
 export default mongoose.model("User", userSchema);
