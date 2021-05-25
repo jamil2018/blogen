@@ -5,7 +5,8 @@ import helmet from "helmet";
 import morgan from "morgan";
 
 import dbConfig from "./src/config/dbConfig.js";
-import userRoute from "./src/routes/usersRoute.js";
+import usersRoute from "./src/routes/usersRoute.js";
+import categoriesRoute from "./src/routes/categoriesRoute.js";
 import { errorHandler, notFound } from "./src/middlewares/errorMiddleware.js";
 
 dotenv.config();
@@ -20,7 +21,8 @@ app.use(helmet());
 if (process.env.NODE_ENV === "DEVELOPMENT") app.use(morgan("dev"));
 
 // routes
-app.use("/api/users", userRoute);
+app.use("/api/users", usersRoute);
+app.use("/api/categories", categoriesRoute);
 app.use(notFound);
 app.use(errorHandler);
 
