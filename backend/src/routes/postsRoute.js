@@ -6,17 +6,31 @@ import {
   getPostById,
   updatePost,
   deletePost,
+  getPostComments,
+  createPostComment,
+  updatePostComment,
+  deleteComment,
+  findPosts,
+  getPostsByAuthorId,
 } from "../controllers/postsController.js";
 
 const router = Router();
 
 router.route("/").get(getAllPosts).post(protect, createNewPost);
+router.route("/find").get(findPosts);
+router.route("/author/:id").get(getPostsByAuthorId);
 router
   .route("/:id")
   .get(getPostById)
   .put(protect, updatePost)
   .delete(protect, deletePost);
-router.route("/authors/:author").get();
-router.route("/find").get();
+router
+  .route("/:id/comments")
+  .get(getPostComments)
+  .post(protect, createPostComment);
+router
+  .route("/:pid/comments/:cid")
+  .put(protect, updatePostComment)
+  .delete(protect, deleteComment);
 
 export default router;

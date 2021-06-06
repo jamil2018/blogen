@@ -28,4 +28,19 @@ const protect = asyncHandler(async (req, res, next) => {
   }
 });
 
-export { protect };
+const checkAdmin = asyncHandler(async (req, res, next) => {
+  if (req.user) {
+    const { isAdmin } = req.user;
+    if (isAdmin) {
+      next();
+    } else {
+      res.status(401);
+      throw new Error("Unauthorized, invalid admin operation request");
+    }
+  } else {
+    res.status(401);
+    throw new Error("Unauthorized, token failed");
+  }
+});
+
+export { protect, checkAdmin };
