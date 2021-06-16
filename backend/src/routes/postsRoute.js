@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { protect } from "../middlewares/authMiddleware.js";
+import { uploads } from "../middlewares/fileStorageMiddleware.js";
 import {
   createNewPost,
   getAllPosts,
@@ -16,7 +17,10 @@ import {
 
 const router = Router();
 
-router.route("/").get(getAllPosts).post(protect, createNewPost);
+router
+  .route("/")
+  .get(getAllPosts)
+  .post(protect, uploads.single("image"), createNewPost);
 router.route("/find").get(findPosts);
 router.route("/author/:id").get(getPostsByAuthorId);
 router

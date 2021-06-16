@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 import colors from "colors";
 import helmet from "helmet";
 import morgan from "morgan";
+import path from "path";
+import { fileURLToPath } from "url";
 
 import dbConfig from "./src/config/dbConfig.js";
 import usersRoute from "./src/routes/usersRoute.js";
@@ -15,7 +17,8 @@ dbConfig();
 
 const app = express();
 const PORT = process.env.PORT;
-
+const __rootDirname = path.dirname(fileURLToPath(import.meta.url));
+global.__rootDirname = __rootDirname;
 // middlewares
 app.use(express.json());
 app.use(helmet());

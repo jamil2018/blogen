@@ -1,4 +1,6 @@
 import asyncHandler from "express-async-handler";
+import fs from "fs";
+import path from "path";
 
 import Post from "../models/PostModel.js";
 import Category from "../models/CategoryModel.js";
@@ -41,8 +43,13 @@ const getPostById = asyncHandler(async (req, res) => {
  * @access private
  */
 const createNewPost = asyncHandler(async (req, res) => {
-  const { title, description, image, author, summary, category, tags } =
-    req.body;
+  const { title, description, author, summary, category, tags } = req.body;
+  const image = {
+    data: fs.readFileSync(
+      path.join(__rootDirname, process.env.FILE_UPLOAD_PATH, req.file.filename)
+    ),
+    contentType: "image/*",
+  };
   const post = await Post.create({
     title,
     description,
@@ -51,6 +58,7 @@ const createNewPost = asyncHandler(async (req, res) => {
     summary,
     category,
     tags,
+    image,
   });
   if (post) {
     return res.status(201).json({
@@ -61,7 +69,7 @@ const createNewPost = asyncHandler(async (req, res) => {
       author: post.author,
       summary: post.summary,
       category: post.category,
-      tags: [post.tags],
+      tags: post.tags,
     });
   } else {
     res.status(400);
