@@ -43,7 +43,8 @@ const getPostById = asyncHandler(async (req, res) => {
  * @access private
  */
 const createNewPost = asyncHandler(async (req, res) => {
-  const { title, description, author, summary, category, tags } = req.body;
+  const { title, description, summary, category, tags } = req.body;
+  const author = req.user._id;
   const image = {
     data: fs.readFileSync(
       path.join(__rootDirname, process.env.FILE_UPLOAD_PATH, req.file.filename)
