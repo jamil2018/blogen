@@ -1,18 +1,20 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Drawer from "@material-ui/core/Drawer";
-import List from "@material-ui/core/List";
-import Typography from "@material-ui/core/Typography";
-import Divider from "@material-ui/core/Divider";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
+import {
+  makeStyles,
+  Drawer,
+  List,
+  Typography,
+  Divider,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+} from "@material-ui/core";
 import {
   People as PeopleIcon,
   Category as CategoryIcon,
   Note as PostIcon,
 } from "@material-ui/icons";
-import { Link } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 
 const drawerWidth = 240;
 
@@ -28,24 +30,28 @@ const useStyles = makeStyles((theme) => ({
   drawerPaper: {
     width: drawerWidth,
   },
-  // necessary for content to be below app bar
-  toolbar: theme.mixins.toolbar,
+  list: {
+    marginTop: theme.spacing(2),
+  },
   content: {
     flexGrow: 1,
     backgroundColor: theme.palette.background.default,
     padding: theme.spacing(3),
   },
   drawerHeader: {
-    marginLeft: theme.spacing(3),
+    marginLeft: theme.spacing(2),
     marginTop: theme.spacing(2),
     marginBottom: theme.spacing(2),
     textDecoration: "none",
+  },
+  activeLink: {
+    color: theme.palette.primary.main,
   },
 }));
 
 const AdminLayout = ({ children }) => {
   const classes = useStyles();
-
+  const location = useLocation();
   return (
     <div className={classes.root}>
       <Drawer
@@ -58,7 +64,7 @@ const AdminLayout = ({ children }) => {
       >
         <Typography
           className={classes.drawerHeader}
-          variant="h5"
+          variant="h6"
           component={Link}
           to="/admin"
           color="textPrimary"
@@ -66,22 +72,45 @@ const AdminLayout = ({ children }) => {
           Admin Dashboard
         </Typography>
         <Divider />
-        <List>
-          <ListItem button component={Link} to="/admin/users">
+        <List className={classes.list}>
+          <ListItem
+            button
+            component={NavLink}
+            to="/admin/users"
+            activeClassName={classes.activeLink}
+          >
             <ListItemIcon>
-              <PeopleIcon />
+              <PeopleIcon
+                color={location.pathname === "/admin/users" ? "primary" : ""}
+              />
             </ListItemIcon>
             <ListItemText primary="Users" />
           </ListItem>
-          <ListItem button component={Link} to="/admin/categories">
+          <ListItem
+            button
+            component={NavLink}
+            to="/admin/categories"
+            activeClassName={classes.activeLink}
+          >
             <ListItemIcon>
-              <CategoryIcon />
+              <CategoryIcon
+                color={
+                  location.pathname === "/admin/categories" ? "primary" : ""
+                }
+              />
             </ListItemIcon>
             <ListItemText primary="Categories" />
           </ListItem>
-          <ListItem button component={Link} to="/admin/posts">
+          <ListItem
+            button
+            component={NavLink}
+            to="/admin/posts"
+            activeClassName={classes.activeLink}
+          >
             <ListItemIcon>
-              <PostIcon />
+              <PostIcon
+                color={location.pathname === "/admin/posts" ? "primary" : ""}
+              />
             </ListItemIcon>
             <ListItemText primary="Posts" />
           </ListItem>
