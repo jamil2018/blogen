@@ -1,9 +1,17 @@
-import { Typography, Button } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core";
+import ScreenTitle from "../components/ScreenTitle";
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    marginTop: theme.spacing(2),
+  },
+}));
 
 const AdminHomeScreen = () => {
+  const classes = useStyles();
   return (
     <>
-      <Typography variant="h1">Admin Home</Typography>
+      <ScreenTitle text="Dashboard" className={classes.root} />
     </>
   );
 };

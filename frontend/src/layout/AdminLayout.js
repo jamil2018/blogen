@@ -8,6 +8,7 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  Container,
 } from "@material-ui/core";
 import {
   People as PeopleIcon,
@@ -25,7 +26,6 @@ const useStyles = makeStyles((theme) => ({
   drawer: {
     width: drawerWidth,
     flexShrink: 0,
-    marginRight: theme.spacing(3),
   },
   drawerPaper: {
     width: drawerWidth,
@@ -39,10 +39,11 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(3),
   },
   drawerHeader: {
-    marginLeft: theme.spacing(2),
     marginTop: theme.spacing(2),
     marginBottom: theme.spacing(2),
     textDecoration: "none",
+    fontWeight: theme.typography.fontWeightMedium,
+    letterSpacing: theme.spacing(0.5),
   },
   activeLink: {
     color: theme.palette.primary.main,
@@ -68,8 +69,9 @@ const AdminLayout = ({ children }) => {
           component={Link}
           to="/admin"
           color="textPrimary"
+          align="center"
         >
-          Admin Dashboard
+          Blogen
         </Typography>
         <Divider />
         <List className={classes.list}>
@@ -116,7 +118,7 @@ const AdminLayout = ({ children }) => {
           </ListItem>
         </List>
       </Drawer>
-      {children}
+      <Container maxWidth="lg">{children}</Container>
     </div>
   );
 };

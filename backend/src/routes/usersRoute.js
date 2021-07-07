@@ -5,11 +5,12 @@ import {
   getUserProfile,
   registerUser,
   updateUserProfile,
+  getAllUsers,
 } from "../controllers/usersController.js";
 
 const router = Router();
 
-router.route("/").post(registerUser);
+router.route("/").post(registerUser).get(getAllUsers);
 router.route("/login").post(authUser);
 router
   .route("/profile")

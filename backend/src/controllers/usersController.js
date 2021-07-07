@@ -4,6 +4,16 @@ import User from "../models/UserModel.js";
 import generateToken from "../utils/generateToken.js";
 
 /**
+ * @desc get all users
+ * @route GET /api/users
+ * @access public
+ */
+const getAllUsers = asyncHandler(async (req, res) => {
+  const users = await User.find({}).select("-password");
+  return res.status(200).json(users);
+});
+
+/**
  * @desc create new user & generate token
  * @route POST /api/users
  * @access public
@@ -102,4 +112,10 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 });
-export { registerUser, authUser, getUserProfile, updateUserProfile };
+export {
+  registerUser,
+  authUser,
+  getUserProfile,
+  updateUserProfile,
+  getAllUsers,
+};
