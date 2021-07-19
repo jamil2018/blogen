@@ -2,13 +2,13 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { ThemeProvider, CssBaseline } from "@material-ui/core";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
-import AdminHomeScreen from "./screens/AdminHomeScreen";
-import HomeScreen from "./screens/HomeScreen";
+import AdminHomeScreen from "./screens/admin/AdminHomeScreen";
+import HomeScreen from "./screens/general/HomeScreen";
 import theme from "./theme/theme";
 import AdminLayout from "./layout/AdminLayout";
-import AdminUsers from "./screens/AdminUsers";
-import AdminCategories from "./screens/AdminCategories";
-import AdminPosts from "./screens/AdminPosts";
+import AdminUsers from "./screens/admin/AdminUsers";
+import AdminCategories from "./screens/admin/AdminCategories";
+import AdminPosts from "./screens/admin/AdminPosts";
 
 const App = () => {
   const client = new QueryClient();

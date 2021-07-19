@@ -83,7 +83,9 @@ const AdminLayout = ({ children }) => {
           >
             <ListItemIcon>
               <PeopleIcon
-                color={location.pathname === "/admin/users" ? "primary" : ""}
+                color={
+                  location.pathname === "/admin/users" ? "primary" : "inherit"
+                }
               />
             </ListItemIcon>
             <ListItemText primary="Users" />
@@ -97,7 +99,9 @@ const AdminLayout = ({ children }) => {
             <ListItemIcon>
               <CategoryIcon
                 color={
-                  location.pathname === "/admin/categories" ? "primary" : ""
+                  location.pathname === "/admin/categories"
+                    ? "primary"
+                    : "inherit"
                 }
               />
             </ListItemIcon>
@@ -111,7 +115,9 @@ const AdminLayout = ({ children }) => {
           >
             <ListItemIcon>
               <PostIcon
-                color={location.pathname === "/admin/posts" ? "primary" : ""}
+                color={
+                  location.pathname === "/admin/posts" ? "primary" : "inherit"
+                }
               />
             </ListItemIcon>
             <ListItemText primary="Posts" />

@@ -1,5 +1,5 @@
 import { makeStyles } from "@material-ui/core";
-import ScreenTitle from "../components/ScreenTitle";
+import ScreenTitle from "../../components/ScreenTitle";
 
 const useStyles = makeStyles((theme) => ({
   root: {

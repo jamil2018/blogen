@@ -1,15 +1,10 @@
-import {
-  Box,
-  Button,
-  Divider,
-  Grid,
-  makeStyles,
-  TextField,
-  Typography,
-} from "@material-ui/core";
-import AccountCircleIcon from "@material-ui/icons/AccountCircle";
+import { Box, Button, makeStyles, TextField } from "@material-ui/core";
+import { useMutation, useQueryClient } from "react-query";
 import { useFormik } from "formik";
+
 import * as yup from "yup";
+
+import { createUser } from "../../data/userQueryFunctions";
 
 const validationSchema = yup.object({
   name: yup.string("Enter you name").required("This field is required"),
@@ -35,21 +30,20 @@ const useStyles = makeStyles((theme) => ({
   button: {
     marginTop: theme.spacing(2),
   },
-  formHeader: {
-    paddingLeft: theme.spacing(2),
-    paddingTop: theme.spacing(1),
-    marginBottom: theme.spacing(2),
-  },
   formContent: {
     padding: theme.spacing(2),
   },
-  formIcon: {
-    paddingTop: theme.spacing(2),
-  },
 }));
 
-const SignupScreen = () => {
+const SignupScreen = ({ showSuccessAlertHandler, handleModalClose }) => {
   const classes = useStyles();
+  const queryClient = useQueryClient();
+  const mutation = useMutation(createUser, {
+    onSuccess: () => {
+      queryClient.invalidateQueries("users");
+      showSuccessAlertHandler();
+    },
+  });
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -59,27 +53,17 @@ const SignupScreen = () => {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
+      mutation.mutate({
+        name: values.name,
+        email: values.email,
+        password: values.password,
+        isAdmin: false,
+      });
+      handleModalClose();
     },
   });
   return (
     <Box>
-      <Grid
-        className={classes.formIcon}
-        container
-        justify="center"
-        alignItems="center"
-      >
-        <AccountCircleIcon fontSize="large" color="primary" />
-      </Grid>
-      <Typography
-        variant="h4"
-        component="h1"
-        className={classes.formHeader}
-        align="center"
-      >
-        Sign Up
-      </Typography>
       <form onSubmit={formik.handleSubmit} className={classes.formContent}>
         <TextField
           fullWidth
@@ -121,6 +105,7 @@ const SignupScreen = () => {
             (formik.touched.password && formik.errors.password) || " "
           }
           size="small"
+          type="password"
         />
         <TextField
           fullWidth
@@ -140,6 +125,7 @@ const SignupScreen = () => {
             " "
           }
           size="small"
+          type="password"
         />
         <Button
           color="primary"

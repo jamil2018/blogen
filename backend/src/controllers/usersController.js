@@ -14,6 +14,15 @@ const getAllUsers = asyncHandler(async (req, res) => {
 });
 
 /**
+ * @desc get user by id
+ * @route GET /api/user/:id
+ * @access public
+ */
+const getUserById = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id).select("-password");
+  return res.status(200).json(user);
+});
+/**
  * @desc create new user & generate token
  * @route POST /api/users
  * @access public
@@ -118,4 +127,5 @@ export {
   getUserProfile,
   updateUserProfile,
   getAllUsers,
+  getUserById,
 };
