@@ -23,7 +23,8 @@ import { USER_DATA } from "../../definitions/reactQueryConstants/queryConstants"
 import AdminModal from "../../components/AdminModal";
 import AlertNotification from "../../components/AlertNotification";
 import EditUserScreen from "./EditUserScreen";
-// import Alert from '@material-ui/lab/Alert';
+import { useHistory } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -51,6 +52,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const AdminUsers = (props) => {
+  const history = useHistory();
+  const { user } = useSelector((state) => state.userData);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showCreateSuccessAlert, setShowCreateSuccessAlert] = useState(false);
@@ -58,7 +61,26 @@ const AdminUsers = (props) => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [editDisabled, setEditDisabled] = useState(true);
   const [deleteDisabled, setDeleteDisabled] = useState(true);
+  const classes = useStyles();
+  const { isLoading, isError, data, error, isFetching } = useQuery(
+    USER_DATA,
+    getAllUsers
+  );
+  let rows = [];
+  if (!isLoading && !isError && !isFetching && data.length > 0) {
+    rows = data.map((user) => ({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      isAdmin: user.isAdmin,
+    }));
+  }
 
+  useEffect(() => {
+    if (!user.isAdmin) {
+      history.push("/");
+    }
+  }, [history, user]);
   useEffect(() => {
     if (selectedRows.length > 0) {
       setEditDisabled(false);
@@ -69,28 +91,11 @@ const AdminUsers = (props) => {
       setDeleteDisabled(false);
     }
     if (selectedRows.length === 0) {
-      console.log(selectedRows.length);
       setEditDisabled(true);
       setDeleteDisabled(true);
     }
   }, [selectedRows, editDisabled, deleteDisabled]);
 
-  const classes = useStyles();
-  const { isLoading, isError, data, error, isFetching } = useQuery(
-    USER_DATA,
-    getAllUsers
-  );
-
-  let rows = [];
-
-  if (!isLoading && !isError && !isFetching && data.length > 0) {
-    rows = data.map((user) => ({
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      isAdmin: user.isAdmin,
-    }));
-  }
   const handleModalOpen = (modalType) => {
     switch (modalType) {
       case "CREATE": {
@@ -107,6 +112,7 @@ const AdminUsers = (props) => {
       }
     }
   };
+
   const handleModalClose = (modalType) => {
     switch (modalType) {
       case "CREATE": {
@@ -123,6 +129,7 @@ const AdminUsers = (props) => {
       }
     }
   };
+
   return (
     <>
       <ScreenTitle text="Users" className={classes.root} />
@@ -138,7 +145,7 @@ const AdminUsers = (props) => {
         closeHandler={() => setShowEditSuccessAlert(false)}
         alertSeverity="success"
       />
-      <Grid container alignItems="center" justify="space-between">
+      <Grid container alignItems="center" justifyContent="space-between">
         <Grid item>
           <Typography variant="body1" component="h1">
             All Users
@@ -219,6 +226,7 @@ const AdminUsers = (props) => {
           handleModalClose={() => handleModalClose("EDIT")}
         />
       </AdminModal>
+      <AdminModal></AdminModal>
     </>
   );
 };

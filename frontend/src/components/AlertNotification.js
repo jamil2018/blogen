@@ -5,16 +5,18 @@ import CloseIcon from "@material-ui/icons/Close";
 const useStyles = makeStyles((theme) => ({
   root: {
     marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2),
     maxWidth: "40vw",
     marginLeft: "auto",
     marginRight: "auto",
   },
   animation: {
     zIndex: theme.zIndex.tooltip,
-    position: "absolute",
     top: 0,
     left: "50%",
+  },
+  windowAlert: {
+    position: "absolute",
+    marginBottom: theme.spacing(2),
   },
 }));
 
@@ -23,10 +25,18 @@ const AlertNotification = ({
   alertText,
   closeHandler,
   alertSeverity,
+  windowAlert,
 }) => {
   const classes = useStyles();
   return (
-    <Collapse in={showState} className={classes.animation}>
+    <Collapse
+      in={showState}
+      className={
+        windowAlert
+          ? `${classes.animation} ${classes.windowAlert}`
+          : classes.animation
+      }
+    >
       <Alert
         className={classes.root}
         severity={alertSeverity}

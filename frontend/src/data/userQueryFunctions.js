@@ -1,6 +1,7 @@
 import axios from "axios";
+import { store } from "../redux/store";
 
-export const signInUser = async (email, password) => {
+export const signInUser = async ({ email, password }) => {
   try {
     const config = {
       headers: {
@@ -14,7 +15,11 @@ export const signInUser = async (email, password) => {
     );
     return data;
   } catch (err) {
-    throw new Error(`Error while fetching data. Error Message: ${err.message}`);
+    const error = new Error(
+      `Error while fetching data. Error Message: ${err.message}`
+    );
+    error.status = err.response.request.status;
+    throw error;
   }
 };
 
@@ -60,14 +65,43 @@ export const getUserById = async (userId) => {
   }
 };
 
-export const updateUser = async (userData) => {
+export const updateUser = async (updatedUserData) => {
   try {
+    const { userData } = store.getState();
+    const { token } = userData.user;
     const config = {
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     };
-    const { data } = await axios.put(`/api/users/profile`, userData, config);
+    const { data } = await axios.put(
+      `/api/users/profile`,
+      updatedUserData,
+      config
+    );
+    return data;
+  } catch (err) {
+    throw new Error(`Error while fecthing data. Error Message: ${err.message}`);
+  }
+};
+
+export const updateUserById = async (updatedUserData) => {
+  try {
+    const { userId, values } = updatedUserData;
+    const { userData } = store.getState();
+    const { token } = userData.user;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    const { data } = await axios.put(
+      `/api/users/profile/${userId}`,
+      values,
+      config
+    );
     return data;
   } catch (err) {
     throw new Error(`Error while fecthing data. Error Message: ${err.message}`);

@@ -7,17 +7,23 @@ import {
   updateUserProfile,
   getAllUsers,
   getUserById,
+  updateUserProfileById,
+  deleteUsersById,
 } from "../controllers/usersController.js";
 
 const router = Router();
 
-router.route("/").post(registerUser).get(getAllUsers);
+router
+  .route("/")
+  .post(registerUser)
+  .get(getAllUsers)
+  .delete(protect, checkAdmin, deleteUsersById);
 router.route("/:id").get(getUserById);
-// .put(protect, checkAdmin);
 router.route("/login").post(authUser);
 router
   .route("/profile")
   .get(protect, getUserProfile)
   .put(protect, updateUserProfile);
+router.route("/profile/:id").put(protect, checkAdmin, updateUserProfileById);
 
 export default router;

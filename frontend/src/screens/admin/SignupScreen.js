@@ -5,6 +5,7 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 
 import { createUser } from "../../data/userQueryFunctions";
+import { USER_DATA } from "../../definitions/reactQueryConstants/queryConstants";
 
 const validationSchema = yup.object({
   name: yup.string("Enter you name").required("This field is required"),
@@ -40,7 +41,7 @@ const SignupScreen = ({ showSuccessAlertHandler, handleModalClose }) => {
   const queryClient = useQueryClient();
   const mutation = useMutation(createUser, {
     onSuccess: () => {
-      queryClient.invalidateQueries("users");
+      queryClient.invalidateQueries(USER_DATA);
       showSuccessAlertHandler();
     },
   });
@@ -57,7 +58,6 @@ const SignupScreen = ({ showSuccessAlertHandler, handleModalClose }) => {
         name: values.name,
         email: values.email,
         password: values.password,
-        isAdmin: false,
       });
       handleModalClose();
     },

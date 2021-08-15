@@ -121,6 +121,47 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 });
+
+/**
+ * @desc update user profile by id
+ * @route PUT /api/users/profile/:id
+ * @access private
+ */
+const updateUserProfileById = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (user) {
+    user.name = req.body.name || user.name;
+    user.email = req.body.email || user.email;
+    if (req.body.password) {
+      user.password = req.body.password;
+    }
+    const updatedUser = await user.save();
+    res.status(200).json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      isAdmin: updatedUser.isAdmin,
+      token: generateToken(updatedUser._id),
+    });
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
+});
+
+/**
+ * @desc DELETE users by id
+ * @route DELETE /api/users
+ * @access private
+ */
+const deleteUsersById = asyncHandler(async (req, res) => {
+  const { deletedCount } = await User.deleteMany({ _id: { $in: req.body.id } });
+  if (deletedCount > 0) {
+    return res.status(200).json({ message: "All users have been deleted" });
+  } else {
+    return res.status(400).json({ message: "No users matched the query" });
+  }
+});
 export {
   registerUser,
   authUser,
@@ -128,4 +169,6 @@ export {
   updateUserProfile,
   getAllUsers,
   getUserById,
+  updateUserProfileById,
+  deleteUsersById,
 };

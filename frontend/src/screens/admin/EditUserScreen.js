@@ -11,7 +11,11 @@ import { useFormik } from "formik";
 
 import * as yup from "yup";
 
-import { getUserById, updateUser } from "../../data/userQueryFunctions";
+import {
+  getUserById,
+  updateUser,
+  updateUserById,
+} from "../../data/userQueryFunctions";
 import { SINGLE_USER_DATA } from "../../definitions/reactQueryConstants/queryConstants";
 
 const validationSchema = yup.object({
@@ -60,20 +64,23 @@ const EditUserScreen = ({
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      mutation.mutate(userId, {
-        name: values.name,
-        email: values.email,
-        password: values.password,
-        isAdmin: false,
+      mutation.mutate({
+        userId: userId,
+        values: {
+          name: values.name,
+          email: values.email,
+          password: values.password,
+          isAdmin: false,
+        },
       });
       handleModalClose();
     },
   });
   if (!isLoading && !isError) {
-    formik.values.name = data.name;
-    formik.values.email = data.email;
+    formik.initialValues.name = data.name;
+    formik.initialValues.email = data.email;
   }
-  const mutation = useMutation(updateUser, {
+  const mutation = useMutation(updateUserById, {
     onSuccess: () => {
       queryClient.invalidateQueries("users");
       showSuccessAlertHandler();
