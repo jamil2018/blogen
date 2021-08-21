@@ -64,7 +64,7 @@ export const getUserById = async (userId) => {
     throw new Error(`Error while fecthing data. Error Message: ${err.message}`);
   }
 };
-
+// update currently logged in user data
 export const updateUser = async (updatedUserData) => {
   try {
     const { userData } = store.getState();
@@ -86,6 +86,7 @@ export const updateUser = async (updatedUserData) => {
   }
 };
 
+// update a user by id. for admin users.
 export const updateUserById = async (updatedUserData) => {
   try {
     const { userId, values } = updatedUserData;
@@ -105,5 +106,23 @@ export const updateUserById = async (updatedUserData) => {
     return data;
   } catch (err) {
     throw new Error(`Error while fecthing data. Error Message: ${err.message}`);
+  }
+};
+
+export const deleteMultipleUsersById = async (userId) => {
+  try {
+    const { userData } = store.getState();
+    const { token } = userData.user;
+    const config = {
+      data: { id: userId },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    const { data } = await axios.delete("/api/users", config);
+    return data;
+  } catch (err) {
+    throw new Error(`Error while fetching data. Error Message: ${err.message}`);
   }
 };

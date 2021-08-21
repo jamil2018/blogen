@@ -12,6 +12,7 @@ import {
   Edit as EditIcon,
   Add as CreateIcon,
 } from "@material-ui/icons";
+import ErrorIcon from "@material-ui/icons/Error";
 import { DataGrid, GridToolbar } from "@material-ui/data-grid";
 import { useEffect, useState } from "react";
 import ScreenTitle from "../../components/ScreenTitle";
@@ -25,6 +26,7 @@ import AlertNotification from "../../components/AlertNotification";
 import EditUserScreen from "./EditUserScreen";
 import { useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
+import AdminUserDeleteScreen from "./AdminUserDeleteScreen";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -56,8 +58,10 @@ const AdminUsers = (props) => {
   const { user } = useSelector((state) => state.userData);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showCreateSuccessAlert, setShowCreateSuccessAlert] = useState(false);
   const [showEditSuccessAlert, setShowEditSuccessAlert] = useState(false);
+  const [showDeleteSuccessAlert, setShowDeleteSuccessAlert] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [editDisabled, setEditDisabled] = useState(true);
   const [deleteDisabled, setDeleteDisabled] = useState(true);
@@ -103,6 +107,7 @@ const AdminUsers = (props) => {
         break;
       }
       case "DELETE":
+        setShowDeleteModal(true);
         break;
       case "EDIT":
         setShowEditModal(true);
@@ -120,6 +125,7 @@ const AdminUsers = (props) => {
         break;
       }
       case "DELETE":
+        setShowDeleteModal(false);
         break;
       case "EDIT":
         setShowEditModal(false);
@@ -145,6 +151,13 @@ const AdminUsers = (props) => {
         closeHandler={() => setShowEditSuccessAlert(false)}
         alertSeverity="success"
       />
+      <AlertNotification
+        showState={showDeleteSuccessAlert}
+        alertText="The selected user(s) has been deleted"
+        closeHandler={() => setShowDeleteSuccessAlert(false)}
+        alertSeverity="error"
+      />
+
       <Grid container alignItems="center" justifyContent="space-between">
         <Grid item>
           <Typography variant="body1" component="h1">
@@ -180,7 +193,11 @@ const AdminUsers = (props) => {
                   flexItem
                   light
                 />
-                <IconButton aria-label="delete" disabled={deleteDisabled}>
+                <IconButton
+                  aria-label="delete"
+                  disabled={deleteDisabled}
+                  onClick={() => handleModalOpen("DELETE")}
+                >
                   <DeleteIcon fontSize="small" />
                 </IconButton>
               </Grid>
@@ -226,7 +243,18 @@ const AdminUsers = (props) => {
           handleModalClose={() => handleModalClose("EDIT")}
         />
       </AdminModal>
-      <AdminModal></AdminModal>
+      <AdminModal
+        modalOpenState={showDeleteModal}
+        modalCloseHandler={() => handleModalClose("DELETE")}
+        modalTitle="Confirm Delete"
+        modalIcon={<ErrorIcon fontSize="large" color="secondary" />}
+      >
+        <AdminUserDeleteScreen
+          userId={selectedRows}
+          showSuccessAlertHandler={() => setShowDeleteSuccessAlert(true)}
+          handleModalClose={() => handleModalClose("DELETE")}
+        />
+      </AdminModal>
     </>
   );
 };
