@@ -4,13 +4,13 @@ import { ThemeProvider, CssBaseline } from "@material-ui/core";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 import { store } from "./redux/store";
-import AdminHomeScreen from "./screens/admin/AdminHomeScreen";
+import AdminHomeScreen from "./screens/admin/dashboard/AdminHomeScreen";
 import HomeScreen from "./screens/general/HomeScreen";
 import theme from "./theme/theme";
 import AdminLayout from "./layout/AdminLayout";
-import AdminUsers from "./screens/admin/AdminUsers";
-import AdminCategories from "./screens/admin/AdminCategories";
-import AdminPosts from "./screens/admin/AdminPosts";
+import AdminUsers from "./screens/admin/users/AdminUsers";
+import AdminCategories from "./screens/admin/categories/AdminCategories";
+import AdminPosts from "./screens/admin/posts/AdminPosts";
 
 const App = () => {
   const client = new QueryClient();

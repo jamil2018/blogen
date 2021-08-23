@@ -4,8 +4,8 @@ import { useFormik } from "formik";
 
 import * as yup from "yup";
 
-import { createUser } from "../../data/userQueryFunctions";
-import { USER_DATA } from "../../definitions/reactQueryConstants/queryConstants";
+import { createUser } from "../../../data/userQueryFunctions";
+import { USER_DATA } from "../../../definitions/reactQueryConstants/queryConstants";
 
 const validationSchema = yup.object({
   name: yup.string("Enter you name").required("This field is required"),

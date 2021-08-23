@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "react-query";
-import AdminDeleteConfirmation from "../../components/AdminDeleteConfirmation";
-import { deleteMultipleUsersById } from "../../data/userQueryFunctions";
+import AdminDeleteConfirmation from "../../../components/AdminDeleteConfirmation";
+import { deleteMultipleUsersById } from "../../../data/userQueryFunctions";
 
 const AdminUserDeleteScreen = ({
   showSuccessAlertHandler,

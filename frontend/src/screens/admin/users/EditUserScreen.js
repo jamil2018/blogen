@@ -11,12 +11,8 @@ import { useFormik } from "formik";
 
 import * as yup from "yup";
 
-import {
-  getUserById,
-  updateUser,
-  updateUserById,
-} from "../../data/userQueryFunctions";
-import { SINGLE_USER_DATA } from "../../definitions/reactQueryConstants/queryConstants";
+import { getUserById, updateUserById } from "../../../data/userQueryFunctions";
+import { SINGLE_USER_DATA } from "../../../definitions/reactQueryConstants/queryConstants";
 
 const validationSchema = yup.object({
   name: yup.string("Enter you name"),
