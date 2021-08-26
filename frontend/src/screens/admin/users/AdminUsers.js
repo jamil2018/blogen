@@ -1,10 +1,7 @@
-import { makeStyles } from "@material-ui/core";
+import { ButtonGroup, makeStyles } from "@material-ui/core";
 import Box from "@material-ui/core/Box";
-import Divider from "@material-ui/core/Divider";
-import Card from "@material-ui/core/Card";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
-import CardContent from "@material-ui/core/CardContent";
 import IconButton from "@material-ui/core/IconButton";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import {
@@ -32,20 +29,8 @@ const useStyles = makeStyles((theme) => ({
   root: {
     marginTop: theme.spacing(2),
   },
-  actionCard: {
+  buttonGroup: {
     marginBottom: theme.spacing(2),
-    backgroundColor: "inherit",
-  },
-  actionCardContent: {
-    paddingLeft: theme.spacing(1),
-    paddingRight: theme.spacing(1),
-    paddingTop: theme.spacing(0.1),
-    "&:last-child": {
-      paddingBottom: theme.spacing(0.1),
-    },
-  },
-  divider: {
-    margin: theme.spacing(1.5),
   },
   dataGridContainer: {
     height: "70vh",
@@ -157,53 +142,37 @@ const AdminUsers = (props) => {
         closeHandler={() => setShowDeleteSuccessAlert(false)}
         alertSeverity="error"
       />
-
       <Grid container alignItems="center" justifyContent="space-between">
-        <Grid item>
-          <Typography variant="body1" component="h1">
-            All Users
-          </Typography>
-        </Grid>
-        <Grid item>
-          <Card variant="outlined" className={classes.actionCard}>
-            <CardContent className={classes.actionCardContent}>
-              <Grid container justify="space-around" alignItems="center">
-                <IconButton
-                  aria-label="create"
-                  onClick={() => handleModalOpen("CREATE")}
-                >
-                  <CreateIcon fontSize="small" />
-                </IconButton>
-                <Divider
-                  className={classes.divider}
-                  orientation="vertical"
-                  flexItem
-                  light
-                />
-                <IconButton
-                  aria-label="edit"
-                  disabled={editDisabled}
-                  onClick={() => handleModalOpen("EDIT")}
-                >
-                  <EditIcon fontSize="small" />
-                </IconButton>
-                <Divider
-                  className={classes.divider}
-                  orientation="vertical"
-                  flexItem
-                  light
-                />
-                <IconButton
-                  aria-label="delete"
-                  disabled={deleteDisabled}
-                  onClick={() => handleModalOpen("DELETE")}
-                >
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-              </Grid>
-            </CardContent>
-          </Card>
-        </Grid>
+        <Typography variant="body1" component="h1">
+          All Users
+        </Typography>
+        <ButtonGroup
+          className={classes.buttonGroup}
+          color="primary"
+          variant="outlined"
+          aria-label="admin user action button group"
+        >
+          <IconButton
+            aria-label="create"
+            onClick={() => handleModalOpen("CREATE")}
+          >
+            <CreateIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            aria-label="edit"
+            disabled={editDisabled}
+            onClick={() => handleModalOpen("EDIT")}
+          >
+            <EditIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            aria-label="delete"
+            disabled={deleteDisabled}
+            onClick={() => handleModalOpen("DELETE")}
+          >
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        </ButtonGroup>
       </Grid>
       <Box className={classes.dataGridContainer}>
         <DataGrid

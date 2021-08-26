@@ -155,7 +155,6 @@ const updateUserProfileById = asyncHandler(async (req, res) => {
  * @access private
  */
 const deleteUsersById = asyncHandler(async (req, res) => {
-  console.log(req.body);
   const { deletedCount } = await User.deleteMany({ _id: { $in: req.body.id } });
   if (deletedCount > 0) {
     return res.status(200).json({ message: "All users have been deleted" });

@@ -71,4 +71,29 @@ const deleteCategory = asyncHandler(async (req, res) => {
     throw new Error("Invalid category id");
   }
 });
-export { createNewCategory, getAllCategories, updateCategory, deleteCategory };
+
+/**
+ * @desc delete multiple categories
+ * @route DELETE /api/categories/
+ * @access private
+ */
+const deleteMultipleCategoryById = asyncHandler(async (req, res) => {
+  const { deletedCount } = await Category.deleteMany({
+    _id: { $in: req.body.id },
+  });
+  if (deletedCount > 0) {
+    return res
+      .status(200)
+      .json({ message: "All categories have been deleted" });
+  } else {
+    return res.status(400).json({ message: "No categories matched the query" });
+  }
+});
+
+export {
+  createNewCategory,
+  getAllCategories,
+  updateCategory,
+  deleteCategory,
+  deleteMultipleCategoryById,
+};

@@ -4,6 +4,7 @@ import {
   deleteCategory,
   getAllCategories,
   updateCategory,
+  deleteMultipleCategoryById,
 } from "../controllers/categoriesController.js";
 import { checkAdmin, protect } from "../middlewares/authMiddleware.js";
 
@@ -12,7 +13,8 @@ const router = Router();
 router
   .route("/")
   .get(protect, checkAdmin, getAllCategories)
-  .post(protect, checkAdmin, createNewCategory);
+  .post(protect, checkAdmin, createNewCategory)
+  .delete(protect, checkAdmin, deleteMultipleCategoryById);
 
 router
   .route("/:id")
