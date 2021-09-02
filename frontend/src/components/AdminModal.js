@@ -19,6 +19,7 @@ const useStyles = makeStyles((theme) => ({
   },
   modalHeader: {
     paddingLeft: theme.spacing(2),
+    paddingRight: theme.spacing(2),
     paddingTop: theme.spacing(1),
     marginBottom: theme.spacing(2),
   },

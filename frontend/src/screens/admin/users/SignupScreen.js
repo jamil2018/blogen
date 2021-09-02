@@ -10,7 +10,7 @@ import { USER_DATA } from "../../../definitions/reactQueryConstants/queryConstan
 const validationSchema = yup.object({
   name: yup.string("Enter you name").required("This field is required"),
   email: yup
-    .string("Enter you email address")
+    .string("Enter your email address")
     .required("This field is required")
     .email("Please enter a valid email address"),
   password: yup

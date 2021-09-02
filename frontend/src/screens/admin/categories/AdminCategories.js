@@ -21,6 +21,8 @@ import columns from "../../../definitions/gridColDef/categoryGrids";
 import AdminModal from "../../../components/AdminModal";
 import CategoryIcon from "@material-ui/icons/Category";
 import ErrorIcon from "@material-ui/icons/Error";
+import CreateCategoryScreen from "./CreateCategoryScreen";
+import AlertNotification from "../../../components/AlertNotification";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -48,6 +50,7 @@ const AdminCategories = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showCreateSuccessAlert, setShowCreateSuccessAlert] = useState(false);
 
   // effects
   useEffect(() => {
@@ -117,6 +120,12 @@ const AdminCategories = () => {
   return (
     <>
       <ScreenTitle text="Categories" className={classes.root} />
+      <AlertNotification
+        showState={showCreateSuccessAlert}
+        alertText="Category has been created"
+        closeHandler={() => setShowCreateSuccessAlert(false)}
+        alertSeverity="success"
+      />
       <Grid container alignItems="center" justifyContent="space-between">
         <Typography variant="body1" component="h1">
           All Categories
@@ -170,7 +179,10 @@ const AdminCategories = () => {
         modalTitle="Create New Category"
         modalIcon={<CategoryIcon fontSize="large" color="secondary" />}
       >
-        <Typography variant="h5">Create Modal</Typography>
+        <CreateCategoryScreen
+          showSuccessAlertHandler={() => setShowCreateSuccessAlert(true)}
+          handleModalClose={() => handleModalClose("CREATE")}
+        />
       </AdminModal>
       <AdminModal
         modalOpenState={showEditModal}
