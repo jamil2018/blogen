@@ -83,7 +83,7 @@ const AdminUsers = (props) => {
       setEditDisabled(true);
       setDeleteDisabled(true);
     }
-  }, [selectedRows, editDisabled, deleteDisabled]);
+  }, [selectedRows]);
 
   const handleModalOpen = (modalType) => {
     switch (modalType) {
