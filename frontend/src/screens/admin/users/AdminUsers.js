@@ -41,6 +41,14 @@ const useStyles = makeStyles((theme) => ({
 const AdminUsers = (props) => {
   const history = useHistory();
   const { user } = useSelector((state) => state.userData);
+  const classes = useStyles();
+  const { isLoading, isError, data, error, isFetching } = useQuery(
+    USER_DATA,
+    getAllUsers
+  );
+  let rows = [];
+
+  // states
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -50,26 +58,14 @@ const AdminUsers = (props) => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [editDisabled, setEditDisabled] = useState(true);
   const [deleteDisabled, setDeleteDisabled] = useState(true);
-  const classes = useStyles();
-  const { isLoading, isError, data, error, isFetching } = useQuery(
-    USER_DATA,
-    getAllUsers
-  );
-  let rows = [];
-  if (!isLoading && !isError && !isFetching && data.length > 0) {
-    rows = data.map((user) => ({
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      isAdmin: user.isAdmin,
-    }));
-  }
 
+  // effects
   useEffect(() => {
     if (!user.isAdmin) {
       history.push("/");
     }
   }, [history, user]);
+
   useEffect(() => {
     if (selectedRows.length > 0) {
       setEditDisabled(false);
@@ -85,6 +81,13 @@ const AdminUsers = (props) => {
     }
   }, [selectedRows]);
 
+  useEffect(() => {
+    if (isLoading || isFetching) {
+      setSelectedRows([]);
+    }
+  }, [isLoading, isFetching]);
+
+  // handlers
   const handleModalOpen = (modalType) => {
     switch (modalType) {
       case "CREATE": {
@@ -120,6 +123,15 @@ const AdminUsers = (props) => {
       }
     }
   };
+
+  if (!isLoading && !isError && !isFetching && data.length > 0) {
+    rows = data.map((user) => ({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      isAdmin: user.isAdmin,
+    }));
+  }
 
   return (
     <>

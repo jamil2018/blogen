@@ -9,7 +9,7 @@ import {
   makeStyles,
   Typography,
 } from "@material-ui/core";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import ScreenTitle from "../../../components/ScreenTitle";
@@ -23,6 +23,8 @@ import CategoryIcon from "@material-ui/icons/Category";
 import ErrorIcon from "@material-ui/icons/Error";
 import CreateCategoryScreen from "./CreateCategoryScreen";
 import AlertNotification from "../../../components/AlertNotification";
+import EditCategoryScreen from "./EditCategoryScreen";
+import DeleteCategoryScreen from "./DeleteCategoryScreen";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -45,13 +47,14 @@ const AdminCategories = () => {
 
   // states
   const [selectedRows, setSelectedRows] = useState([]);
-  const [editDisabled, setEditDisabled] = useState(false);
-  const [deleteDisabled, setDeleteDisabled] = useState(false);
+  const [editDisabled, setEditDisabled] = useState(true);
+  const [deleteDisabled, setDeleteDisabled] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showCreateSuccessAlert, setShowCreateSuccessAlert] = useState(false);
-
+  const [showEditSuccessAlert, setShowEditSuccessAlert] = useState(false);
+  const [showDeleteSuccessAlert, setShowDeleteSuccessAlert] = useState(false);
   // effects
   useEffect(() => {
     if (!user.isAdmin) {
@@ -72,13 +75,11 @@ const AdminCategories = () => {
       setDeleteDisabled(true);
     }
   }, [selectedRows]);
-
-  if (!isFetching && !isError && !isLoading && data.length > 0) {
-    rows = data.map((cat) => ({
-      id: cat._id,
-      Title: cat.title,
-    }));
-  }
+  useEffect(() => {
+    if (isLoading || isFetching) {
+      setSelectedRows([]);
+    }
+  }, [isLoading, isFetching]);
 
   // modal handlers
   const handleModalOpen = (modalType) => {
@@ -117,6 +118,12 @@ const AdminCategories = () => {
     }
   };
 
+  if (!isFetching && !isError && !isLoading && data.length > 0) {
+    rows = data.map((cat) => ({
+      id: cat._id,
+      Title: cat.title,
+    }));
+  }
   return (
     <>
       <ScreenTitle text="Categories" className={classes.root} />
@@ -125,6 +132,18 @@ const AdminCategories = () => {
         alertText="Category has been created"
         closeHandler={() => setShowCreateSuccessAlert(false)}
         alertSeverity="success"
+      />
+      <AlertNotification
+        showState={showEditSuccessAlert}
+        alertText="Category has been updated"
+        closeHandler={() => setShowEditSuccessAlert(false)}
+        alertSeverity="success"
+      />
+      <AlertNotification
+        showState={showDeleteSuccessAlert}
+        alertText="The selected category(s) has been deleted"
+        closeHandler={() => setShowDeleteSuccessAlert(false)}
+        alertSeverity="error"
       />
       <Grid container alignItems="center" justifyContent="space-between">
         <Typography variant="body1" component="h1">
@@ -190,7 +209,11 @@ const AdminCategories = () => {
         modalTitle="Edit Category"
         modalIcon={<CategoryIcon fontSize="large" color="secondary" />}
       >
-        <Typography variant="h5">Edit Modal</Typography>
+        <EditCategoryScreen
+          showSuccessAlertHandler={() => setShowEditSuccessAlert(true)}
+          categoryId={selectedRows[0]}
+          handleModalClose={() => handleModalClose("EDIT")}
+        />
       </AdminModal>
       <AdminModal
         modalOpenState={showDeleteModal}
@@ -198,7 +221,11 @@ const AdminCategories = () => {
         modalTitle="Delete Category"
         modalIcon={<ErrorIcon fontSize="large" color="secondary" />}
       >
-        <Typography variant="h5">Delete Modal</Typography>
+        <DeleteCategoryScreen
+          categoryId={selectedRows}
+          showSuccessAlertHandler={() => setShowDeleteSuccessAlert(true)}
+          handleModalClose={() => handleModalClose("DELETE")}
+        />
       </AdminModal>
     </>
   );

@@ -17,6 +17,22 @@ export const getAllCategories = async () => {
     throw new Error(`Error while fecthing data. Error Message: ${err.message}`);
   }
 };
+export const getCategoryById = async (catId) => {
+  try {
+    const { userData } = store.getState();
+    const { user } = userData;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
+    };
+    const { data } = await axios.get(`/api/categories/${catId}`, config);
+    return data;
+  } catch (err) {
+    throw new Error(`Error while fetching data. Error Message: ${err.message}`);
+  }
+};
 
 export const createCategory = async (categoryData) => {
   try {
