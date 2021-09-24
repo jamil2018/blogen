@@ -116,7 +116,9 @@ const AdminLayout = ({ children }) => {
             <ListItemIcon>
               <PostIcon
                 color={
-                  location.pathname === "/admin/posts" ? "primary" : "inherit"
+                  location.pathname.includes("/admin/posts")
+                    ? "primary"
+                    : "inherit"
                 }
               />
             </ListItemIcon>

@@ -125,6 +125,24 @@ const deletePost = asyncHandler(async (req, res) => {
 });
 
 /**
+ * @desc delete multiple posts by id
+ * @route DELETE /api/posts
+ * @access private
+ */
+const deleteMultiplePostsById = asyncHandler(async (req,res)=>{
+  const { deletedCount } = await Post.deleteMany({
+    _id: { $in: req.body.id },
+  });
+  if (deletedCount > 0) {
+    return res
+      .status(200)
+      .json({ message: "All posts have been deleted" });
+  } else {
+    return res.status(400).json({ message: "No posts matched the query" });
+  }
+})
+
+/**
  * @desc get all comments for a post
  * @route GET /api/posts/:id/comments
  * @access public
@@ -264,4 +282,5 @@ export {
   deleteComment,
   findPosts,
   getPostsByAuthorId,
+  deleteMultiplePostsById
 };

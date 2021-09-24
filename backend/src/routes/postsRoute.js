@@ -13,6 +13,7 @@ import {
   deleteComment,
   findPosts,
   getPostsByAuthorId,
+  deleteMultiplePostsById,
 } from "../controllers/postsController.js";
 
 const router = Router();
@@ -20,7 +21,8 @@ const router = Router();
 router
   .route("/")
   .get(getAllPosts)
-  .post(protect, uploads.single("image"), createNewPost);
+  .post(protect, uploads.single("image"), createNewPost)
+  .delete(protect, deleteMultiplePostsById);
 router.route("/find").get(findPosts);
 router.route("/author/:id").get(getPostsByAuthorId);
 router

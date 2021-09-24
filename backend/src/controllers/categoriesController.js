@@ -15,7 +15,7 @@ const getAllCategories = asyncHandler(async (req, res) => {
 /**
  * @desc create a new category
  * @route POST /api/categories
- * @access private
+ * @access private, admin
  */
 const createNewCategory = asyncHandler(async (req, res) => {
   const { title } = req.body;
@@ -39,7 +39,7 @@ const createNewCategory = asyncHandler(async (req, res) => {
 /**
  * @desc update a category
  * @route PUT /api/categories/:id
- * @access private
+ * @access private, admin
  */
 const updateCategory = asyncHandler(async (req, res) => {
   const category = await Category.findById(req.params.id);
@@ -59,7 +59,7 @@ const updateCategory = asyncHandler(async (req, res) => {
 /**
  * @desc delete a category
  * @route DELETE /api/categories/:id
- * @access private
+ * @access private, admin
  */
 const deleteCategory = asyncHandler(async (req, res) => {
   const category = await Category.findById(req.params.id);
@@ -75,7 +75,7 @@ const deleteCategory = asyncHandler(async (req, res) => {
 /**
  * @desc delete multiple categories
  * @route DELETE /api/categories/
- * @access private
+ * @access private, admin
  */
 const deleteMultipleCategoryById = asyncHandler(async (req, res) => {
   const { deletedCount } = await Category.deleteMany({
@@ -90,10 +90,25 @@ const deleteMultipleCategoryById = asyncHandler(async (req, res) => {
   }
 });
 
+/**
+ * @desc get a category by id
+ * @route GET /api/categories/:id
+ * @access public
+ */
+const getCategoryById = asyncHandler(async (req, res) => {
+  const category = await Category.findById(req.params.id);
+  if (category) {
+    return res.status(200).json(category);
+  } else {
+    return res.status(400).json({ message: "Invalid category id" });
+  }
+});
+
 export {
   createNewCategory,
   getAllCategories,
   updateCategory,
   deleteCategory,
   deleteMultipleCategoryById,
+  getCategoryById,
 };

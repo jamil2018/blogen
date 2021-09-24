@@ -11,6 +11,7 @@ import AdminLayout from "./layout/AdminLayout";
 import AdminUsers from "./screens/admin/users/AdminUsers";
 import AdminCategories from "./screens/admin/categories/AdminCategories";
 import AdminPosts from "./screens/admin/posts/AdminPosts";
+import CreatePostScreen from "./screens/admin/posts/CreatePostScreen";
 
 const App = () => {
   const client = new QueryClient();
@@ -26,7 +27,12 @@ const App = () => {
                 <Route exact path="/admin" component={AdminHomeScreen} />
                 <Route path="/admin/users" component={AdminUsers} />
                 <Route path="/admin/categories" component={AdminCategories} />
-                <Route path="/admin/posts" component={AdminPosts} />
+                <Route path="/admin/posts" component={AdminPosts} exact />
+                <Route
+                  path="/admin/posts/create"
+                  component={CreatePostScreen}
+                  exact
+                />
               </AdminLayout>
             </Switch>
           </Router>
