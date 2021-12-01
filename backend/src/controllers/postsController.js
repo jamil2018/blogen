@@ -54,7 +54,6 @@ const createNewPost = asyncHandler(async (req, res) => {
   const post = await Post.create({
     title,
     description,
-    image,
     author,
     summary,
     category,
@@ -129,18 +128,16 @@ const deletePost = asyncHandler(async (req, res) => {
  * @route DELETE /api/posts
  * @access private
  */
-const deleteMultiplePostsById = asyncHandler(async (req,res)=>{
+const deleteMultiplePostsById = asyncHandler(async (req, res) => {
   const { deletedCount } = await Post.deleteMany({
     _id: { $in: req.body.id },
   });
   if (deletedCount > 0) {
-    return res
-      .status(200)
-      .json({ message: "All posts have been deleted" });
+    return res.status(200).json({ message: "All posts have been deleted" });
   } else {
     return res.status(400).json({ message: "No posts matched the query" });
   }
-})
+});
 
 /**
  * @desc get all comments for a post
@@ -282,5 +279,5 @@ export {
   deleteComment,
   findPosts,
   getPostsByAuthorId,
-  deleteMultiplePostsById
+  deleteMultiplePostsById,
 };

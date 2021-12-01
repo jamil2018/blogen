@@ -34,15 +34,22 @@ export const getPostById = async (postId) => {
 
 export const createPost = async (postData) => {
   try {
+    const formData = new FormData();
+    formData.append("title", postData.title);
+    formData.append("description", postData.description);
+    formData.append("summary", postData.summary);
+    formData.append("category", postData.category);
+    formData.append("tags", postData.tags);
+    formData.append("image", postData.image);
     const { userData } = store.getState();
     const { user } = userData;
     const config = {
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${user.token}`,
       },
     };
-    const { data } = await axios.post("/api/posts", postData, config);
+    const { data } = await axios.post("/api/posts", formData, config);
     return data;
   } catch (err) {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
