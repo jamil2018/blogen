@@ -93,7 +93,7 @@ const deleteMultipleCategoryById = asyncHandler(async (req, res) => {
 /**
  * @desc get a category by id
  * @route GET /api/categories/:id
- * @access public
+ * @access private
  */
 const getCategoryById = asyncHandler(async (req, res) => {
   const category = await Category.findById(req.params.id);
@@ -104,6 +104,16 @@ const getCategoryById = asyncHandler(async (req, res) => {
   }
 });
 
+/**
+ * @desc get total number of categories
+ * @route GET /api/categories/count
+ * @access private, admin
+ */
+const getCategoryCount = asyncHandler(async (req, res) => {
+  const count = await Category.estimatedDocumentCount();
+  return res.status(200).json({ count });
+});
+
 export {
   createNewCategory,
   getAllCategories,
@@ -111,4 +121,5 @@ export {
   deleteCategory,
   deleteMultipleCategoryById,
   getCategoryById,
+  getCategoryCount,
 };

@@ -18,6 +18,10 @@ import columns from "../../../definitions/gridColDef/postGrids";
 import { POST_DATA } from "../../../definitions/reactQueryConstants/queryConstants";
 import { getAllPosts } from "../../../data/postQueryFunctions";
 import { DataGrid, GridToolbar } from "@material-ui/data-grid";
+import DeletePostScreen from "./DeletePostScreen";
+import AdminModal from "../../../components/AdminModal";
+import ErrorIcon from "@material-ui/icons/Error";
+import AlertNotification from "../../../components/AlertNotification";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -42,7 +46,6 @@ const AdminPosts = () => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [editDisabled, setEditDisabled] = useState(true);
   const [deleteDisabled, setDeleteDisabled] = useState(true);
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showCreateSuccessAlert, setShowCreateSuccessAlert] = useState(false);
@@ -82,7 +85,7 @@ const AdminPosts = () => {
         setShowDeleteModal(true);
         break;
       default: {
-        setShowDeleteModal(true);
+        return;
       }
     }
   };
@@ -93,7 +96,7 @@ const AdminPosts = () => {
         setShowDeleteModal(false);
         break;
       default: {
-        setShowCreateModal(false);
+        return;
       }
     }
   };
@@ -110,6 +113,12 @@ const AdminPosts = () => {
   return (
     <>
       <ScreenTitle text="Posts" className={classes.root} />
+      <AlertNotification
+        showState={showDeleteSuccessAlert}
+        alertText="The selected post(s) has been deleted"
+        closeHandler={() => setShowDeleteSuccessAlert(false)}
+        alertSeverity="error"
+      />
       <Grid container alignItems="center" justifyContent="space-between">
         <Typography variant="body1" component="h1">
           All Categories
@@ -128,9 +137,10 @@ const AdminPosts = () => {
             <CreateIcon fontSize="small" />
           </IconButton>
           <IconButton
-            aria-label="edit"
             disabled={editDisabled}
-            onClick={() => handleModalOpen("EDIT")}
+            aria-label="edit"
+            component={Link}
+            to={`/admin/posts/edit/${selectedRows[0]}`}
           >
             <EditIcon fontSize="small" />
           </IconButton>
@@ -157,6 +167,19 @@ const AdminPosts = () => {
           error={error}
         />
       </Box>
+      {/* modals */}
+      <AdminModal
+        modalOpenState={showDeleteModal}
+        modalCloseHandler={() => handleModalClose("DELETE")}
+        modalTitle="Delete Post(s)"
+        modalIcon={<ErrorIcon fontSize="large" color="secondary" />}
+      >
+        <DeletePostScreen
+          postId={selectedRows}
+          showSuccessAlertHandler={() => setShowDeleteSuccessAlert(true)}
+          handleModalClose={() => handleModalClose("DELETE")}
+        />
+      </AdminModal>
     </>
   );
 };

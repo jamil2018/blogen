@@ -74,7 +74,7 @@ export const updatePostById = async (updatedPostData) => {
   }
 };
 
-export const deleteMultipleCategoriesById = async (postId) => {
+export const deleteMultiplePostsById = async (postId) => {
   try {
     const { userData } = store.getState();
     const { token } = userData.user;

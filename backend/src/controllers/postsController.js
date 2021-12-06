@@ -26,7 +26,7 @@ const getAllPosts = asyncHandler(async (req, res) => {
  */
 const getPostById = asyncHandler(async (req, res) => {
   const post = await Post.findById(req.params.id)
-    .select("title description author category tags image comments")
+    .select("title description summary author category tags image comments")
     .populate("author", "name")
     .populate("category", "title");
   if (post) {

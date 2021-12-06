@@ -10,9 +10,13 @@ import {
   Select,
   TextField,
 } from "@material-ui/core";
-import { useHistory } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { createPost } from "../../../data/postQueryFunctions";
+import {
+  createPost,
+  getPostById,
+  updatePostById,
+} from "../../../data/postQueryFunctions";
 import { useFormik } from "formik";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
@@ -26,6 +30,7 @@ import { getAllCategories } from "../../../data/categoryQueryFunctions";
 import {
   CATEGORY_DATA,
   POST_DATA,
+  SINGLE_POST_DATA,
 } from "../../../definitions/reactQueryConstants/queryConstants";
 
 const useStyles = makeStyles((theme) => ({
@@ -94,19 +99,27 @@ const validationSchema = yup.object({
     .required("This field is required"),
 });
 
-const CreatePostScreen = () => {
+const EditPostScreen = () => {
   const classes = useStyles();
   const history = useHistory();
   const queryClient = useQueryClient();
   const { user } = useSelector((state) => state.userData);
+  const { editPostId } = useParams();
   useEffect(() => {
     if (!user.isAdmin) {
       history.push("/");
     }
   }, [history, user]);
-  const mutation = useMutation(createPost, {
+  const {
+    isLoading: isUserDataLoading,
+    isError: isUserDataError,
+    data: userData,
+  } = useQuery([SINGLE_POST_DATA, editPostId], ({ queryKey }) =>
+    getPostById(queryKey[1])
+  );
+  const mutation = useMutation(updatePostById, {
     onSuccess: () => {
-      queryClient.invalidateQueries(POST_DATA);
+      queryClient.invalidateQueries("posts");
       history.push("/admin/posts");
     },
   });
@@ -129,16 +142,28 @@ const CreatePostScreen = () => {
         values.tags.length > 0
           ? values.tags.split(",").map((tag) => tag.trim())
           : values.tags;
+
       mutation.mutate({
-        title: values.title,
-        description: values.description,
-        summary: values.summary,
-        category: values.category,
-        tags: values.tags,
-        image: values.image,
+        postId: editPostId,
+        values: {
+          title: values.title,
+          description: values.description,
+          summary: values.summary,
+          category: values.category,
+          tags: values.tags,
+          image: values.image,
+        },
       });
     },
   });
+  if (!isUserDataLoading && !isUserDataError) {
+    formik.initialValues.title = userData.title;
+    formik.initialValues.description = userData.description;
+    formik.initialValues.summary = userData.summary;
+    formik.initialValues.category = userData.category._id;
+    formik.initialValues.tags = userData.tags.join(",");
+    formik.initialValues.image = userData.image;
+  }
   return (
     <>
       <Grid container justifyContent="flex-start" alignItems="center">
@@ -154,9 +179,9 @@ const CreatePostScreen = () => {
           Return to Posts
         </Button>
       </Grid>
-      <ScreenTitle text="Create a new post" className={classes.root} />
+      <ScreenTitle text="Edit Post" className={classes.root} />
       <Box className={classes.formContent}>
-        {isLoading && !isError ? (
+        {(isLoading && !isError) || (isUserDataLoading && !isUserDataError) ? (
           <Grid container alignItems="center" justifyContent="center">
             <CircularProgress />
           </Grid>
@@ -275,7 +300,7 @@ const CreatePostScreen = () => {
               type="submit"
               className={classes.submitBtn}
             >
-              Create Post
+              Update Post
             </Button>
           </form>
         )}
@@ -284,4 +309,4 @@ const CreatePostScreen = () => {
   );
 };
 
-export default CreatePostScreen;
+export default EditPostScreen;

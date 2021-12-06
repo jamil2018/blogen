@@ -12,6 +12,7 @@ import AdminUsers from "./screens/admin/users/AdminUsers";
 import AdminCategories from "./screens/admin/categories/AdminCategories";
 import AdminPosts from "./screens/admin/posts/AdminPosts";
 import CreatePostScreen from "./screens/admin/posts/CreatePostScreen";
+import EditPostScreen from "./screens/admin/posts/EditPostScreen";
 
 const App = () => {
   const client = new QueryClient();
@@ -32,6 +33,10 @@ const App = () => {
                   path="/admin/posts/create"
                   component={CreatePostScreen}
                   exact
+                />
+                <Route
+                  path="/admin/posts/edit/:editPostId"
+                  component={EditPostScreen}
                 />
               </AdminLayout>
             </Switch>
