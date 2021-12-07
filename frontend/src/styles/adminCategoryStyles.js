@@ -10,4 +10,13 @@ const adminCategoryHomeStyles = makeStyles((theme) => ({
   },
 }));
 
-export { adminCategoryHomeStyles };
+const adminCategoryCreateStyles = makeStyles((theme) => ({
+  button: {
+    marginTop: theme.spacing(2),
+  },
+  formContent: {
+    padding: theme.spacing(2),
+  },
+}));
+
+export { adminCategoryHomeStyles, adminCategoryCreateStyles };

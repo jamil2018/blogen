@@ -1,28 +1,20 @@
-import { Box, Button, makeStyles, TextField } from "@material-ui/core";
+import { Box, Button, TextField } from "@material-ui/core";
 import { useFormik } from "formik";
 import { useMutation, useQueryClient } from "react-query";
 import * as yup from "yup";
 import { createCategory } from "../../../data/categoryQueryFunctions";
 import { CATEGORY_DATA } from "../../../definitions/reactQueryConstants/queryConstants";
+import { adminCategoryCreateStyles } from "../../../styles/adminCategoryStyles";
 
 const validationSchema = yup.object({
   title: yup.string("Enter category title").required("This field is required"),
 });
 
-const useStyles = makeStyles((theme) => ({
-  button: {
-    marginTop: theme.spacing(2),
-  },
-  formContent: {
-    padding: theme.spacing(2),
-  },
-}));
-
 const CreateCategoryScreen = ({
   showSuccessAlertHandler,
   handleModalClose,
 }) => {
-  const classes = useStyles();
+  const classes = adminCategoryCreateStyles();
   const queryClient = useQueryClient();
   const mutation = useMutation(createCategory, {
     onSuccess: () => {
