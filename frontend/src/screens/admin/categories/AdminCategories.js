@@ -6,7 +6,6 @@ import {
   ButtonGroup,
   Grid,
   IconButton,
-  makeStyles,
   Typography,
 } from "@material-ui/core";
 import { useEffect, useState } from "react";
@@ -25,20 +24,12 @@ import CreateCategoryScreen from "./CreateCategoryScreen";
 import AlertNotification from "../../../components/AlertNotification";
 import EditCategoryScreen from "./EditCategoryScreen";
 import DeleteCategoryScreen from "./DeleteCategoryScreen";
+import { adminCategoryHomeStyles } from "../../../styles/adminCategoryStyles";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    marginTop: theme.spacing(2),
-  },
-  dataGridContainer: {
-    height: "70vh",
-    width: "100%",
-  },
-}));
 const AdminCategories = () => {
   let rows = [];
   const { user } = useSelector((state) => state.userData);
-  const classes = useStyles();
+  const classes = adminCategoryHomeStyles();
   const history = useHistory();
   const { data, isLoading, isError, error, isFetching } = useQuery(
     CATEGORY_DATA,
