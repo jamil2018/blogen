@@ -3,7 +3,6 @@ import {
   Button,
   CircularProgress,
   Grid,
-  makeStyles,
   TextField,
 } from "@material-ui/core";
 import { useFormik } from "formik";
@@ -17,26 +16,18 @@ import {
   CATEGORY_DATA,
   SINGLE_CATEGORY_DATA,
 } from "../../../definitions/reactQueryConstants/queryConstants";
+import { adminCategoryEditStyles } from "../../../styles/adminCategoryStyles";
 
 const validationSchema = yup.object({
   title: yup.string("Enter category title").required("This field is required"),
 });
-
-const useStyles = makeStyles((theme) => ({
-  button: {
-    marginTop: theme.spacing(2),
-  },
-  formContent: {
-    padding: theme.spacing(2),
-  },
-}));
 
 const EditCategoryScreen = ({
   showSuccessAlertHandler,
   handleModalClose,
   categoryId,
 }) => {
-  const classes = useStyles();
+  const classes = adminCategoryEditStyles();
   const queryClient = useQueryClient();
   const { isLoading, isError, data } = useQuery(
     [SINGLE_CATEGORY_DATA, categoryId],
