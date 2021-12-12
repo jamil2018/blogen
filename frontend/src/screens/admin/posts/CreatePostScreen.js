@@ -5,7 +5,6 @@ import {
   FormControl,
   Grid,
   InputLabel,
-  makeStyles,
   MenuItem,
   Select,
   TextField,
@@ -27,56 +26,7 @@ import {
   CATEGORY_DATA,
   POST_DATA,
 } from "../../../definitions/reactQueryConstants/queryConstants";
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    marginTop: theme.spacing(2),
-  },
-  formControl: {
-    minWidth: 240,
-    marginBottom: theme.spacing(2.5),
-  },
-  formContent: {
-    padding: `${theme.spacing(4)}px 0px`,
-    paddingRight: theme.spacing(4),
-  },
-  editor: {
-    height: "50vh",
-    border: "1px solid #ddd",
-    borderRadius: theme.shape.borderRadius,
-    paddingTop: theme.spacing(2),
-    paddingLeft: theme.spacing(8),
-    paddingRight: theme.spacing(8),
-    "& .ql-container": {
-      fontFamily: theme.typography.fontFamily,
-      fontSize: theme.typography.fontSize,
-    },
-  },
-  input: {
-    display: "none",
-  },
-  inputGroup: {
-    display: "block",
-    marginBottom: theme.spacing(2),
-  },
-  inputLabel: {
-    marginLeft: theme.spacing(1),
-  },
-  errorLabel: {
-    color: theme.palette.error.main,
-    marginLeft: theme.spacing(2),
-    fontSize: "0.75rem",
-    lineHeight: 1.66,
-    letterSpacing: "0.03333em",
-    display: "block",
-  },
-  submitBtn: {
-    marginTop: theme.spacing(4),
-  },
-  returnLink: {
-    marginTop: theme.spacing(2),
-  },
-}));
+import { adminPostCreateStyles } from "../../../styles/adminPostStyles";
 
 const validationSchema = yup.object({
   title: yup.string("Enter post title").required("This field is required"),
@@ -95,7 +45,7 @@ const validationSchema = yup.object({
 });
 
 const CreatePostScreen = () => {
-  const classes = useStyles();
+  const classes = adminPostCreateStyles();
   const history = useHistory();
   const queryClient = useQueryClient();
   const { user } = useSelector((state) => state.userData);

@@ -1,5 +1,4 @@
 import {
-  makeStyles,
   Grid,
   Typography,
   IconButton,
@@ -22,20 +21,11 @@ import DeletePostScreen from "./DeletePostScreen";
 import AdminModal from "../../../components/AdminModal";
 import ErrorIcon from "@material-ui/icons/Error";
 import AlertNotification from "../../../components/AlertNotification";
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    marginTop: theme.spacing(2),
-  },
-  dataGridContainer: {
-    height: "70vh",
-    width: "100%",
-  },
-}));
+import { adminPostHomeStyles } from "../../../styles/adminPostStyles";
 
 const AdminPosts = () => {
   let rows = [];
-  const classes = useStyles();
+  const classes = adminPostHomeStyles();
   const history = useHistory();
   const { user } = useSelector((state) => state.userData);
   const { data, isLoading, isFetching, isError, error } = useQuery(

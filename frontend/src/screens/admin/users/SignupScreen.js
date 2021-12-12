@@ -1,9 +1,8 @@
 import { Box, Button, makeStyles, TextField } from "@material-ui/core";
 import { useMutation, useQueryClient } from "react-query";
 import { useFormik } from "formik";
-
+import AddBoxIcon from "@material-ui/icons/AddBox";
 import * as yup from "yup";
-
 import { createUser } from "../../../data/userQueryFunctions";
 import { USER_DATA } from "../../../definitions/reactQueryConstants/queryConstants";
 
@@ -133,8 +132,9 @@ const SignupScreen = ({ showSuccessAlertHandler, handleModalClose }) => {
           type="submit"
           fullWidth
           className={classes.button}
+          startIcon={<AddBoxIcon />}
         >
-          Submit
+          Create
         </Button>
       </form>
     </Box>

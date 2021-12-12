@@ -8,7 +8,7 @@ import {
 } from "@material-ui/core";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useFormik } from "formik";
-
+import CreateIcon from "@material-ui/icons/Create";
 import * as yup from "yup";
 
 import { getUserById, updateUserById } from "../../../data/userQueryFunctions";
@@ -159,8 +159,9 @@ const EditUserScreen = ({
             type="submit"
             fullWidth
             className={classes.button}
+            startIcon={<CreateIcon />}
           >
-            Submit
+            Update
           </Button>
         </form>
       )}

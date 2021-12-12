@@ -43,6 +43,26 @@ const AdminHomeScreen = () => {
             </Typography>
           </CardContent>
         </Card>
+        <Card className={classes.card}>
+          <CardContent>
+            <Typography variant="h5" component="h2">
+              Users
+            </Typography>
+            <Typography variant="body2" component="p">
+              15
+            </Typography>
+          </CardContent>
+        </Card>
+        <Card className={classes.card}>
+          <CardContent>
+            <Typography variant="h5" component="h2">
+              Categories
+            </Typography>
+            <Typography variant="body2" component="p">
+              5
+            </Typography>
+          </CardContent>
+        </Card>
       </Grid>
     </>
   );
