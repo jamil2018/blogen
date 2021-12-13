@@ -14,6 +14,7 @@ import {
   findPosts,
   getPostsByAuthorId,
   deleteMultiplePostsById,
+  getCuratedPostsCount,
 } from "../controllers/postsController.js";
 
 const router = Router();
@@ -23,17 +24,23 @@ router
   .get(getAllPosts)
   .post(protect, uploads.single("image"), createNewPost)
   .delete(protect, deleteMultiplePostsById);
+
 router.route("/find").get(findPosts);
+router.route("/curated").get(getCuratedPostsCount);
+
 router.route("/author/:id").get(getPostsByAuthorId);
+
 router
   .route("/:id")
   .get(getPostById)
   .put(protect, updatePost)
   .delete(protect, deletePost);
+
 router
   .route("/:id/comments")
   .get(getPostComments)
   .post(protect, createPostComment);
+
 router
   .route("/:pid/comments/:cid")
   .put(protect, updatePostComment)

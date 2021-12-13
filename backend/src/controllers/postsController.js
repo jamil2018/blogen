@@ -267,6 +267,19 @@ const getPostsByAuthorId = asyncHandler(async (req, res) => {
     throw new Error("Invalid author id");
   }
 });
+
+/**
+ * @desc GET curated post count
+ * @route GET /api/posts/curated
+ * @access public
+ */
+const getCuratedPostsCount = asyncHandler(async (req, res) => {
+  const curatedPosts = await Post.find().select(
+    "_id title createdAt updatedAt"
+  );
+  return res.status(200).json(curatedPosts);
+});
+
 export {
   getAllPosts,
   createNewPost,
@@ -280,4 +293,5 @@ export {
   findPosts,
   getPostsByAuthorId,
   deleteMultiplePostsById,
+  getCuratedPostsCount,
 };

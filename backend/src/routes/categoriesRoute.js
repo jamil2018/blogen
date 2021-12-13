@@ -7,6 +7,7 @@ import {
   deleteMultipleCategoryById,
   getCategoryById,
   getCategoryCount,
+  getCuratedCategoryCount,
 } from "../controllers/categoriesController.js";
 import { checkAdmin, protect } from "../middlewares/authMiddleware.js";
 
@@ -19,6 +20,7 @@ router
   .delete(protect, checkAdmin, deleteMultipleCategoryById);
 
 router.route("/count").get(protect, checkAdmin, getCategoryCount);
+router.route("/curated").get(protect, checkAdmin, getCuratedCategoryCount);
 
 router
   .route("/:id")

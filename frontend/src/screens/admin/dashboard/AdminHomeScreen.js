@@ -13,9 +13,10 @@ import ScreenTitle from "../../../components/ScreenTitle";
 const useStyles = makeStyles((theme) => ({
   root: {
     marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(4),
   },
   card: {
-    minWidth: 275,
+    minWidth: "25vw",
   },
 }));
 
@@ -35,31 +36,31 @@ const AdminHomeScreen = () => {
       <Grid container alignItems="center" justifyContent="space-between">
         <Card className={classes.card}>
           <CardContent>
-            <Typography variant="h5" component="h2">
+            <Typography gutterBottom align="center" variant="h5" component="h2">
               Posts
             </Typography>
-            <Typography variant="body2" component="p">
+            <Typography align="center" variant="body1" component="p">
               25
             </Typography>
           </CardContent>
         </Card>
         <Card className={classes.card}>
           <CardContent>
-            <Typography variant="h5" component="h2">
+            <Typography gutterBottom align="center" variant="h5" component="h2">
               Users
             </Typography>
-            <Typography variant="body2" component="p">
+            <Typography align="center" variant="body1" component="p">
               15
             </Typography>
           </CardContent>
         </Card>
         <Card className={classes.card}>
           <CardContent>
-            <Typography variant="h5" component="h2">
+            <Typography gutterBottom align="center" variant="h5" component="h2">
               Categories
             </Typography>
-            <Typography variant="body2" component="p">
-              5
+            <Typography align="center" variant="body1" component="p">
+              05
             </Typography>
           </CardContent>
         </Card>

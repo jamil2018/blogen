@@ -162,6 +162,17 @@ const deleteUsersById = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "No users matched the query" });
   }
 });
+
+/**
+ * @desc GET curated user count
+ * @route GET /api/users/curated
+ * @access public
+ */
+const getCuratedUserCount = asyncHandler(async (req, res) => {
+  const users = await User.find().select("_id name email createdAt updatedAt");
+  return res.status(200).json(users);
+});
+
 export {
   registerUser,
   authUser,
@@ -171,4 +182,5 @@ export {
   getUserById,
   updateUserProfileById,
   deleteUsersById,
+  getCuratedUserCount,
 };

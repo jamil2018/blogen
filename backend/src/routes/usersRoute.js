@@ -9,6 +9,7 @@ import {
   getUserById,
   updateUserProfileById,
   deleteUsersById,
+  getCuratedUserCount,
 } from "../controllers/usersController.js";
 
 const router = Router();
@@ -18,12 +19,16 @@ router
   .post(registerUser)
   .get(getAllUsers)
   .delete(protect, checkAdmin, deleteUsersById);
-router.route("/:id").get(getUserById);
+
+router.route("/curated").get(getCuratedUserCount);
 router.route("/login").post(authUser);
+router.route("/:id").get(getUserById);
+
 router
   .route("/profile")
   .get(protect, getUserProfile)
   .put(protect, updateUserProfile);
+
 router.route("/profile/:id").put(protect, checkAdmin, updateUserProfileById);
 
 export default router;

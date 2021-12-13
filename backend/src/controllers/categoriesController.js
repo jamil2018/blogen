@@ -114,6 +114,16 @@ const getCategoryCount = asyncHandler(async (req, res) => {
   return res.status(200).json({ count });
 });
 
+/**
+ * @desc GET curated categories count
+ * @route GET /api/categories/curated
+ * @access private, admin
+ */
+const getCuratedCategoryCount = asyncHandler(async (req, res) => {
+  const count = await Category.find().select("_id title createdAt updatedAt");
+  return res.status(200).json(count);
+});
+
 export {
   createNewCategory,
   getAllCategories,
@@ -122,4 +132,5 @@ export {
   deleteMultipleCategoryById,
   getCategoryById,
   getCategoryCount,
+  getCuratedCategoryCount,
 };
