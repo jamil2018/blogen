@@ -15,16 +15,14 @@ const useStyles = makeStyles((theme) => ({
   modalContent: {
     minWidth: "20vw",
     maxWidth: "40vw",
-    minHeight: "30vh",
+    minHeight: "28vh",
   },
   modalHeader: {
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(2),
-    paddingTop: theme.spacing(1),
-    marginBottom: theme.spacing(2),
+    marginBottom: theme.spacing(1.5),
+    marginTop: theme.spacing(2.5),
   },
-  modalIcon: {
-    paddingTop: theme.spacing(2),
+  heading: {
+    marginLeft: theme.spacing(1),
   },
 }));
 
@@ -52,21 +50,16 @@ const AdminModal = ({
       <Fade in={modalOpenState}>
         <Paper className={classes.modalContent}>
           <Grid
-            className={classes.modalIcon}
             container
             justify="center"
             alignItems="center"
+            className={classes.modalHeader}
           >
             {modalIcon}
+            <Typography className={classes.heading} variant="h5" component="h1">
+              {modalTitle}
+            </Typography>
           </Grid>
-          <Typography
-            variant="h4"
-            component="h1"
-            className={classes.modalHeader}
-            align="center"
-          >
-            {modalTitle}
-          </Typography>
           {children}
         </Paper>
       </Fade>

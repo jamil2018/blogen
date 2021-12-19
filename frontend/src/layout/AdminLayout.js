@@ -15,7 +15,11 @@ import {
   Category as CategoryIcon,
   Note as PostIcon,
 } from "@material-ui/icons";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import AccountCircleIcon from "@material-ui/icons/AccountCircle";
+import PowerSettingsNewIcon from "@material-ui/icons/PowerSettingsNew";
+import { Link, NavLink, useHistory, useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { clearUserData } from "../redux/slices/userDataSlice";
 
 const drawerWidth = 240;
 
@@ -32,6 +36,9 @@ const useStyles = makeStyles((theme) => ({
   },
   list: {
     marginTop: theme.spacing(2),
+  },
+  bottomList: {
+    marginTop: "auto",
   },
   content: {
     flexGrow: 1,
@@ -53,6 +60,13 @@ const useStyles = makeStyles((theme) => ({
 const AdminLayout = ({ children }) => {
   const classes = useStyles();
   const location = useLocation();
+  const dispatch = useDispatch();
+  const history = useHistory();
+
+  const handleLogout = () => {
+    dispatch(clearUserData());
+    history.push("/");
+  };
   return (
     <div className={classes.root}>
       <Drawer
@@ -123,6 +137,32 @@ const AdminLayout = ({ children }) => {
               />
             </ListItemIcon>
             <ListItemText primary="Posts" />
+          </ListItem>
+        </List>
+        <List className={classes.bottomList}>
+          <ListItem divider></ListItem>
+          <ListItem
+            button
+            component={NavLink}
+            to="/admin/profile"
+            activeClassName={classes.activeLink}
+          >
+            <ListItemIcon>
+              <AccountCircleIcon
+                color={
+                  location.pathname.includes("/admin/profile")
+                    ? "primary"
+                    : "inherit"
+                }
+              />
+            </ListItemIcon>
+            <ListItemText primary="Profile" />
+          </ListItem>
+          <ListItem button onClick={handleLogout}>
+            <ListItemIcon>
+              <PowerSettingsNewIcon />
+            </ListItemIcon>
+            <ListItemText primary="Logout" />
           </ListItem>
         </List>
       </Drawer>

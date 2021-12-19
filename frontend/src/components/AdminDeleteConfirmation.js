@@ -1,14 +1,18 @@
 import { Box, Button, Grid, makeStyles, Typography } from "@material-ui/core";
+import DeleteIcon from "@material-ui/icons/Delete";
+import CancelIcon from "@material-ui/icons/Cancel";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    padding: `0px ${theme.spacing(2)}px`,
+    padding: theme.spacing(2),
   },
   title: {
-    marginBottom: theme.spacing(3),
+    marginBottom: theme.spacing(2),
   },
   button: {
-    margin: `0px ${theme.spacing(2)}px`,
+    marginTop: theme.spacing(2),
+    marginLeft: theme.spacing(1.5),
+    marginRight: theme.spacing(1.5),
   },
 }));
 
@@ -16,7 +20,7 @@ const AdminDeleteConfirmation = ({ deleteAction, cancelAction }) => {
   const classes = useStyles();
   return (
     <Box className={classes.root}>
-      <Typography variant="body1" className={classes.title}>
+      <Typography variant="body2" className={classes.title}>
         Are you sure you want to delete the selected item(s)?
       </Typography>
       <Grid container justifyContent="center" alignItems="center">
@@ -25,6 +29,7 @@ const AdminDeleteConfirmation = ({ deleteAction, cancelAction }) => {
           className={classes.button}
           variant="contained"
           color="primary"
+          startIcon={<DeleteIcon />}
         >
           Yes
         </Button>
@@ -33,6 +38,7 @@ const AdminDeleteConfirmation = ({ deleteAction, cancelAction }) => {
           className={classes.button}
           variant="outlined"
           color="secondary"
+          startIcon={<CancelIcon />}
         >
           No
         </Button>

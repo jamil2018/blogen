@@ -42,7 +42,7 @@ const App = () => {
             </Switch>
           </Router>
         </ThemeProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
+        <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
       </QueryClientProvider>
     </Provider>
   );

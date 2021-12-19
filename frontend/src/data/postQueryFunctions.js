@@ -91,3 +91,17 @@ export const deleteMultiplePostsById = async (postId) => {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
   }
 };
+
+export const getCuratedPostList = async () => {
+  try {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const { data } = await axios.get("/api/posts/curated", config);
+    return data;
+  } catch (err) {
+    throw new Error(`Error while fetching data. Error Message: ${err.message}`);
+  }
+};

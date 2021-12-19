@@ -1,70 +1,251 @@
 import {
   Card,
   CardContent,
+  CircularProgress,
   Grid,
-  makeStyles,
   Typography,
 } from "@material-ui/core";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useQuery } from "react-query";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
+import AlertNotification from "../../../components/AlertNotification";
 import ScreenTitle from "../../../components/ScreenTitle";
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(4),
-  },
-  card: {
-    minWidth: "25vw",
-  },
-}));
+import { getCuratedCategoryList } from "../../../data/categoryQueryFunctions";
+import { getCuratedPostList } from "../../../data/postQueryFunctions";
+import { getCuratedUserList } from "../../../data/userQueryFunctions";
+import {
+  CATEGORY_DATA,
+  POST_DATA,
+  USER_DATA,
+} from "../../../definitions/reactQueryConstants/queryConstants";
+import { adminHomeStyles } from "../../../styles/adminHomeStyles";
+import { formatData } from "../../../utils/dataFormat";
+import {
+  LineChart,
+  Line,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Legend,
+  Bar,
+} from "recharts";
+import { useTheme } from "@material-ui/styles";
 
 const AdminHomeScreen = () => {
-  const classes = useStyles();
+  const classes = adminHomeStyles();
   const history = useHistory();
   const { user } = useSelector((state) => state.userData);
+  const theme = useTheme();
 
+  const [showErrorNotification, setShowErrorNotification] = useState(false);
+  const [curatedUserData, setCuratedUserData] = useState([]);
+  const [curatedPostData, setCuratedPostData] = useState([]);
+
+  const {
+    isLoading: isUserDataLoading,
+    isError: isUserDataError,
+    isFetching: isUserDataFetching,
+    data: userData,
+  } = useQuery(USER_DATA, getCuratedUserList);
+
+  const {
+    isLoading: isCategoryDataLoading,
+    isError: isCategoryDataError,
+    isFetching: isCategoryDataFetching,
+    data: categoryData,
+  } = useQuery(CATEGORY_DATA, getCuratedCategoryList);
+
+  const {
+    isLoading: isPostDataLoading,
+    isError: isPostDataError,
+    isFetching: isPostDataFetching,
+    data: postData,
+  } = useQuery(POST_DATA, getCuratedPostList);
+  useEffect(() => {
+    if (!isUserDataLoading || !isUserDataFetching) {
+      console.log("userData", userData);
+      setCuratedUserData(formatData(userData, "createdAt"));
+    }
+    if (!isPostDataLoading || !isPostDataFetching) {
+      setCuratedPostData(formatData(postData, "createdAt"));
+      // console.log(formatData(postData, "createdAt"));
+    }
+  }, [
+    isUserDataLoading,
+    isCategoryDataLoading,
+    isPostDataLoading,
+    userData,
+    categoryData,
+    postData,
+    isUserDataFetching,
+    isCategoryDataFetching,
+    isPostDataFetching,
+  ]);
   useEffect(() => {
     if (!user.isAdmin) {
       history.push("/");
     }
   }, [history, user]);
+  useEffect(() => {
+    console.log("curatedUserData", curatedUserData);
+    console.log("curatedPostData", curatedPostData);
+  }, [curatedUserData, curatedPostData]);
   return (
     <>
       <ScreenTitle text="Dashboard" className={classes.root} />
-      <Grid container alignItems="center" justifyContent="space-between">
-        <Card className={classes.card}>
-          <CardContent>
-            <Typography gutterBottom align="center" variant="h5" component="h2">
-              Posts
-            </Typography>
-            <Typography align="center" variant="body1" component="p">
-              25
-            </Typography>
-          </CardContent>
-        </Card>
-        <Card className={classes.card}>
-          <CardContent>
-            <Typography gutterBottom align="center" variant="h5" component="h2">
-              Users
-            </Typography>
-            <Typography align="center" variant="body1" component="p">
-              15
-            </Typography>
-          </CardContent>
-        </Card>
-        <Card className={classes.card}>
-          <CardContent>
-            <Typography gutterBottom align="center" variant="h5" component="h2">
-              Categories
-            </Typography>
-            <Typography align="center" variant="body1" component="p">
-              05
-            </Typography>
-          </CardContent>
-        </Card>
-      </Grid>
+      {isUserDataError || isCategoryDataError || isPostDataError ? (
+        <AlertNotification
+          showState={showErrorNotification}
+          alertText="Error while loading data. Please try again later"
+          closeHandler={() => setShowErrorNotification(false)}
+          alertSeverity="error"
+        />
+      ) : (
+        <>
+          <Grid container alignItems="center" justifyContent="space-between">
+            <Card className={classes.card}>
+              <CardContent>
+                <Typography
+                  gutterBottom
+                  align="center"
+                  variant="h5"
+                  component="h2"
+                >
+                  Posts
+                </Typography>
+                {isPostDataLoading || isPostDataFetching ? (
+                  <Grid container justify="center">
+                    <CircularProgress size={25} color="primary" />
+                  </Grid>
+                ) : (
+                  <Typography
+                    color="primary"
+                    align="center"
+                    variant="h6"
+                    component="p"
+                  >
+                    {postData.length}
+                  </Typography>
+                )}
+              </CardContent>
+            </Card>
+            <Card className={classes.card}>
+              <CardContent>
+                <Typography
+                  gutterBottom
+                  align="center"
+                  variant="h5"
+                  component="h2"
+                >
+                  Users
+                </Typography>
+                {isUserDataLoading || isUserDataFetching ? (
+                  <Grid container justify="center">
+                    <CircularProgress size={25} color="primary" />
+                  </Grid>
+                ) : (
+                  <Typography
+                    color="primary"
+                    align="center"
+                    variant="h6"
+                    component="p"
+                  >
+                    {userData.length}
+                  </Typography>
+                )}
+              </CardContent>
+            </Card>
+            <Card className={classes.card}>
+              <CardContent>
+                <Typography
+                  gutterBottom
+                  align="center"
+                  variant="h5"
+                  component="h2"
+                >
+                  Categories
+                </Typography>
+                {isCategoryDataLoading || isCategoryDataFetching ? (
+                  <Grid container justify="center">
+                    <CircularProgress size={25} color="primary" />
+                  </Grid>
+                ) : (
+                  <Typography
+                    color="primary"
+                    align="center"
+                    variant="h6"
+                    component="p"
+                  >
+                    {categoryData.length}
+                  </Typography>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid container justifyContent="space-between" alignItems="center">
+            <Grid item xs={12} sm={5} className={classes.chartContainer}>
+              <ResponsiveContainer width="100%" height="100%">
+                <Card>
+                  <CardContent>
+                    <Typography
+                      variant="h6"
+                      component="h2"
+                      align="center"
+                      gutterBottom
+                    >
+                      Users added on the last 7 days
+                    </Typography>
+                    <BarChart
+                      width={500}
+                      height={200}
+                      data={curatedUserData}
+                      margin={{ top: 5, right: 30, bottom: 5, left: 20 }}
+                    >
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="count" fill={theme.palette.primary.main} />
+                    </BarChart>
+                  </CardContent>
+                </Card>
+              </ResponsiveContainer>
+            </Grid>
+            <Grid item xs={12} sm={5} className={classes.chartContainer}>
+              <ResponsiveContainer width="100%" height="100%">
+                <Card>
+                  <CardContent>
+                    <Typography
+                      variant="h6"
+                      component="h2"
+                      align="center"
+                      gutterBottom
+                    >
+                      Posts created on the last 7 days
+                    </Typography>
+                    <BarChart
+                      width={500}
+                      height={200}
+                      data={curatedPostData}
+                      margin={{ top: 5, right: 30, bottom: 5, left: 20 }}
+                    >
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="count" fill={theme.palette.primary.main} />
+                    </BarChart>
+                  </CardContent>
+                </Card>
+              </ResponsiveContainer>
+            </Grid>
+          </Grid>
+        </>
+      )}
     </>
   );
 };

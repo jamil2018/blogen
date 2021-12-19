@@ -228,7 +228,7 @@ const AdminUsers = (props) => {
         modalOpenState={showDeleteModal}
         modalCloseHandler={() => handleModalClose("DELETE")}
         modalTitle="Confirm Delete"
-        modalIcon={<ErrorIcon fontSize="large" color="secondary" />}
+        modalIcon={<ErrorIcon fontSize="medium" color="secondary" />}
       >
         <AdminUserDeleteScreen
           userId={selectedRows}

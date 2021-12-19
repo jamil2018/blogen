@@ -90,3 +90,20 @@ export const deleteMultipleCategoriesById = async (categoryId) => {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
   }
 };
+
+export const getCuratedCategoryList = async () => {
+  try {
+    const { userData } = store.getState();
+    const { user } = userData;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
+    };
+    const { data } = await axios.get("/api/categories/curated", config);
+    return data;
+  } catch (err) {
+    throw new Error(`Error while fecthing data. Error Message: ${err.message}`);
+  }
+};

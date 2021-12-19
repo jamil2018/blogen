@@ -126,3 +126,17 @@ export const deleteMultipleUsersById = async (userId) => {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
   }
 };
+
+export const getCuratedUserList = async () => {
+  try {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const { data } = await axios.get("/api/users/curated", config);
+    return data;
+  } catch (err) {
+    throw new Error(`Error while fecthing data. Error Message: ${err.message}`);
+  }
+};
