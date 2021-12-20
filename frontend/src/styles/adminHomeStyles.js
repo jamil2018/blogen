@@ -7,6 +7,7 @@ const adminHomeStyles = makeStyles((theme) => ({
   },
   card: {
     minWidth: "25vw",
+    height: "15vh",
   },
   chart: {},
   chartContainer: {

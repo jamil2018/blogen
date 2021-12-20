@@ -16,6 +16,8 @@ import { useFormik } from "formik";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Link as RouterLink } from "react-router-dom";
+import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
+import AddBoxIcon from "@material-ui/icons/AddBox";
 import * as yup from "yup";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ReactQuill from "react-quill";
@@ -193,7 +195,12 @@ const CreatePostScreen = () => {
                 name="image"
               />
               <label htmlFor="image">
-                <Button variant="contained" color="primary" component="span">
+                <Button
+                  startIcon={<PhotoCameraIcon />}
+                  variant="contained"
+                  color="primary"
+                  component="span"
+                >
                   Upload Image
                 </Button>
               </label>
@@ -224,6 +231,7 @@ const CreatePostScreen = () => {
               color="primary"
               type="submit"
               className={classes.submitBtn}
+              startIcon={<AddBoxIcon />}
             >
               Create Post
             </Button>

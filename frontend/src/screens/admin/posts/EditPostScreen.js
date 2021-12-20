@@ -21,6 +21,8 @@ import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ReactQuill from "react-quill";
 import ScreenTitle from "../../../components/ScreenTitle";
 import "react-quill/dist/quill.bubble.css";
+import CreateIcon from "@material-ui/icons/Create";
+import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
 import { getAllCategories } from "../../../data/categoryQueryFunctions";
 import {
   CATEGORY_DATA,
@@ -213,7 +215,12 @@ const EditPostScreen = () => {
                 name="image"
               />
               <label htmlFor="image">
-                <Button variant="contained" color="primary" component="span">
+                <Button
+                  startIcon={<PhotoCameraIcon />}
+                  variant="contained"
+                  color="primary"
+                  component="span"
+                >
                   Upload Image
                 </Button>
               </label>
@@ -244,6 +251,7 @@ const EditPostScreen = () => {
               color="primary"
               type="submit"
               className={classes.submitBtn}
+              startIcon={<CreateIcon />}
             >
               Update Post
             </Button>

@@ -8,6 +8,7 @@ import {
 import { useFormik } from "formik";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import * as yup from "yup";
+import CreateIcon from "@material-ui/icons/Create";
 import {
   getCategoryById,
   updateCategoryById,
@@ -87,8 +88,9 @@ const EditCategoryScreen = ({
             type="submit"
             fullWidth
             className={classes.button}
+            startIcon={<CreateIcon />}
           >
-            Submit
+            Update
           </Button>
         </form>
       )}

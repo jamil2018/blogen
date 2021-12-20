@@ -66,13 +66,11 @@ const AdminHomeScreen = () => {
     data: postData,
   } = useQuery(POST_DATA, getCuratedPostList);
   useEffect(() => {
-    if (!isUserDataLoading || !isUserDataFetching) {
-      console.log("userData", userData);
+    if (!isUserDataLoading && !isUserDataFetching) {
       setCuratedUserData(formatData(userData, "createdAt"));
     }
-    if (!isPostDataLoading || !isPostDataFetching) {
+    if (!isPostDataLoading && !isPostDataFetching) {
       setCuratedPostData(formatData(postData, "createdAt"));
-      // console.log(formatData(postData, "createdAt"));
     }
   }, [
     isUserDataLoading,
@@ -90,10 +88,6 @@ const AdminHomeScreen = () => {
       history.push("/");
     }
   }, [history, user]);
-  useEffect(() => {
-    console.log("curatedUserData", curatedUserData);
-    console.log("curatedPostData", curatedPostData);
-  }, [curatedUserData, curatedPostData]);
   return (
     <>
       <ScreenTitle text="Dashboard" className={classes.root} />

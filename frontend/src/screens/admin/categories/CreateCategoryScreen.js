@@ -1,6 +1,7 @@
 import { Box, Button, TextField } from "@material-ui/core";
 import { useFormik } from "formik";
 import { useMutation, useQueryClient } from "react-query";
+import AddBoxIcon from "@material-ui/icons/AddBox";
 import * as yup from "yup";
 import { createCategory } from "../../../data/categoryQueryFunctions";
 import { CATEGORY_DATA } from "../../../definitions/reactQueryConstants/queryConstants";
@@ -56,8 +57,9 @@ const CreateCategoryScreen = ({
           type="submit"
           fullWidth
           className={classes.button}
+          startIcon={<AddBoxIcon />}
         >
-          Submit
+          Create
         </Button>
       </form>
     </Box>

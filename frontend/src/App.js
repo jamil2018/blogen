@@ -13,6 +13,7 @@ import AdminCategories from "./screens/admin/categories/AdminCategories";
 import AdminPosts from "./screens/admin/posts/AdminPosts";
 import CreatePostScreen from "./screens/admin/posts/CreatePostScreen";
 import EditPostScreen from "./screens/admin/posts/EditPostScreen";
+import AdminProfile from "./screens/admin/profile/AdminProfile";
 
 const App = () => {
   const client = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => {
                   path="/admin/posts/edit/:editPostId"
                   component={EditPostScreen}
                 />
+                <Route path="/admin/profile" component={AdminProfile} />
               </AdminLayout>
             </Switch>
           </Router>
