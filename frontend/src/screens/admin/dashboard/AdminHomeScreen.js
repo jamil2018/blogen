@@ -22,9 +22,6 @@ import {
 import { adminHomeStyles } from "../../../styles/adminHomeStyles";
 import { formatData } from "../../../utils/dataFormat";
 import {
-  LineChart,
-  Line,
-  CartesianGrid,
   XAxis,
   YAxis,
   Tooltip,

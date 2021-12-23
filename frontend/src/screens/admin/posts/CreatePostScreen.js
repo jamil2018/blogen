@@ -29,6 +29,7 @@ import {
   POST_DATA,
 } from "../../../definitions/reactQueryConstants/queryConstants";
 import { adminPostCreateStyles } from "../../../styles/adminPostStyles";
+import { modules } from "../../../definitions/editorModules";
 
 const validationSchema = yup.object({
   title: yup.string("Enter post title").required("This field is required"),
@@ -59,7 +60,13 @@ const CreatePostScreen = () => {
   const mutation = useMutation(createPost, {
     onSuccess: () => {
       queryClient.invalidateQueries(POST_DATA);
-      history.push("/admin/posts");
+      history.push({
+        pathname: "/admin/posts/",
+        state: {
+          showCreateSuccessAlert: true,
+          showEditSuccessAlert: false,
+        },
+      });
     },
   });
   const { data, isLoading, isError } = useQuery(
@@ -222,6 +229,7 @@ const CreatePostScreen = () => {
               placeholder="Description"
               className={classes.editor}
               name="description"
+              modules={modules}
             />
             <span className={classes.errorLabel}>
               {(formik.touched.description && formik.errors.description) || " "}

@@ -9,6 +9,8 @@ import EditProfileScreen from "./EditProfileScreen";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { storeUserData } from "../../../redux/slices/userDataSlice";
+import AlertNotification from "../../../components/AlertNotification";
+import CreateIcon from "@material-ui/icons/Create";
 
 const AdminProfile = () => {
   const { user } = useSelector((state) => state.userData);
@@ -39,12 +41,19 @@ const AdminProfile = () => {
         <Typography variant="body1" gutterBottom>
           Welcome admin
         </Typography>
+        <AlertNotification
+          showState={showAlert}
+          alertText="Profile has been updated"
+          closeHandler={() => setShowAlert(false)}
+          alertSeverity="success"
+        />
       </Box>
       <AdminProfileDataRow title="Name" value={user.name} />
       <AdminProfileDataRow title="Email" value={user.email} />
       <Button
         variant="contained"
         color="primary"
+        startIcon={<CreateIcon />}
         onClick={() => setShowProfileEditModal(true)}
       >
         Edit profile

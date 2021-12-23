@@ -14,6 +14,7 @@ import AdminPosts from "./screens/admin/posts/AdminPosts";
 import CreatePostScreen from "./screens/admin/posts/CreatePostScreen";
 import EditPostScreen from "./screens/admin/posts/EditPostScreen";
 import AdminProfile from "./screens/admin/profile/AdminProfile";
+import UserDashboard from "./screens/user/UserDashboard";
 
 const App = () => {
   const client = new QueryClient();
@@ -25,11 +26,12 @@ const App = () => {
           <Router>
             <Switch>
               <Route exact path="/" component={HomeScreen} />
+              <Route path="/user" component={UserDashboard} />
+
               <AdminLayout>
                 <Route exact path="/admin" component={AdminHomeScreen} />
                 <Route path="/admin/users" component={AdminUsers} />
                 <Route path="/admin/categories" component={AdminCategories} />
-                <Route path="/admin/posts" component={AdminPosts} exact />
                 <Route
                   path="/admin/posts/create"
                   component={CreatePostScreen}
@@ -39,6 +41,7 @@ const App = () => {
                   path="/admin/posts/edit/:editPostId"
                   component={EditPostScreen}
                 />
+                <Route path="/admin/posts" component={AdminPosts} exact />
                 <Route path="/admin/profile" component={AdminProfile} />
               </AdminLayout>
             </Switch>

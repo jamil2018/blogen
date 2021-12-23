@@ -32,6 +32,7 @@ const adminPostCreateStyles = makeStyles((theme) => ({
     "& .ql-container": {
       fontFamily: theme.typography.fontFamily,
       fontSize: theme.typography.fontSize,
+      zIndex: theme.zIndex.tooltip,
     },
   },
   input: {
@@ -82,6 +83,7 @@ const adminPostEditStyles = makeStyles((theme) => ({
     "& .ql-container": {
       fontFamily: theme.typography.fontFamily,
       fontSize: theme.typography.fontSize,
+      zIndex: theme.zIndex.tooltip,
     },
   },
   input: {

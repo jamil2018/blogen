@@ -7,7 +7,7 @@ import {
 } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 import ScreenTitle from "../../../components/ScreenTitle";
 import CreateIcon from "@material-ui/icons/Add";
 import EditIcon from "@material-ui/icons/Edit";
@@ -25,6 +25,7 @@ import { adminPostHomeStyles } from "../../../styles/adminPostStyles";
 
 const AdminPosts = () => {
   let rows = [];
+  const location = useLocation();
   const classes = adminPostHomeStyles();
   const history = useHistory();
   const { user } = useSelector((state) => state.userData);
@@ -36,13 +37,22 @@ const AdminPosts = () => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [editDisabled, setEditDisabled] = useState(true);
   const [deleteDisabled, setDeleteDisabled] = useState(true);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showCreateSuccessAlert, setShowCreateSuccessAlert] = useState(false);
   const [showEditSuccessAlert, setShowEditSuccessAlert] = useState(false);
   const [showDeleteSuccessAlert, setShowDeleteSuccessAlert] = useState(false);
 
   // effects
+  useEffect(() => {
+    if (location.state) {
+      if (location.state.showCreateSuccessAlert) {
+        setShowCreateSuccessAlert(true);
+      }
+      if (location.state.showEditSuccessAlert) {
+        setShowEditSuccessAlert(true);
+      }
+    }
+  }, [location]);
   useEffect(() => {
     if (!user.isAdmin) {
       history.push("/");
@@ -67,7 +77,6 @@ const AdminPosts = () => {
       setSelectedRows([]);
     }
   }, [isLoading, isFetching]);
-
   // modal handlers
   const handleModalOpen = (modalType) => {
     switch (modalType) {
@@ -108,6 +117,18 @@ const AdminPosts = () => {
         alertText="The selected post(s) has been deleted"
         closeHandler={() => setShowDeleteSuccessAlert(false)}
         alertSeverity="error"
+      />
+      <AlertNotification
+        showState={showCreateSuccessAlert}
+        alertText="Post has been created"
+        closeHandler={() => setShowCreateSuccessAlert(false)}
+        alertSeverity="success"
+      />
+      <AlertNotification
+        showState={showEditSuccessAlert}
+        alertText="The selected post has been updated"
+        closeHandler={() => setShowEditSuccessAlert(false)}
+        alertSeverity="success"
       />
       <Grid container alignItems="center" justifyContent="space-between">
         <Typography variant="body1" component="h1">
