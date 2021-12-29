@@ -48,14 +48,14 @@ const validationSchema = yup.object({
     .required("This field is required"),
 });
 
-const EditPostScreen = () => {
+const EditUserPostScreen = () => {
   const classes = adminPostEditStyles();
   const history = useHistory();
   const queryClient = useQueryClient();
   const { user } = useSelector((state) => state.userData);
   const { editPostId } = useParams();
   useEffect(() => {
-    if (!user.isAdmin) {
+    if (user.isAdmin) {
       history.push("/");
     }
   }, [history, user]);
@@ -71,7 +71,7 @@ const EditPostScreen = () => {
       queryClient.invalidateQueries(POST_DATA);
       queryClient.invalidateQueries(SINGLE_POST_DATA);
       history.push({
-        pathname: "/admin/posts/",
+        pathname: "/user/posts/",
         state: {
           showCreateSuccessAlert: false,
           showEditSuccessAlert: true,
@@ -127,7 +127,7 @@ const EditPostScreen = () => {
           variant="text"
           className={classes.returnLink}
           component={RouterLink}
-          to="/admin/posts"
+          to="/user/posts"
           color="primary"
           size="small"
           startIcon={<ArrowBackIcon />}
@@ -272,4 +272,4 @@ const EditPostScreen = () => {
   );
 };
 
-export default EditPostScreen;
+export default EditUserPostScreen;

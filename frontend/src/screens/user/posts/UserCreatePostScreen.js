@@ -9,27 +9,26 @@ import {
   Select,
   TextField,
 } from "@material-ui/core";
-import { useHistory, useParams } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { getPostById, updatePostById } from "../../../data/postQueryFunctions";
+import { createPost } from "../../../data/postQueryFunctions";
 import { useFormik } from "formik";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Link as RouterLink } from "react-router-dom";
+import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
+import AddBoxIcon from "@material-ui/icons/AddBox";
 import * as yup from "yup";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ReactQuill from "react-quill";
 import ScreenTitle from "../../../components/ScreenTitle";
 import "react-quill/dist/quill.bubble.css";
-import CreateIcon from "@material-ui/icons/Create";
-import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
 import { getAllCategories } from "../../../data/categoryQueryFunctions";
 import {
   CATEGORY_DATA,
   POST_DATA,
-  SINGLE_POST_DATA,
 } from "../../../definitions/reactQueryConstants/queryConstants";
-import { adminPostEditStyles } from "../../../styles/adminPostStyles";
+import { adminPostCreateStyles } from "../../../styles/adminPostStyles";
 import { modules } from "../../../definitions/editorModules";
 
 const validationSchema = yup.object({
@@ -48,33 +47,24 @@ const validationSchema = yup.object({
     .required("This field is required"),
 });
 
-const EditPostScreen = () => {
-  const classes = adminPostEditStyles();
+const UserCreatePostScreen = () => {
+  const classes = adminPostCreateStyles();
   const history = useHistory();
   const queryClient = useQueryClient();
   const { user } = useSelector((state) => state.userData);
-  const { editPostId } = useParams();
   useEffect(() => {
-    if (!user.isAdmin) {
+    if (user.isAdmin) {
       history.push("/");
     }
   }, [history, user]);
-  const {
-    isLoading: isUserDataLoading,
-    isError: isUserDataError,
-    data: userData,
-  } = useQuery([SINGLE_POST_DATA, editPostId], ({ queryKey }) =>
-    getPostById(queryKey[1])
-  );
-  const mutation = useMutation(updatePostById, {
+  const mutation = useMutation(createPost, {
     onSuccess: () => {
       queryClient.invalidateQueries(POST_DATA);
-      queryClient.invalidateQueries(SINGLE_POST_DATA);
       history.push({
-        pathname: "/admin/posts/",
+        pathname: "/user/posts/",
         state: {
-          showCreateSuccessAlert: false,
-          showEditSuccessAlert: true,
+          showCreateSuccessAlert: true,
+          showEditSuccessAlert: false,
         },
       });
     },
@@ -98,28 +88,16 @@ const EditPostScreen = () => {
         values.tags.length > 0
           ? values.tags.split(",").map((tag) => tag.trim())
           : values.tags;
-
       mutation.mutate({
-        postId: editPostId,
-        values: {
-          title: values.title,
-          description: values.description,
-          summary: values.summary,
-          category: values.category,
-          tags: values.tags,
-          image: values.image,
-        },
+        title: values.title,
+        description: values.description,
+        summary: values.summary,
+        category: values.category,
+        tags: values.tags,
+        image: values.image,
       });
     },
   });
-  if (!isUserDataLoading && !isUserDataError) {
-    formik.initialValues.title = userData.title;
-    formik.initialValues.description = userData.description;
-    formik.initialValues.summary = userData.summary;
-    formik.initialValues.category = userData.category._id;
-    formik.initialValues.tags = userData.tags.join(",");
-    formik.initialValues.image = userData.image;
-  }
   return (
     <>
       <Grid container justifyContent="flex-start" alignItems="center">
@@ -127,7 +105,7 @@ const EditPostScreen = () => {
           variant="text"
           className={classes.returnLink}
           component={RouterLink}
-          to="/admin/posts"
+          to="/user/posts"
           color="primary"
           size="small"
           startIcon={<ArrowBackIcon />}
@@ -135,9 +113,9 @@ const EditPostScreen = () => {
           Return to Posts
         </Button>
       </Grid>
-      <ScreenTitle text="Edit Post" className={classes.root} />
+      <ScreenTitle text="Create a new post" className={classes.root} />
       <Box className={classes.formContent}>
-        {(isLoading && !isError) || (isUserDataLoading && !isUserDataError) ? (
+        {isLoading && !isError ? (
           <Grid container alignItems="center" justifyContent="center">
             <CircularProgress />
           </Grid>
@@ -261,9 +239,9 @@ const EditPostScreen = () => {
               color="primary"
               type="submit"
               className={classes.submitBtn}
-              startIcon={<CreateIcon />}
+              startIcon={<AddBoxIcon />}
             >
-              Update Post
+              Create Post
             </Button>
           </form>
         )}
@@ -272,4 +250,4 @@ const EditPostScreen = () => {
   );
 };
 
-export default EditPostScreen;
+export default UserCreatePostScreen;

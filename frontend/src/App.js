@@ -15,6 +15,10 @@ import CreatePostScreen from "./screens/admin/posts/CreatePostScreen";
 import EditPostScreen from "./screens/admin/posts/EditPostScreen";
 import AdminProfile from "./screens/admin/profile/AdminProfile";
 import UserDashboard from "./screens/user/UserDashboard";
+import UserLayout from "./layout/UserLayout";
+import UserPosts from "./screens/user/posts/UserPosts";
+import UserProfile from "./screens/user/profile/UserProfile";
+import UserCreatePostScreen from "./screens/user/posts/UserCreatePostScreen";
 
 const App = () => {
   const client = new QueryClient();
@@ -24,10 +28,20 @@ const App = () => {
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <Router>
-            <Switch>
-              <Route exact path="/" component={HomeScreen} />
-              <Route path="/user" component={UserDashboard} />
-
+            <Route exact path="/" component={HomeScreen} />
+            <Route path="/user">
+              <UserLayout>
+                <Route path="/user" component={UserDashboard} />
+                <Route exact path="/user/posts" component={UserPosts} />
+                <Route
+                  exact
+                  path="/user/posts/create"
+                  component={UserCreatePostScreen}
+                />
+                <Route path="/user/profile" component={UserProfile} />
+              </UserLayout>
+            </Route>
+            <Route path="/admin">
               <AdminLayout>
                 <Route exact path="/admin" component={AdminHomeScreen} />
                 <Route path="/admin/users" component={AdminUsers} />
@@ -44,7 +58,7 @@ const App = () => {
                 <Route path="/admin/posts" component={AdminPosts} exact />
                 <Route path="/admin/profile" component={AdminProfile} />
               </AdminLayout>
-            </Switch>
+            </Route>
           </Router>
         </ThemeProvider>
         <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />

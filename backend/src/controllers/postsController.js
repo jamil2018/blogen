@@ -260,7 +260,9 @@ const findPosts = asyncHandler(async (req, res) => {
 const getPostsByAuthorId = asyncHandler(async (req, res) => {
   const author = User.findById(req.params.id);
   if (author) {
-    const posts = await Post.find({ author: req.params.id });
+    const posts = await Post.find({ author: req.params.id })
+      .populate("author", "name")
+      .populate("category", "title");
     return res.status(200).json(posts);
   } else {
     res.status(400);
