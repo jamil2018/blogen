@@ -14,7 +14,7 @@ import AdminPosts from "./screens/admin/posts/AdminPosts";
 import CreatePostScreen from "./screens/admin/posts/CreatePostScreen";
 import EditPostScreen from "./screens/admin/posts/EditPostScreen";
 import AdminProfile from "./screens/admin/profile/AdminProfile";
-import UserDashboard from "./screens/user/UserDashboard";
+import UserDashboard from "./screens/user/Dashboard/UserDashboard";
 import UserLayout from "./layout/UserLayout";
 import UserPosts from "./screens/user/posts/UserPosts";
 import UserProfile from "./screens/user/profile/UserProfile";

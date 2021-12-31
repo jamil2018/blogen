@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { protect } from "../middlewares/authMiddleware.js";
+import { checkAdmin, protect } from "../middlewares/authMiddleware.js";
 import { uploads } from "../middlewares/fileStorageMiddleware.js";
 import {
   createNewPost,
@@ -15,6 +15,7 @@ import {
   getPostsByAuthorId,
   deleteMultiplePostsById,
   getCuratedPostsCount,
+  getCuratedPostsCountByAuthorId,
 } from "../controllers/postsController.js";
 
 const router = Router();
@@ -27,8 +28,9 @@ router
 
 router.route("/find").get(findPosts);
 router.route("/curated").get(getCuratedPostsCount);
+router.route("/curated/:author").get(protect, getCuratedPostsCountByAuthorId);
 
-router.route("/author/:id").get(getPostsByAuthorId);
+router.route("/author/:aid").get(getPostsByAuthorId);
 
 router
   .route("/:id")

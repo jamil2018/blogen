@@ -282,6 +282,19 @@ const getCuratedPostsCount = asyncHandler(async (req, res) => {
   return res.status(200).json(curatedPosts);
 });
 
+/**
+ * @desc GET curated post count by author id
+ * @route GET /api/posts/curated/author
+ * @access public
+ */
+const getCuratedPostsCountByAuthorId = asyncHandler(async (req, res) => {
+  const authorId = req.user._id;
+  const curatedPosts = await Post.find({ author: authorId }).select(
+    "_id title createdAt updatedAt"
+  );
+  return res.status(200).json(curatedPosts);
+});
+
 export {
   getAllPosts,
   createNewPost,
@@ -296,4 +309,5 @@ export {
   getPostsByAuthorId,
   deleteMultiplePostsById,
   getCuratedPostsCount,
+  getCuratedPostsCountByAuthorId,
 };

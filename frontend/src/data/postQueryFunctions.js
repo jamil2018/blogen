@@ -122,3 +122,20 @@ export const getCuratedPostList = async () => {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
   }
 };
+
+export const getCuratedPostListByAuthor = async () => {
+  try {
+    const { userData } = store.getState();
+    const { token } = userData.user;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    const { data } = await axios.get("/api/posts/curated/author", config);
+    return data;
+  } catch (err) {
+    throw new Error(`Error while fetching data. Error Message: ${err.message}`);
+  }
+};
