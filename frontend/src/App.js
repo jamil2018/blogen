@@ -19,6 +19,7 @@ import UserLayout from "./layout/UserLayout";
 import UserPosts from "./screens/user/posts/UserPosts";
 import UserProfile from "./screens/user/profile/UserProfile";
 import UserCreatePostScreen from "./screens/user/posts/UserCreatePostScreen";
+import EditUserPostScreen from "./screens/user/posts/EditUserPostScreen";
 
 const App = () => {
   const client = new QueryClient();
@@ -31,7 +32,7 @@ const App = () => {
             <Route exact path="/" component={HomeScreen} />
             <Route path="/user">
               <UserLayout>
-                <Route path="/user" component={UserDashboard} />
+                <Route exact path="/user" component={UserDashboard} />
                 <Route exact path="/user/posts" component={UserPosts} />
                 <Route
                   exact
@@ -39,6 +40,10 @@ const App = () => {
                   component={UserCreatePostScreen}
                 />
                 <Route path="/user/profile" component={UserProfile} />
+                <Route
+                  path="/user/posts/edit/:editPostId"
+                  component={EditUserPostScreen}
+                />
               </UserLayout>
             </Route>
             <Route path="/admin">

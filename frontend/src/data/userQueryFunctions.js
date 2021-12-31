@@ -33,7 +33,7 @@ export const getAllUsers = async () => {
     const { data } = await axios.get("/api/users/", config);
     return data;
   } catch (err) {
-    throw new Error(`Error while fecthing data. Error Message: ${err.message}`);
+    throw new Error(`Error while fetching data. Error Message: ${err.message}`);
   }
 };
 
@@ -47,7 +47,7 @@ export const createUser = async (userData) => {
     const { data } = await axios.post("/api/users", userData, config);
     return data;
   } catch (err) {
-    throw new Error(`Error while fecthing data. Error Message: ${err.message}`);
+    throw new Error(`Error while fetching data. Error Message: ${err.message}`);
   }
 };
 
@@ -61,7 +61,7 @@ export const getUserById = async (userId) => {
     const { data } = await axios.get(`/api/users/${userId}`, config);
     return data;
   } catch (err) {
-    throw new Error(`Error while fecthing data. Error Message: ${err.message}`);
+    throw new Error(`Error while fetching data. Error Message: ${err.message}`);
   }
 };
 // update currently logged in user data
@@ -82,7 +82,7 @@ export const updateUser = async (updatedUserData) => {
     );
     return data;
   } catch (err) {
-    throw new Error(`Error while fecthing data. Error Message: ${err.message}`);
+    throw new Error(`Error while fetching data. Error Message: ${err.message}`);
   }
 };
 
@@ -105,7 +105,7 @@ export const updateUserById = async (updatedUserData) => {
     );
     return data;
   } catch (err) {
-    throw new Error(`Error while fecthing data. Error Message: ${err.message}`);
+    throw new Error(`Error while fetching data. Error Message: ${err.message}`);
   }
 };
 
@@ -137,6 +137,6 @@ export const getCuratedUserList = async () => {
     const { data } = await axios.get("/api/users/curated", config);
     return data;
   } catch (err) {
-    throw new Error(`Error while fecthing data. Error Message: ${err.message}`);
+    throw new Error(`Error while fetching data. Error Message: ${err.message}`);
   }
 };
