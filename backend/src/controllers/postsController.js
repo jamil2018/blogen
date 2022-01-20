@@ -26,9 +26,10 @@ const getAllPosts = asyncHandler(async (req, res) => {
  */
 const getPostById = asyncHandler(async (req, res) => {
   const post = await Post.findById(req.params.id)
-    .select("title description summary author category tags image comments")
+    .select("title description summary author category tags image createdAt")
     .populate("author", "name")
     .populate("category", "title");
+
   if (post) {
     return res.status(200).json(post);
   } else {
@@ -44,6 +45,7 @@ const getPostById = asyncHandler(async (req, res) => {
  */
 const createNewPost = asyncHandler(async (req, res) => {
   const { title, description, summary, category, tags } = req.body;
+  const tagsArr = tags.split(",");
   const author = req.user._id;
   const image = {
     data: fs.readFileSync(
@@ -57,7 +59,7 @@ const createNewPost = asyncHandler(async (req, res) => {
     author,
     summary,
     category,
-    tags,
+    tags: tagsArr,
     image,
   });
   if (post) {
@@ -84,10 +86,23 @@ const createNewPost = asyncHandler(async (req, res) => {
  */
 const updatePost = asyncHandler(async (req, res) => {
   const post = await Post.findById(req.params.id);
+  let image;
+  if (req.file) {
+    image = {
+      data: fs.readFileSync(
+        path.join(
+          __rootDirname,
+          process.env.FILE_UPLOAD_PATH,
+          req.file.filename
+        )
+      ),
+      contentType: "image/*",
+    };
+  }
   if (post) {
     post.title = req.body.title || post.title;
     post.description = req.body.description || post.description;
-    post.image = req.body.image || post.image;
+    post.image = image || post.image;
     post.summary = req.body.summary || post.summary;
     post.category = req.body.category || post.category;
     post.tags = req.body.tags || post.tags;
@@ -145,7 +160,13 @@ const deleteMultiplePostsById = asyncHandler(async (req, res) => {
  * @access public
  */
 const getPostComments = asyncHandler(async (req, res) => {
-  const post = await Post.findById(req.params.id);
+  const post = await Post.findById(req.params.id).populate({
+    path: "comments",
+    populate: {
+      path: "author",
+      select: "name",
+    },
+  });
   if (post) {
     return res.status(200).json(post.comments);
   } else {
@@ -162,7 +183,8 @@ const getPostComments = asyncHandler(async (req, res) => {
 const createPostComment = asyncHandler(async (req, res) => {
   const post = await Post.findById(req.params.id);
   if (post) {
-    const { text, author } = req.body;
+    const { text } = req.body;
+    const author = req.user._id;
     const comment = await post.comments.create({ text, author });
     await post.comments.push(comment);
     await post.save();

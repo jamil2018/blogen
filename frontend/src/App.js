@@ -20,6 +20,8 @@ import UserPosts from "./screens/user/posts/UserPosts";
 import UserProfile from "./screens/user/profile/UserProfile";
 import UserCreatePostScreen from "./screens/user/posts/UserCreatePostScreen";
 import EditUserPostScreen from "./screens/user/posts/EditUserPostScreen";
+import GeneralLayout from "./layout/GeneralLayout";
+import IndividualPostScreen from "./screens/general/IndividualPostScreen";
 
 const App = () => {
   const client = new QueryClient();
@@ -29,10 +31,9 @@ const App = () => {
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <Router>
-            <Route exact path="/" component={HomeScreen} />
             <Route path="/user">
               <UserLayout>
-                <Route exact path="/user" component={UserDashboard} />
+                <Route exact path="/user/dashboard" component={UserDashboard} />
                 <Route exact path="/user/posts" component={UserPosts} />
                 <Route
                   exact
@@ -63,6 +64,16 @@ const App = () => {
                 <Route path="/admin/posts" component={AdminPosts} exact />
                 <Route path="/admin/profile" component={AdminProfile} />
               </AdminLayout>
+            </Route>
+            <Route exact path={["/", "/posts/:postId"]}>
+              <GeneralLayout>
+                <Route exact path="/" component={HomeScreen} />
+                <Route
+                  exact
+                  path="/posts/:postId"
+                  component={IndividualPostScreen}
+                />
+              </GeneralLayout>
             </Route>
           </Router>
         </ThemeProvider>

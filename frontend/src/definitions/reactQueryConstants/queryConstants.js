@@ -9,3 +9,7 @@ export const SINGLE_CATEGORY_DATA = "category";
 // posts
 export const POST_DATA = "posts";
 export const SINGLE_POST_DATA = "post";
+
+// comments
+export const COMMENT_DATA = "comments";
+export const SINGLE_COMMENT_DATA = "comment";

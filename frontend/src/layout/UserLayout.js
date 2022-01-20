@@ -16,6 +16,7 @@ import {
   Note as PostIcon,
 } from "@material-ui/icons";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
+import DashboardIcon from "@material-ui/icons/Dashboard";
 import PowerSettingsNewIcon from "@material-ui/icons/PowerSettingsNew";
 import { Link, NavLink, useHistory, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -81,7 +82,7 @@ const UserLayout = ({ children }) => {
           className={classes.drawerHeader}
           variant="h6"
           component={Link}
-          to="/user"
+          to="/"
           color="textPrimary"
           align="center"
         >
@@ -89,6 +90,23 @@ const UserLayout = ({ children }) => {
         </Typography>
         <Divider />
         <List className={classes.list}>
+          <ListItem
+            button
+            component={NavLink}
+            to="/user/dashboard"
+            activeClassName={classes.activeLink}
+          >
+            <ListItemIcon>
+              <DashboardIcon
+                color={
+                  location.pathname.includes("/user/dashboard")
+                    ? "primary"
+                    : "inherit"
+                }
+              />
+            </ListItemIcon>
+            <ListItemText primary="Dashboard" />
+          </ListItem>
           <ListItem
             button
             component={NavLink}

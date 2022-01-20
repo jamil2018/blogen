@@ -35,7 +35,7 @@ router.route("/author/:aid").get(getPostsByAuthorId);
 router
   .route("/:id")
   .get(getPostById)
-  .put(protect, updatePost)
+  .put(protect, uploads.single("image"), updatePost)
   .delete(protect, deletePost);
 
 router

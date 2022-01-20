@@ -26,3 +26,9 @@ export const formatData = (data, type) => {
     };
   });
 };
+
+export const getAuthorNameInitials = (author) =>
+  author.split(" ").map((np, index) => {
+    if (index > 1) return null;
+    return np[0];
+  });
