@@ -40,3 +40,23 @@ export const createCommentByPostId = async ({ postId, values }) => {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
   }
 };
+
+export const deleteCommentById = async ({ postId, commentId }) => {
+  try {
+    const { userData } = store.getState();
+    const { user } = userData;
+    const config = {
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
+    };
+    const { data } = await axios.delete(
+      `/api/posts/${postId}/comments/${commentId}`,
+      config
+    );
+    return data;
+  } catch (err) {
+    throw new Error(`Error while fetching data. Error Message: ${err.message}`);
+  }
+};

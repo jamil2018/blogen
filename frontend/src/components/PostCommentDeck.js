@@ -5,7 +5,10 @@ import {
   makeStyles,
   Typography,
 } from "@material-ui/core";
+import { grey } from "@material-ui/core/colors";
+import { useState } from "react";
 import { useQuery } from "react-query";
+import { useSelector } from "react-redux";
 import { getCommentsByPostId } from "../data/commentQueryFunctions";
 import { COMMENT_DATA } from "../definitions/reactQueryConstants/queryConstants";
 import PostComment from "./PostComment";
@@ -16,15 +19,32 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(6),
     maxHeight: "60vh",
     overflowY: "auto",
+    paddingRight: theme.spacing(2),
+    "&::-webkit-scrollbar": {
+      width: "0.4em",
+    },
+    "&::-webkit-scrollbar-track": {
+      backgroundColor: grey[200],
+    },
+    "&::-webkit-scrollbar-thumb": {
+      backgroundColor: theme.palette.primary.main,
+    },
   },
 }));
 
-const PostCommentDeck = ({ postId }) => {
+const PostCommentDeck = ({ postId, editHandler, deleteHandler }) => {
+  // user data
+  const { user } = useSelector((state) => state.userData);
+
+  // classes
   const classes = useStyles();
+
+  // query
   const { isLoading, data, isFetching } = useQuery(
     [COMMENT_DATA, postId],
     ({ queryKey }) => getCommentsByPostId(queryKey[1])
   );
+
   return (
     <>
       {isLoading || isFetching ? (
@@ -37,8 +57,18 @@ const PostCommentDeck = ({ postId }) => {
             data.map((comment) => (
               <PostComment
                 key={comment._id}
+                showCommentActions={
+                  user._id === comment.author._id ? true : false
+                }
+                authorId={comment.author._id}
                 authorName={comment.author.name}
                 commentText={comment.text}
+                editHandler={() => {
+                  editHandler(comment._id);
+                }}
+                deleteHandler={() => {
+                  deleteHandler(comment._id);
+                }}
               />
             ))
           ) : (

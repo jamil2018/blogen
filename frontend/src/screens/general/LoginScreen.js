@@ -58,7 +58,7 @@ const LoginScreen = ({ handleModalClose }) => {
       if (data.isAdmin) {
         history.push("/admin");
       } else {
-        history.push("/user");
+        history.push("/user/dashboard");
       }
       handleModalClose();
     },

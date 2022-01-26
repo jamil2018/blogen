@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import { grey } from "@material-ui/core/colors";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 import PostCommentDeck from "../../components/PostCommentDeck";
@@ -20,6 +20,10 @@ import { getAuthorNameInitials } from "../../utils/dataFormat";
 import { getPostFormattedDate } from "../../utils/dateUtils";
 import { toBase64 } from "../../utils/imageConvertion";
 import ReactQuill from "react-quill";
+import UserModal from "../../components/UserModal";
+import DeleteCommentScreen from "./DeleteCommentScreen";
+import AdminModal from "../../components/AdminModal";
+import ErrorIcon from "@material-ui/icons/Error";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -60,17 +64,29 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(4, 0),
   },
   loader: {
-    minHeight: "40vh",
+    minHeight: "35vh",
   },
 }));
 
 const IndividualPostScreen = () => {
+  const [showDeleteCommentModal, setShowDeleteCommentModal] = useState(false);
+  const [modificationCommentId, setModificationCommentId] = useState(null);
   const { postId } = useParams();
   const classes = useStyles();
-  const { isLoading, isError, data, isFetching } = useQuery(
+  const { isLoading, data } = useQuery(
     [SINGLE_POST_DATA, postId],
     ({ queryKey }) => getPostById(queryKey[1])
   );
+
+  // action handlers
+  const handleDeleteComment = (commentId) => {
+    setModificationCommentId(commentId);
+    setShowDeleteCommentModal(true);
+  };
+
+  const handleEditComment = (commentId) => {
+    setModificationCommentId(commentId);
+  };
   return (
     <Container maxWidth="md" className={classes.container}>
       {isLoading ? (
@@ -133,10 +149,27 @@ const IndividualPostScreen = () => {
           >
             See what others say about this post
           </Typography>
-          <PostCommentDeck postId={postId} />
+          <PostCommentDeck
+            postId={postId}
+            deleteHandler={(commentId) => handleDeleteComment(commentId)}
+            editHandler={(commentId) => handleEditComment(commentId)}
+          />
           <CreateCommentScreen postId={postId} />
         </>
       )}
+      {/* modals */}
+      <AdminModal
+        modalOpenState={showDeleteCommentModal}
+        modalCloseHandler={() => setShowDeleteCommentModal(false)}
+        modalTitle={"Delete comment"}
+        modalIcon={<ErrorIcon fontSize="large" color="secondary" />}
+      >
+        <DeleteCommentScreen
+          handleModalClose={() => setShowDeleteCommentModal(false)}
+          commentId={modificationCommentId}
+          postId={postId}
+        />
+      </AdminModal>
     </Container>
   );
 };

@@ -16,12 +16,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const AdminDeleteConfirmation = ({ deleteAction, cancelAction }) => {
+const AdminDeleteConfirmation = ({
+  deleteAction,
+  cancelAction,
+  singleItem = false,
+}) => {
   const classes = useStyles();
   return (
     <Box className={classes.root}>
       <Typography variant="body2" className={classes.title}>
-        Are you sure you want to delete the selected item(s)?
+        {singleItem
+          ? "Are you sure you want to delete the selected item?"
+          : "Are you sure you want to delete the selected item(s)?"}
       </Typography>
       <Grid container justifyContent="center" alignItems="center">
         <Button

@@ -3,10 +3,13 @@ import {
   Card,
   CardContent,
   Grid,
+  IconButton,
   makeStyles,
   Typography,
 } from "@material-ui/core";
 import { grey } from "@material-ui/core/colors";
+import DeleteIcon from "@material-ui/icons/Delete";
+import EditIcon from "@material-ui/icons/Edit";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -20,9 +23,22 @@ const useStyles = makeStyles((theme) => ({
   commentTextContainer: {
     alignSelf: "flex-start",
   },
+  actionButtonContainer: {
+    alignSelf: "flex-start",
+  },
+  hide: {
+    visibility: "hidden",
+  },
 }));
 
-const PostComment = ({ authorName, commentText }) => {
+const PostComment = ({
+  authorId,
+  authorName,
+  commentText,
+  editHandler,
+  deleteHandler,
+  showCommentActions,
+}) => {
   const classes = useStyles();
   return (
     <Card className={classes.container} elevation={1} variant="outlined">
@@ -41,10 +57,37 @@ const PostComment = ({ authorName, commentText }) => {
               </Typography>
             </Grid>
           </Grid>
-          <Grid item xs={10} className={classes.commentTextContainer}>
+          <Grid item xs={9} className={classes.commentTextContainer}>
             <Typography variant="subtitle1" color="secondary">
               {commentText}
             </Typography>
+          </Grid>
+          <Grid item xs={1} className={classes.actionButtonContainer}>
+            <Grid
+              container
+              justifyContent="space-evenly"
+              alignItems="flex-start"
+              className={showCommentActions ? "" : classes.hide}
+            >
+              <IconButton
+                aria-label="edit"
+                size="small"
+                edge="start"
+                color="primary"
+                onClick={editHandler}
+              >
+                <EditIcon />
+              </IconButton>
+              <IconButton
+                aria-label="delete"
+                size="small"
+                edge="start"
+                color="primary"
+                onClick={deleteHandler}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Grid>
           </Grid>
         </Grid>
       </CardContent>
