@@ -5,3 +5,7 @@ export const toBase64 = (arr) => {
     arr.reduce((data, byte) => data + String.fromCharCode(byte), "")
   );
 };
+
+export const getBase64ImageURL = (arr) => {
+  return `data:image/*;base64,${toBase64(arr)}`;
+};

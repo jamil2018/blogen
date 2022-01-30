@@ -8,6 +8,7 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     marginBottom: theme.spacing(2),
+    textAlign: "center",
   },
   button: {
     marginTop: theme.spacing(2),

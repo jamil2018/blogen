@@ -176,6 +176,35 @@ const getPostComments = asyncHandler(async (req, res) => {
 });
 
 /**
+ * @desc get post comment by id
+ * @route GET /api/posts/:pid/comments/:cid
+ * @access public
+ */
+const getPostCommentById = asyncHandler(async (req, res) => {
+  const post = await Post.findById(req.params.pid).populate({
+    path: "comments",
+    populate: {
+      path: "author",
+      select: "name",
+    },
+  });
+  if (post) {
+    const comment = post.comments.find(
+      (comment) => comment._id == req.params.cid
+    );
+    if (comment) {
+      return res.status(200).json(comment);
+    } else {
+      res.status(400);
+      throw new Error("Invalid comment id");
+    }
+  } else {
+    res.status(400);
+    throw new Error("Invalid post id");
+  }
+});
+
+/**
  * @desc create a post comment
  * @route POST /api/posts/:id/comments
  * @access private
@@ -324,6 +353,7 @@ export {
   updatePost,
   deletePost,
   getPostComments,
+  getPostCommentById,
   createPostComment,
   updatePostComment,
   deleteComment,

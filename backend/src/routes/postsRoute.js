@@ -16,6 +16,7 @@ import {
   deleteMultiplePostsById,
   getCuratedPostsCount,
   getCuratedPostsCountByAuthorId,
+  getPostCommentById,
 } from "../controllers/postsController.js";
 
 const router = Router();
@@ -45,6 +46,7 @@ router
 
 router
   .route("/:pid/comments/:cid")
+  .get(getPostCommentById)
   .put(protect, updatePostComment)
   .delete(protect, deleteComment);
 

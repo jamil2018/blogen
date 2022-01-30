@@ -18,12 +18,13 @@ import { SINGLE_POST_DATA } from "../../definitions/reactQueryConstants/queryCon
 import CreateCommentScreen from "./CreateCommentScreen";
 import { getAuthorNameInitials } from "../../utils/dataFormat";
 import { getPostFormattedDate } from "../../utils/dateUtils";
-import { toBase64 } from "../../utils/imageConvertion";
+import { getBase64ImageURL, toBase64 } from "../../utils/imageConvertion";
 import ReactQuill from "react-quill";
-import UserModal from "../../components/UserModal";
+import CreateIcon from "@material-ui/icons/Create";
 import DeleteCommentScreen from "./DeleteCommentScreen";
 import AdminModal from "../../components/AdminModal";
 import ErrorIcon from "@material-ui/icons/Error";
+import EditCommentScreen from "./EditCommentScreen";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -70,6 +71,7 @@ const useStyles = makeStyles((theme) => ({
 
 const IndividualPostScreen = () => {
   const [showDeleteCommentModal, setShowDeleteCommentModal] = useState(false);
+  const [showEditCommentModal, setShowEditCommentModal] = useState(false);
   const [modificationCommentId, setModificationCommentId] = useState(null);
   const { postId } = useParams();
   const classes = useStyles();
@@ -86,6 +88,7 @@ const IndividualPostScreen = () => {
 
   const handleEditComment = (commentId) => {
     setModificationCommentId(commentId);
+    setShowEditCommentModal(true);
   };
   return (
     <Container maxWidth="md" className={classes.container}>
@@ -127,7 +130,7 @@ const IndividualPostScreen = () => {
           </Grid>
           <img
             className={classes.postImg}
-            src={`data:image/*;base64,${toBase64(data.image.data.data)}`}
+            src={getBase64ImageURL(data.image.data.data)}
             alt="post"
           />
           <ReactQuill
@@ -166,6 +169,18 @@ const IndividualPostScreen = () => {
       >
         <DeleteCommentScreen
           handleModalClose={() => setShowDeleteCommentModal(false)}
+          commentId={modificationCommentId}
+          postId={postId}
+        />
+      </AdminModal>
+      <AdminModal
+        modalOpenState={showEditCommentModal}
+        modalCloseHandler={() => setShowEditCommentModal(false)}
+        modalTitle={`Edit comment`}
+        modalIcon={<CreateIcon fontSize="large" color="secondary" />}
+      >
+        <EditCommentScreen
+          modalCloseHandler={() => setShowEditCommentModal(false)}
           commentId={modificationCommentId}
           postId={postId}
         />

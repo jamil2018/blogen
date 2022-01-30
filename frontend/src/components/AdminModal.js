@@ -13,8 +13,8 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
   },
   modalContent: {
-    minWidth: "20vw",
-    maxWidth: "40vw",
+    minWidth: "30vw",
+    maxWidth: "50vw",
     minHeight: "28vh",
   },
   modalHeader: {
