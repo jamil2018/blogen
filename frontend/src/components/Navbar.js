@@ -132,7 +132,7 @@ const Navbar = ({ headerText, children }) => {
             </Grid>
           </Grid>
           <Grid item>
-            <Box>{children}</Box>
+            <Grid container>{children}</Grid>
           </Grid>
         </Grid>
       </Toolbar>
