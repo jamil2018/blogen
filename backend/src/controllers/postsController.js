@@ -305,13 +305,18 @@ const findPosts = asyncHandler(async (req, res) => {
 
 /**
  * @desc GET posts by author id
- * @route GET /api/author/:id
+ * @route GET /api/posts/author/:aid
  * @access public
  */
 const getPostsByAuthorId = asyncHandler(async (req, res) => {
-  const author = User.findById(req.params.id);
+  const author = User.findById(req.params.aid);
+  console.log(req.params.aid);
   if (author) {
-    const posts = await Post.find({ author: req.params.id })
+    const posts = await Post.find({
+      author: {
+        _id: req.params.aid,
+      },
+    })
       .populate("author", "name")
       .populate("category", "title");
     return res.status(200).json(posts);

@@ -11,12 +11,13 @@ import {
   deleteUsersById,
   getCuratedUserCount,
 } from "../controllers/usersController.js";
+import { uploads } from "../middlewares/fileStorageMiddleware.js";
 
 const router = Router();
 
 router
   .route("/")
-  .post(registerUser)
+  .post(uploads.single("image"), registerUser)
   .get(getAllUsers)
   .delete(protect, checkAdmin, deleteUsersById);
 

@@ -20,6 +20,22 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    bio: {
+      type: String,
+    },
+    facebookId: {
+      type: String,
+    },
+    linkedinId: {
+      type: String,
+    },
+    twitterId: {
+      type: String,
+    },
+    image: {
+      data: Buffer,
+      contentType: String,
+    },
   },
   { timestamps: true }
 );

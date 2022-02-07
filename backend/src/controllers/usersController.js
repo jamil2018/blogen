@@ -2,6 +2,8 @@ import asyncHandler from "express-async-handler";
 
 import User from "../models/UserModel.js";
 import generateToken from "../utils/generateToken.js";
+import fs from "fs";
+import path from "path";
 
 /**
  * @desc get all users
@@ -28,7 +30,14 @@ const getUserById = asyncHandler(async (req, res) => {
  * @access public
  */
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, bio, facebookId, linkedinId, twitterId } =
+    req.body;
+  const image = {
+    data: fs.readFileSync(
+      path.join(__rootDirname, process.env.FILE_UPLOAD_PATH, req.file.filename)
+    ),
+    contentType: "image/*",
+  };
   const userExists = await User.findOne({ email });
   if (userExists) {
     res.status(400);
@@ -38,6 +47,11 @@ const registerUser = asyncHandler(async (req, res) => {
     name,
     email,
     password,
+    bio,
+    facebookId,
+    linkedinId,
+    twitterId,
+    image,
   });
   if (user) {
     res.status(201).json({
@@ -102,9 +116,27 @@ const getUserProfile = asyncHandler(async (req, res) => {
  */
 const updateUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
+  let image;
+  if (req.file) {
+    image = {
+      data: fs.readFileSync(
+        path.join(
+          __rootDirname,
+          process.env.FILE_UPLOAD_PATH,
+          req.file.filename
+        )
+      ),
+      contentType: "image/*",
+    };
+  }
   if (user) {
     user.name = req.body.name || user.name;
     user.email = req.body.email || user.email;
+    user.bio = req.body.bio || user.bio;
+    user.facebookId = req.body.facebookId || user.facebookId;
+    user.linkedinId = req.body.linkedinId || user.linkedinId;
+    user.twitterId = req.body.twitterId || user.twitterId;
+    user.image = image || user.image;
     if (req.body.password) {
       user.password = req.body.password;
     }
@@ -113,6 +145,11 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       _id: updatedUser._id,
       name: updatedUser.name,
       email: updatedUser.email,
+      bio: updatedUser.bio,
+      facebookId: updatedUser.facebookId,
+      linkedinId: updatedUser.linkedinId,
+      twitterId: updatedUser.twitterId,
+      image: updatedUser.image,
       isAdmin: updatedUser.isAdmin,
       token: generateToken(updatedUser._id),
     });

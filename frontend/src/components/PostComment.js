@@ -10,6 +10,7 @@ import {
 import { grey } from "@material-ui/core/colors";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
+import { getAuthorNameInitials } from "../utils/dataFormat";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -51,7 +52,7 @@ const PostComment = ({
               justifyContent="center"
               alignItems="center"
             >
-              <Avatar>{authorName.split(" ").map((np) => np[0])}</Avatar>
+              <Avatar>{getAuthorNameInitials(authorName)}</Avatar>
               <Typography variant="subtitle2" className={classes.authorText}>
                 {authorName}
               </Typography>

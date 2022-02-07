@@ -5,7 +5,7 @@ const HomeScreen = () => {
   return (
     <>
       <h1>Home</h1>
-      <Button component={Link} to="/posts/61e7abbec6e9792eb0a6c11b">
+      <Button component={Link} to="/posts/62012b36d1d39908d0175f80">
         Go to demo post
       </Button>
     </>
