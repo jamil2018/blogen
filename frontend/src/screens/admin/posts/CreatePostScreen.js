@@ -96,7 +96,6 @@ const CreatePostScreen = () => {
         tags: values.tags,
         image: values.image,
       });
-      // console.log(values);
     },
   });
   return (

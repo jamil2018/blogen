@@ -6,6 +6,10 @@ import {
   TextField,
   Typography,
 } from "@material-ui/core";
+import FacebookIcon from "@material-ui/icons/Facebook";
+import LinkedInIcon from "@material-ui/icons/LinkedIn";
+import TwitterIcon from "@material-ui/icons/Twitter";
+import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
 import * as yup from "yup";
 import { useFormik } from "formik";
 import { useMutation, useQueryClient } from "react-query";
@@ -29,6 +33,24 @@ const useStyles = makeStyles((theme) => ({
     paddingBottom: theme.spacing(2),
     paddingTop: theme.spacing(2),
   },
+  input: {
+    display: "none",
+  },
+  inputGroup: {
+    display: "block",
+    marginBottom: theme.spacing(2),
+  },
+  inputLabel: {
+    marginLeft: theme.spacing(1),
+  },
+  errorLabel: {
+    color: theme.palette.error.main,
+    marginLeft: theme.spacing(2),
+    fontSize: "0.75rem",
+    lineHeight: 1.66,
+    letterSpacing: "0.03333em",
+    display: "block",
+  },
 }));
 
 const validationSchema = yup.object({
@@ -48,6 +70,11 @@ const validationSchema = yup.object({
       .oneOf([yup.ref("password")], "Both passwords need to be the same")
       .required("This field is required"),
     otherwise: yup.string("Confirm your password"),
+    bio: yup.string("Enter your bio").required("This field is required"),
+    facebookId: yup.string("Enter your facebook id"),
+    linkedinId: yup.string("Enter your linkedin id"),
+    twitterId: yup.string("Enter your twitter id"),
+    image: yup.mixed(),
   }),
 });
 
@@ -66,6 +93,11 @@ const RegisterScreen = ({ handleModalClose }) => {
       name: "",
       email: "",
       password: "",
+      bio: "",
+      facebookId: "",
+      linkedinId: "",
+      twitterId: "",
+      image: "",
       confirmPassword: "",
     },
     validationSchema: validationSchema,
@@ -74,6 +106,11 @@ const RegisterScreen = ({ handleModalClose }) => {
         name: values.name,
         email: values.email,
         password: values.password,
+        bio: values.bio,
+        facebookId: values.facebookId,
+        linkedinId: values.linkedinId,
+        twitterId: values.twitterId,
+        image: values.image,
         isAdmin: false,
       });
       handleModalClose();
@@ -162,6 +199,127 @@ const RegisterScreen = ({ handleModalClose }) => {
               size="small"
               type="password"
             />
+            <Box className={classes.inputGroup}>
+              <input
+                accept="image/*"
+                className={classes.input}
+                id="image"
+                multiple
+                type="file"
+                onChange={(event) => {
+                  formik.setFieldValue("image", event.target.files[0]);
+                }}
+                onBlur={formik.handleBlur}
+                name="image"
+              />
+              <label htmlFor="image">
+                <Button
+                  startIcon={<PhotoCameraIcon />}
+                  variant="contained"
+                  color="primary"
+                  component="span"
+                >
+                  Upload Photo
+                </Button>
+              </label>
+              <label className={classes.inputLabel}>
+                {formik.values.image.name ? formik.values.image.name : ""}
+              </label>
+              <span className={classes.errorLabel}>
+                {(formik.touched.image && formik.errors.image) || " "}
+              </span>
+            </Box>
+            <TextField
+              fullWidth
+              multiline
+              minRows={2.5}
+              variant="outlined"
+              id="bio"
+              name="bio"
+              label="Bio"
+              value={formik.values.bio}
+              onBlur={formik.handleBlur}
+              onChange={formik.handleChange}
+              error={formik.touched.bio && Boolean(formik.errors.bio)}
+              helperText={(formik.touched.bio && formik.errors.bio) || " "}
+              size="small"
+            />
+            <Grid container>
+              <Grid item xs={2}>
+                <FacebookIcon fontSize="large" />
+              </Grid>
+              <Grid item xs={10}>
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  id="facebookId"
+                  name="facebookId"
+                  label="Facebook"
+                  value={formik.values.facebookId}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched.facebookId &&
+                    Boolean(formik.errors.facebookId)
+                  }
+                  helperText={
+                    (formik.touched.facebookId && formik.errors.facebookId) ||
+                    " "
+                  }
+                  size="small"
+                />
+              </Grid>
+            </Grid>
+            <Grid container>
+              <Grid item xs={2}>
+                <LinkedInIcon fontSize="large" />
+              </Grid>
+              <Grid item xs={10}>
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  id="linkedinId"
+                  name="linkedinId"
+                  label="Linkedin"
+                  value={formik.values.linkedinId}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched.linkedinId &&
+                    Boolean(formik.errors.linkedinId)
+                  }
+                  helperText={
+                    (formik.touched.linkedinId && formik.errors.linkedinId) ||
+                    " "
+                  }
+                  size="small"
+                />
+              </Grid>
+            </Grid>
+            <Grid container>
+              <Grid item xs={2}>
+                <TwitterIcon fontSize="large" />
+              </Grid>
+              <Grid item xs={10}>
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  id="twitterId"
+                  name="twitterId"
+                  label="Twitter"
+                  value={formik.values.twitterId}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched.twitterId && Boolean(formik.errors.twitterId)
+                  }
+                  helperText={
+                    (formik.touched.twitterId && formik.errors.twitterId) || " "
+                  }
+                  size="small"
+                />
+              </Grid>
+            </Grid>
             <Button
               color="primary"
               variant="outlined"

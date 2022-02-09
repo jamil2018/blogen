@@ -39,12 +39,22 @@ export const getAllUsers = async () => {
 
 export const createUser = async (userData) => {
   try {
+    const formData = new FormData();
+    formData.append("name", userData.name);
+    formData.append("email", userData.email);
+    formData.append("password", userData.password);
+    formData.append("image", userData.image);
+    formData.append("bio", userData.bio);
+    formData.append("facebookId", userData.facebookId);
+    formData.append("linkedinId", userData.linkedinId);
+    formData.append("twitterId", userData.twitterId);
+    formData.append("isAdmin", userData.isAdmin);
     const config = {
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "multipart/form-data",
       },
     };
-    const { data } = await axios.post("/api/users", userData, config);
+    const { data } = await axios.post("/api/users", formData, config);
     return data;
   } catch (err) {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
