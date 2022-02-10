@@ -32,12 +32,19 @@ const getUserById = asyncHandler(async (req, res) => {
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password, bio, facebookId, linkedinId, twitterId } =
     req.body;
-  const image = {
-    data: fs.readFileSync(
-      path.join(__rootDirname, process.env.FILE_UPLOAD_PATH, req.file.filename)
-    ),
-    contentType: "image/*",
-  };
+  let image;
+  if (req.file) {
+    image = {
+      data: fs.readFileSync(
+        path.join(
+          __rootDirname,
+          process.env.FILE_UPLOAD_PATH,
+          req.file.filename
+        )
+      ),
+      contentType: "image/*",
+    };
+  }
   const userExists = await User.findOne({ email });
   if (userExists) {
     res.status(400);

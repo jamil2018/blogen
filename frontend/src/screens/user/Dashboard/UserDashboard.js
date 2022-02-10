@@ -47,7 +47,7 @@ const UserDashboard = () => {
     }
   }, [isPostDataLoading, postData, isPostDataFetching]);
   useEffect(() => {
-    if (user.isAdmin) {
+    if (user.isAdmin || !user._id) {
       history.push("/");
     }
   }, [history, user]);

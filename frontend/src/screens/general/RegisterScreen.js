@@ -18,6 +18,9 @@ import { createUser } from "../../data/userQueryFunctions";
 import { USER_DATA } from "../../definitions/reactQueryConstants/queryConstants";
 import { useDispatch } from "react-redux";
 import { storeUserData } from "../../redux/slices/userDataSlice";
+import { sanitizeSocialURL } from "../../utils/dataFormat";
+import { useState } from "react";
+import AlertNotification from "../../components/AlertNotification";
 
 const useStyles = makeStyles((theme) => ({
   image: {
@@ -51,6 +54,9 @@ const useStyles = makeStyles((theme) => ({
     letterSpacing: "0.03333em",
     display: "block",
   },
+  alertContainer: {
+    paddingRight: theme.spacing(2),
+  },
 }));
 
 const validationSchema = yup.object({
@@ -79,6 +85,10 @@ const validationSchema = yup.object({
 });
 
 const RegisterScreen = ({ handleModalClose }) => {
+  // states
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const classes = useStyles();
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
@@ -86,6 +96,13 @@ const RegisterScreen = ({ handleModalClose }) => {
     onSuccess: (data) => {
       queryClient.invalidateQueries(USER_DATA);
       dispatch(storeUserData(data));
+      handleModalClose();
+    },
+    onError: (error) => {
+      if (error.status === 400) {
+        setErrorMessage("User with this email already exists");
+        setShowErrorAlert(true);
+      }
     },
   });
   const formik = useFormik({
@@ -107,13 +124,12 @@ const RegisterScreen = ({ handleModalClose }) => {
         email: values.email,
         password: values.password,
         bio: values.bio,
-        facebookId: values.facebookId,
-        linkedinId: values.linkedinId,
-        twitterId: values.twitterId,
+        facebookId: sanitizeSocialURL(values.facebookId),
+        linkedinId: sanitizeSocialURL(values.linkedinId),
+        twitterId: sanitizeSocialURL(values.twitterId),
         image: values.image,
         isAdmin: false,
       });
-      handleModalClose();
     },
   });
   return (
@@ -135,6 +151,14 @@ const RegisterScreen = ({ handleModalClose }) => {
           Sign Up
         </Typography>
         <Box>
+          <Box className={classes.alertContainer}>
+            <AlertNotification
+              alertSeverity="error"
+              alertText={errorMessage}
+              showState={showErrorAlert}
+              closeHandler={() => setShowErrorAlert(false)}
+            />
+          </Box>
           <form onSubmit={formik.handleSubmit} className={classes.formContent}>
             <TextField
               fullWidth
@@ -232,7 +256,7 @@ const RegisterScreen = ({ handleModalClose }) => {
             <TextField
               fullWidth
               multiline
-              minRows={2.5}
+              minRows={4}
               variant="outlined"
               id="bio"
               name="bio"
@@ -244,80 +268,92 @@ const RegisterScreen = ({ handleModalClose }) => {
               helperText={(formik.touched.bio && formik.errors.bio) || " "}
               size="small"
             />
-            <Grid container>
-              <Grid item xs={2}>
-                <FacebookIcon fontSize="large" />
+            <Grid container justifyContent="space-between" spacing={1}>
+              <Grid item xs={4}>
+                <Grid container>
+                  <Grid item xs={3}>
+                    <FacebookIcon fontSize="large" />
+                  </Grid>
+                  <Grid item xs={9}>
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      id="facebookId"
+                      name="facebookId"
+                      label="Facebook"
+                      value={formik.values.facebookId}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      error={
+                        formik.touched.facebookId &&
+                        Boolean(formik.errors.facebookId)
+                      }
+                      helperText={
+                        (formik.touched.facebookId &&
+                          formik.errors.facebookId) ||
+                        " "
+                      }
+                      size="small"
+                    />
+                  </Grid>
+                </Grid>
               </Grid>
-              <Grid item xs={10}>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  id="facebookId"
-                  name="facebookId"
-                  label="Facebook"
-                  value={formik.values.facebookId}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={
-                    formik.touched.facebookId &&
-                    Boolean(formik.errors.facebookId)
-                  }
-                  helperText={
-                    (formik.touched.facebookId && formik.errors.facebookId) ||
-                    " "
-                  }
-                  size="small"
-                />
+              <Grid item xs={4}>
+                <Grid container>
+                  <Grid item xs={3}>
+                    <LinkedInIcon fontSize="large" />
+                  </Grid>
+                  <Grid item xs={9}>
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      id="linkedinId"
+                      name="linkedinId"
+                      label="Linkedin"
+                      value={formik.values.linkedinId}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      error={
+                        formik.touched.linkedinId &&
+                        Boolean(formik.errors.linkedinId)
+                      }
+                      helperText={
+                        (formik.touched.linkedinId &&
+                          formik.errors.linkedinId) ||
+                        " "
+                      }
+                      size="small"
+                    />
+                  </Grid>
+                </Grid>
               </Grid>
-            </Grid>
-            <Grid container>
-              <Grid item xs={2}>
-                <LinkedInIcon fontSize="large" />
-              </Grid>
-              <Grid item xs={10}>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  id="linkedinId"
-                  name="linkedinId"
-                  label="Linkedin"
-                  value={formik.values.linkedinId}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={
-                    formik.touched.linkedinId &&
-                    Boolean(formik.errors.linkedinId)
-                  }
-                  helperText={
-                    (formik.touched.linkedinId && formik.errors.linkedinId) ||
-                    " "
-                  }
-                  size="small"
-                />
-              </Grid>
-            </Grid>
-            <Grid container>
-              <Grid item xs={2}>
-                <TwitterIcon fontSize="large" />
-              </Grid>
-              <Grid item xs={10}>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  id="twitterId"
-                  name="twitterId"
-                  label="Twitter"
-                  value={formik.values.twitterId}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={
-                    formik.touched.twitterId && Boolean(formik.errors.twitterId)
-                  }
-                  helperText={
-                    (formik.touched.twitterId && formik.errors.twitterId) || " "
-                  }
-                  size="small"
-                />
+              <Grid item xs={4}>
+                <Grid container>
+                  <Grid item xs={3}>
+                    <TwitterIcon fontSize="large" />
+                  </Grid>
+                  <Grid item xs={9}>
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      id="twitterId"
+                      name="twitterId"
+                      label="Twitter"
+                      value={formik.values.twitterId}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      error={
+                        formik.touched.twitterId &&
+                        Boolean(formik.errors.twitterId)
+                      }
+                      helperText={
+                        (formik.touched.twitterId && formik.errors.twitterId) ||
+                        " "
+                      }
+                      size="small"
+                    />
+                  </Grid>
+                </Grid>
               </Grid>
             </Grid>
             <Button

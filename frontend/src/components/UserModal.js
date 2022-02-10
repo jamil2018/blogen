@@ -17,12 +17,16 @@ const useStyles = makeStyles((theme) => ({
     width: "50vw",
     minHeight: "40vh",
   },
+  modalContentExpanded: {
+    width: "70vw",
+    minHeight: "40vh",
+  },
   closeIcon: {
     padding: theme.spacing(1),
   },
 }));
 
-const UserModal = ({ children, open, onClose }) => {
+const UserModal = ({ children, open, onClose, expanded = false }) => {
   const classes = useStyles();
   return (
     <Modal
@@ -38,7 +42,11 @@ const UserModal = ({ children, open, onClose }) => {
       className={classes.modal}
     >
       <Fade in={open}>
-        <Paper className={classes.modalContent}>
+        <Paper
+          className={
+            expanded ? classes.modalContentExpanded : classes.modalContent
+          }
+        >
           <Grid container justifyContent="flex-end">
             <IconButton aria-label="close" onClick={onClose} size="small">
               <Box className={classes.closeIcon}>

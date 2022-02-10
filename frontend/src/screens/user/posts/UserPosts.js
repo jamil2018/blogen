@@ -57,7 +57,7 @@ const UserPosts = () => {
     }
   }, [location]);
   useEffect(() => {
-    if (user.isAdmin) {
+    if (user.isAdmin || !user._id) {
       history.push("/");
     }
   }, [history, user]);

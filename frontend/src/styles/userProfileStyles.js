@@ -8,6 +8,11 @@ const userProfileStyles = makeStyles((theme) => ({
   header: {
     marginBottom: theme.spacing(8),
   },
+  avatar: {
+    width: theme.spacing(20),
+    height: theme.spacing(20),
+    margin: theme.spacing(2),
+  },
 }));
 
 export { userProfileStyles };

@@ -32,3 +32,22 @@ export const getAuthorNameInitials = (author) =>
     if (index > 1) return null;
     return np[0];
   });
+
+export const sanitizeSocialURL = (url) => {
+  const urlHandles = {
+    fb: "https://www.facebook.com/",
+    twitter: "https://twitter.com/",
+    linkedin: "https://www.linkedin.com/in/",
+  };
+
+  if (url.includes(urlHandles.fb)) {
+    return url.replace(urlHandles.fb, "");
+  }
+  if (url.includes(urlHandles.linkedin)) {
+    return url.replace(urlHandles.linkedin, "");
+  }
+  if (url.includes(urlHandles.twitter)) {
+    return url.replace(urlHandles.twitter, "");
+  }
+  return url;
+};

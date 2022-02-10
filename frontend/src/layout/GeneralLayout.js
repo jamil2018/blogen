@@ -108,6 +108,7 @@ const GeneralLayout = ({ children }) => {
       <UserModal
         open={openRegistrationModal}
         onClose={() => setOpenRegistrationModal(false)}
+        expanded={true}
       >
         <RegisterScreen
           handleModalClose={() => modalCloseHandler("REGISTER")}

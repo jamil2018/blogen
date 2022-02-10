@@ -9,7 +9,7 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: "bold",
     marginRight: theme.spacing(1.5),
     display: "inline-block",
-    minWidth: "4vw",
+    width: "8vw",
   },
   value: {
     display: "inline-block",

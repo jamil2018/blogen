@@ -57,7 +57,11 @@ export const createUser = async (userData) => {
     const { data } = await axios.post("/api/users", formData, config);
     return data;
   } catch (err) {
-    throw new Error(`Error while fetching data. Error Message: ${err.message}`);
+    const error = new Error(
+      `Error while fetching data. Error Message: ${err.message}`
+    );
+    error.status = err.response.request.status;
+    throw error;
   }
 };
 
