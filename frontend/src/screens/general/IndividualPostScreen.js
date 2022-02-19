@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import { grey } from "@material-ui/core/colors";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 import PostCommentDeck from "../../components/PostCommentDeck";
@@ -18,7 +18,7 @@ import { SINGLE_POST_DATA } from "../../definitions/reactQueryConstants/queryCon
 import CreateCommentScreen from "./CreateCommentScreen";
 import { getAuthorNameInitials } from "../../utils/dataFormat";
 import { getPostFormattedDate } from "../../utils/dateUtils";
-import { getBase64ImageURL, toBase64 } from "../../utils/imageConvertion";
+import { getBase64ImageURL } from "../../utils/imageConvertion";
 import ReactQuill from "react-quill";
 import CreateIcon from "@material-ui/icons/Create";
 import DeleteCommentScreen from "./DeleteCommentScreen";

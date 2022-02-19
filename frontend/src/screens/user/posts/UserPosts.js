@@ -15,10 +15,7 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import { useQuery } from "react-query";
 import columns from "../../../definitions/gridColDef/postGrids";
 import { POST_DATA } from "../../../definitions/reactQueryConstants/queryConstants";
-import {
-  getAllPosts,
-  getAllPostsByAuthorId,
-} from "../../../data/postQueryFunctions";
+import { getAllPostsByAuthorId } from "../../../data/postQueryFunctions";
 import { DataGrid, GridToolbar } from "@material-ui/data-grid";
 import AdminModal from "../../../components/AdminModal";
 import ErrorIcon from "@material-ui/icons/Error";

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, IconButton, Menu, MenuItem } from "@material-ui/core";
+import { Button, IconButton, Menu } from "@material-ui/core";
 
 const ItemMenu = ({ children, isIconButton, menuButtonContent }) => {
   const [anchorEl, setAnchorEl] = useState(null);

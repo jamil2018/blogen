@@ -6,7 +6,6 @@ import {
   Typography,
 } from "@material-ui/core";
 import { grey } from "@material-ui/core/colors";
-import { useState } from "react";
 import { useQuery } from "react-query";
 import { useSelector } from "react-redux";
 import { getCommentsByPostId } from "../data/commentQueryFunctions";

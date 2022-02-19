@@ -1,4 +1,4 @@
-import { Box, Chip, makeStyles } from "@material-ui/core";
+import { Box, makeStyles } from "@material-ui/core";
 import PostTag from "./PostTag";
 
 const useStyles = makeStyles((theme) => ({

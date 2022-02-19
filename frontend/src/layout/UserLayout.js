@@ -10,11 +10,7 @@ import {
   ListItemText,
   Container,
 } from "@material-ui/core";
-import {
-  People as PeopleIcon,
-  Category as CategoryIcon,
-  Note as PostIcon,
-} from "@material-ui/icons";
+import { Note as PostIcon } from "@material-ui/icons";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import PowerSettingsNewIcon from "@material-ui/icons/PowerSettingsNew";
