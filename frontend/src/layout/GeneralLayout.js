@@ -15,6 +15,11 @@ import ItemMenu from "../components/ItemMenu";
 import ItemMenuElement from "../components/ItemMenuElement";
 import { getAuthorNameInitials } from "../utils/dataFormat";
 import { clearUserData } from "../redux/slices/userDataSlice";
+import { useQuery } from "react-query";
+import { USER_PROFILE_DATA } from "../definitions/reactQueryConstants/queryConstants";
+import { getUserById } from "../data/userQueryFunctions";
+import { getBase64ImageURL } from "../utils/imageConvertion";
+import { useEffect } from "react";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -66,7 +71,14 @@ const GeneralLayout = ({ children }) => {
           <ItemMenu
             isIconButton={true}
             menuButtonContent={
-              <Avatar>{getAuthorNameInitials(user.name)}</Avatar>
+              user.image.data ? (
+                <Avatar
+                  src={getBase64ImageURL(user.image.data.data)}
+                  alt={user.name}
+                />
+              ) : (
+                <Avatar>{getAuthorNameInitials(user.name)}</Avatar>
+              )
             }
           >
             <ItemMenuElement isLink={true} link="/user/dashboard">

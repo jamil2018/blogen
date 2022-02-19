@@ -66,6 +66,7 @@ export const createUser = async (userData) => {
 };
 
 export const getUserById = async (userId) => {
+  if (!userId) return {};
   try {
     const config = {
       headers: {
@@ -85,18 +86,28 @@ export const updateUser = async (updatedUserData) => {
     const { token } = userData.user;
     const config = {
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${token}`,
       },
     };
-    const { data } = await axios.put(
-      `/api/users/profile`,
-      updatedUserData,
-      config
-    );
+    const formData = new FormData();
+    formData.append("name", updatedUserData.name);
+    formData.append("email", updatedUserData.email);
+    formData.append("password", updatedUserData.password);
+    formData.append("image", updatedUserData.image);
+    formData.append("bio", updatedUserData.bio);
+    formData.append("facebookId", updatedUserData.facebookId);
+    formData.append("linkedinId", updatedUserData.linkedinId);
+    formData.append("twitterId", updatedUserData.twitterId);
+    formData.append("isAdmin", updatedUserData.isAdmin);
+    const { data } = await axios.put(`/api/users/profile`, formData, config);
     return data;
   } catch (err) {
-    throw new Error(`Error while fetching data. Error Message: ${err.message}`);
+    const error = new Error(
+      `Error while fetching data. Error Message: ${err.message}`
+    );
+    error.status = err.response.request.status;
+    throw error;
   }
 };
 

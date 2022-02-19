@@ -4,6 +4,7 @@ import User from "../models/UserModel.js";
 import generateToken from "../utils/generateToken.js";
 import fs from "fs";
 import path from "path";
+import { compressImage } from "../utils/compressImage.js";
 
 /**
  * @desc get all users
@@ -34,14 +35,11 @@ const registerUser = asyncHandler(async (req, res) => {
     req.body;
   let image;
   if (req.file) {
+    let storedImage = fs.readFileSync(
+      path.join(__rootDirname, process.env.FILE_UPLOAD_PATH, req.file.filename)
+    );
     image = {
-      data: fs.readFileSync(
-        path.join(
-          __rootDirname,
-          process.env.FILE_UPLOAD_PATH,
-          req.file.filename
-        )
-      ),
+      data: await compressImage(storedImage),
       contentType: "image/*",
     };
   }
@@ -66,6 +64,7 @@ const registerUser = asyncHandler(async (req, res) => {
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
+      image: user.image,
       token: generateToken(user._id),
     });
   } else {
@@ -88,6 +87,7 @@ const authUser = asyncHandler(async (req, res) => {
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
+      image: user.image,
       token: generateToken(user._id),
     });
   } else {
@@ -125,14 +125,11 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
   let image;
   if (req.file) {
+    let storedImage = fs.readFileSync(
+      path.join(__rootDirname, process.env.FILE_UPLOAD_PATH, req.file.filename)
+    );
     image = {
-      data: fs.readFileSync(
-        path.join(
-          __rootDirname,
-          process.env.FILE_UPLOAD_PATH,
-          req.file.filename
-        )
-      ),
+      data: await compressImage(storedImage),
       contentType: "image/*",
     };
   }

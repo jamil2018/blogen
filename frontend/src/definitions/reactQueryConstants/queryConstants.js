@@ -1,6 +1,7 @@
 // user
 export const USER_DATA = "users";
 export const SINGLE_USER_DATA = "user";
+export const USER_PROFILE_DATA = "userProfile";
 
 // category
 export const CATEGORY_DATA = "categories";

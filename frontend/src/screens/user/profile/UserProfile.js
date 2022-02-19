@@ -40,6 +40,7 @@ const UserProfile = () => {
         _id: userData._id,
         name: userData.name,
         email: userData.email,
+        image: userData.image,
         isAdmin: userData.isAdmin,
         token: user.token,
       })
@@ -64,7 +65,7 @@ const UserProfile = () => {
         <Typography variant="body1" gutterBottom>
           Hello{" "}
           <Typography component="span" variant="subtitle1" color="primary">
-            {data.name}
+            {user.name}
           </Typography>
         </Typography>
         <AlertNotification

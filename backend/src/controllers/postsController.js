@@ -5,6 +5,7 @@ import path from "path";
 import Post from "../models/PostModel.js";
 import Category from "../models/CategoryModel.js";
 import User from "../models/UserModel.js";
+import { compressImage } from "../utils/compressImage.js";
 
 /**
  * @desc get all posts
@@ -47,12 +48,16 @@ const createNewPost = asyncHandler(async (req, res) => {
   const { title, description, summary, category, tags } = req.body;
   const tagsArr = tags.split(",");
   const author = req.user._id;
-  const image = {
-    data: fs.readFileSync(
+  let image;
+  if (req.file) {
+    let storedImage = fs.readFileSync(
       path.join(__rootDirname, process.env.FILE_UPLOAD_PATH, req.file.filename)
-    ),
-    contentType: "image/*",
-  };
+    );
+    image = {
+      data: await compressImage(storedImage),
+      contentType: "image/*",
+    };
+  }
   const post = await Post.create({
     title,
     description,
@@ -88,14 +93,11 @@ const updatePost = asyncHandler(async (req, res) => {
   const post = await Post.findById(req.params.id);
   let image;
   if (req.file) {
+    let storedImage = fs.readFileSync(
+      path.join(__rootDirname, process.env.FILE_UPLOAD_PATH, req.file.filename)
+    );
     image = {
-      data: fs.readFileSync(
-        path.join(
-          __rootDirname,
-          process.env.FILE_UPLOAD_PATH,
-          req.file.filename
-        )
-      ),
+      data: await compressImage(storedImage),
       contentType: "image/*",
     };
   }
@@ -310,7 +312,6 @@ const findPosts = asyncHandler(async (req, res) => {
  */
 const getPostsByAuthorId = asyncHandler(async (req, res) => {
   const author = User.findById(req.params.aid);
-  console.log(req.params.aid);
   if (author) {
     const posts = await Post.find({
       author: {

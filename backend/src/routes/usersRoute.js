@@ -28,7 +28,7 @@ router.route("/:id").get(getUserById);
 router
   .route("/profile")
   .get(protect, getUserProfile)
-  .put(protect, updateUserProfile);
+  .put(uploads.single("image"), protect, updateUserProfile);
 
 router.route("/profile/:id").put(protect, checkAdmin, updateUserProfileById);
 

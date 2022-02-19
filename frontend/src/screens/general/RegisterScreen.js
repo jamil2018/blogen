@@ -76,12 +76,12 @@ const validationSchema = yup.object({
       .oneOf([yup.ref("password")], "Both passwords need to be the same")
       .required("This field is required"),
     otherwise: yup.string("Confirm your password"),
-    bio: yup.string("Enter your bio").required("This field is required"),
-    facebookId: yup.string("Enter your facebook id"),
-    linkedinId: yup.string("Enter your linkedin id"),
-    twitterId: yup.string("Enter your twitter id"),
-    image: yup.mixed(),
   }),
+  bio: yup.string("Enter your bio").required("This field is required"),
+  facebookId: yup.string("Enter your facebook id"),
+  linkedinId: yup.string("Enter your linkedin id"),
+  twitterId: yup.string("Enter your twitter id"),
+  image: yup.mixed(),
 });
 
 const RegisterScreen = ({ handleModalClose }) => {
