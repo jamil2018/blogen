@@ -5,6 +5,7 @@ import {
   makeStyles,
   TextField,
   Typography,
+  Link,
 } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { useFormik } from "formik";
@@ -46,7 +47,7 @@ const validationSchema = yup.object({
     .required("This field is required"),
 });
 
-const LoginScreen = ({ handleModalClose }) => {
+const LoginScreen = ({ handleModalClose, openRegistrationModal }) => {
   const [showInvalidCredentialsAlert, setShowInvalidCredentialsAlert] =
     useState(false);
   const history = useHistory();
@@ -131,6 +132,18 @@ const LoginScreen = ({ handleModalClose }) => {
               size="small"
               type="password"
             />
+            <Typography variant="subtitle1" component="span">
+              Don't have an account?{" "}
+              <Link
+                href="#"
+                onClick={() => {
+                  handleModalClose();
+                  openRegistrationModal();
+                }}
+              >
+                Sign Up
+              </Link>
+            </Typography>
             <Button
               color="primary"
               variant="outlined"

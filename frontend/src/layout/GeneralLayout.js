@@ -113,7 +113,7 @@ const GeneralLayout = ({ children }) => {
           </>
         )}
       </Navbar>
-      <Container maxWidth="xl" className={classes.container}>
+      <Container maxWidth="lg" className={classes.container}>
         {children}
       </Container>
       {/* Modals */}

@@ -114,18 +114,29 @@ export const updateUser = async (updatedUserData) => {
 // update a user by id. for admin users.
 export const updateUserById = async (updatedUserData) => {
   try {
+    console.log(updatedUserData);
     const { userId, values } = updatedUserData;
     const { userData } = store.getState();
     const { token } = userData.user;
     const config = {
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${token}`,
       },
     };
+    const formData = new FormData();
+    formData.append("name", values.name);
+    formData.append("email", values.email);
+    formData.append("password", values.password);
+    formData.append("image", values.image);
+    formData.append("bio", values.bio);
+    formData.append("facebookId", values.facebookId);
+    formData.append("linkedinId", values.linkedinId);
+    formData.append("twitterId", values.twitterId);
+    formData.append("isAdmin", values.isAdmin);
     const { data } = await axios.put(
       `/api/users/profile/${userId}`,
-      values,
+      formData,
       config
     );
     return data;

@@ -4,6 +4,7 @@ import {
   Box,
   Card,
   CardContent,
+  Container,
   Grid,
   InputBase,
   makeStyles,
@@ -87,54 +88,60 @@ const Navbar = ({ headerText, children }) => {
       elevation={false}
     >
       <Toolbar>
-        <Grid container justifyContent="space-between">
-          <Grid item>
-            <Grid container justifyContent="flex-start" alignItems="center">
-              <Box className={classes.headerLink} component={Link} to="/">
-                <Grid container justifyContent="flex-start" alignItems="center">
-                  <img
-                    className={classes.headerImage}
-                    src={AppIcon}
-                    alt="App Icon"
-                  />
-                  <Typography
-                    variant="h6"
-                    color="primary"
-                    className={classes.headerText}
+        <Container maxWidth="lg">
+          <Grid container justifyContent="space-between" alignItems="center">
+            <Grid item>
+              <Grid container justifyContent="flex-start" alignItems="center">
+                <Box className={classes.headerLink} component={Link} to="/">
+                  <Grid
+                    container
+                    justifyContent="flex-start"
+                    alignItems="center"
                   >
-                    {headerText}
-                  </Typography>
-                </Grid>
-              </Box>
-              <Box>
-                <Box className={classes.search}>
-                  <Box className={classes.searchIcon}>
-                    <SearchIcon />
-                  </Box>
-                  <InputBase
-                    placeholder="Search…"
-                    classes={{
-                      root: classes.inputRoot,
-                      input: classes.inputInput,
-                    }}
-                    inputProps={{ "aria-label": "search" }}
-                    onChange={(e) => console.log(e.target.value)}
-                  />
-                  <Card className={classes.searchResult} hidden={true}>
-                    <CardContent>
-                      <SearchLink to="/">hello 01</SearchLink>
-                      <SearchLink to="/">hello 02</SearchLink>
-                      <SearchLink to="/">hello 03</SearchLink>
-                    </CardContent>
-                  </Card>
+                    <img
+                      className={classes.headerImage}
+                      src={AppIcon}
+                      alt="App Icon"
+                    />
+                    <Typography
+                      variant="h6"
+                      color="primary"
+                      className={classes.headerText}
+                    >
+                      {headerText}
+                    </Typography>
+                  </Grid>
                 </Box>
-              </Box>
+                <Box>
+                  <Box className={classes.search}>
+                    <Box className={classes.searchIcon}>
+                      <SearchIcon />
+                    </Box>
+                    <InputBase
+                      placeholder="Search…"
+                      classes={{
+                        root: classes.inputRoot,
+                        input: classes.inputInput,
+                      }}
+                      inputProps={{ "aria-label": "search" }}
+                      onChange={(e) => console.log(e.target.value)}
+                    />
+                    <Card className={classes.searchResult} hidden={true}>
+                      <CardContent>
+                        <SearchLink to="/">hello 01</SearchLink>
+                        <SearchLink to="/">hello 02</SearchLink>
+                        <SearchLink to="/">hello 03</SearchLink>
+                      </CardContent>
+                    </Card>
+                  </Box>
+                </Box>
+              </Grid>
+            </Grid>
+            <Grid item>
+              <Grid container>{children}</Grid>
             </Grid>
           </Grid>
-          <Grid item>
-            <Grid container>{children}</Grid>
-          </Grid>
-        </Grid>
+        </Container>
       </Toolbar>
     </AppBar>
   );

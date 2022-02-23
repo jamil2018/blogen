@@ -125,7 +125,6 @@ const AdminProfile = () => {
         <EditProfileScreen
           handleModalClose={() => setShowProfileEditModal(false)}
           showSuccessAlertHandler={() => setShowAlert(true)}
-          userData={user}
           dispatcher={(userData) => updateUserState(userData)}
         />
       </AdminModal>

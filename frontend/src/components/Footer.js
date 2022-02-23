@@ -37,84 +37,88 @@ const useStyles = makeStyles((theme) => ({
 const Footer = () => {
   const classes = useStyles();
   return (
-    <Container className={classes.container} maxWidth="xl">
-      <Grid
-        className={classes.footerTextContainer}
-        container
-        justifyContent="space-between"
-        alignItems="center"
-      >
-        <Grid item xs={12} sm={3}>
-          <Typography
-            className={classes.footerTextHeader}
-            variant="h6"
-            color="primary"
-          >
-            Learn More.
-          </Typography>
-          <Typography className={classes.footerTextBody} variant="subtitle2">
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ut, odit.
-            Totam atque, laudantium quibusdam, cumque qui, illo tempora
-            voluptate eos id at dolore sunt neque.
-          </Typography>
-        </Grid>
-        <Grid item xs={12} sm={3}>
-          <Typography
-            className={classes.footerTextHeader}
-            variant="h6"
-            color="primary"
-          >
-            Customize your account.
-          </Typography>
-          <Typography className={classes.footerTextBody} variant="subtitle2">
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ut, odit.
-            Totam atque, laudantium quibusdam, cumque qui, illo tempora
-            voluptate eos id at dolore sunt neque.
-          </Typography>
-        </Grid>
-        <Grid item xs={12} sm={3}>
-          <Typography
-            className={classes.footerTextHeader}
-            variant="h6"
-            color="primary"
-          >
-            Write a story.
-          </Typography>
-          <Typography className={classes.footerTextBody} variant="subtitle2">
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ut, odit.
-            Totam atque, laudantium quibusdam, cumque qui, illo tempora
-            voluptate eos id at dolore sunt neque.
-          </Typography>
-        </Grid>
-      </Grid>
-      <Divider />
-      <Grid
-        className={classes.footerNavigationContainer}
-        container
-        justifyContent="space-between"
-        alignItems="center"
-      >
-        <Grid item sm={3}>
-          <Grid container justifyContent="flex-start" alignItems="center">
-            <img src={Logo} alt="logo" className={classes.footerLogoImage} />
+    <div className={classes.container}>
+      <Container maxWidth="lg">
+        <Grid
+          className={classes.footerTextContainer}
+          container
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Grid item xs={12} sm={3}>
             <Typography
-              className={classes.footerLogoText}
-              variant="h5"
+              className={classes.footerTextHeader}
+              variant="h6"
               color="primary"
             >
-              Blogen
+              Learn More.
+            </Typography>
+            <Typography className={classes.footerTextBody} variant="subtitle2">
+              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ut,
+              odit. Totam atque, laudantium quibusdam, cumque qui, illo tempora
+              voluptate eos id at dolore sunt neque.
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <Typography
+              className={classes.footerTextHeader}
+              variant="h6"
+              color="primary"
+            >
+              Customize your account.
+            </Typography>
+            <Typography className={classes.footerTextBody} variant="subtitle2">
+              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ut,
+              odit. Totam atque, laudantium quibusdam, cumque qui, illo tempora
+              voluptate eos id at dolore sunt neque.
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <Typography
+              className={classes.footerTextHeader}
+              variant="h6"
+              color="primary"
+            >
+              Write a story.
+            </Typography>
+            <Typography className={classes.footerTextBody} variant="subtitle2">
+              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ut,
+              odit. Totam atque, laudantium quibusdam, cumque qui, illo tempora
+              voluptate eos id at dolore sunt neque.
             </Typography>
           </Grid>
         </Grid>
-        <Grid item sm={9}>
-          <Grid container justifyContent="flex-end" alignItems="center">
-            <Typography variant="subtitle2" color="primary">
-              &copy; {new Date().getFullYear()} Blogen. All rights reserved.
-            </Typography>
+      </Container>
+      <Divider />
+      <Container maxWidth="lg">
+        <Grid
+          className={classes.footerNavigationContainer}
+          container
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Grid item sm={3}>
+            <Grid container justifyContent="flex-start" alignItems="center">
+              <img src={Logo} alt="logo" className={classes.footerLogoImage} />
+              <Typography
+                className={classes.footerLogoText}
+                variant="h5"
+                color="primary"
+              >
+                Blogen
+              </Typography>
+            </Grid>
+          </Grid>
+          <Grid item sm={9}>
+            <Grid container justifyContent="flex-end" alignItems="center">
+              <Typography variant="subtitle2" color="primary">
+                &copy; {new Date().getFullYear()} Blogen. All rights reserved.
+              </Typography>
+            </Grid>
           </Grid>
         </Grid>
-      </Grid>
-    </Container>
+      </Container>
+    </div>
   );
 };
 

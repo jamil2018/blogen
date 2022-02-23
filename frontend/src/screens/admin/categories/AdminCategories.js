@@ -33,7 +33,8 @@ const AdminCategories = () => {
   const history = useHistory();
   const { data, isLoading, isError, error, isFetching } = useQuery(
     CATEGORY_DATA,
-    getAllCategories
+    getAllCategories,
+    { refetchOnWindowFocus: false, refetchInterval: 10 * 60 * 1000 }
   );
 
   // states

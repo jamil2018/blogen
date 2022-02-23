@@ -44,7 +44,8 @@ const AdminUsers = (props) => {
   const classes = useStyles();
   const { isLoading, isError, data, error, isFetching } = useQuery(
     USER_DATA,
-    getAllUsers
+    getAllUsers,
+    { refetchOnWindowFocus: false, refetchInterval: 10 * 60 * 1000 }
   );
   let rows = [];
 

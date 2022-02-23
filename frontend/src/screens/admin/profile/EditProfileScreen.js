@@ -3,12 +3,13 @@ import { useFormik } from "formik";
 import { useMutation, useQueryClient } from "react-query";
 import CreateIcon from "@material-ui/icons/Create";
 import * as yup from "yup";
-import { updateUserById } from "../../../data/userQueryFunctions";
+import { updateUser, updateUserById } from "../../../data/userQueryFunctions";
 import { sanitizeSocialURL } from "../../../utils/dataFormat";
 import FacebookIcon from "@material-ui/icons/Facebook";
 import LinkedInIcon from "@material-ui/icons/LinkedIn";
 import TwitterIcon from "@material-ui/icons/Twitter";
 import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
+import { SINGLE_USER_DATA } from "../../../definitions/reactQueryConstants/queryConstants";
 
 const validationSchema = yup.object({
   name: yup.string("Enter you name"),
@@ -25,7 +26,7 @@ const validationSchema = yup.object({
       .oneOf([yup.ref("password")], "Both passwords need to be the same"),
     otherwise: yup.string("Confirm your password"),
   }),
-  bio: yup.string("Enter your bio").required("This field is required"),
+  bio: yup.string("Enter your bio"),
   facebookId: yup.string("Enter your facebook id"),
   linkedinId: yup.string("Enter your linkedin id"),
   twitterId: yup.string("Enter your twitter id"),
@@ -60,7 +61,6 @@ const useStyles = makeStyles((theme) => ({
 const EditProfileScreen = ({
   showSuccessAlertHandler,
   handleModalClose,
-  userData,
   dispatcher,
 }) => {
   const queryClient = useQueryClient();
@@ -81,25 +81,22 @@ const EditProfileScreen = ({
     validationSchema: validationSchema,
     onSubmit: (values) => {
       mutation.mutate({
-        userId: userData._id,
-        values: {
-          name: values.name,
-          email: values.email,
-          password: values.password,
-          bio: values.bio,
-          facebookId: sanitizeSocialURL(values.facebookId),
-          linkedinId: sanitizeSocialURL(values.linkedinId),
-          twitterId: sanitizeSocialURL(values.twitterId),
-          image: values.image,
-          isAdmin: false,
-        },
+        name: values.name,
+        email: values.email,
+        password: values.password,
+        bio: values.bio,
+        facebookId: sanitizeSocialURL(values.facebookId),
+        linkedinId: sanitizeSocialURL(values.linkedinId),
+        twitterId: sanitizeSocialURL(values.twitterId),
+        image: values.image,
+        isAdmin: true,
       });
       handleModalClose();
     },
   });
-  const mutation = useMutation(updateUserById, {
+  const mutation = useMutation(updateUser, {
     onSuccess: (data) => {
-      queryClient.invalidateQueries("users");
+      queryClient.invalidateQueries(SINGLE_USER_DATA);
       showSuccessAlertHandler();
       dispatcher(data);
     },

@@ -31,7 +31,8 @@ const AdminPosts = () => {
   const { user } = useSelector((state) => state.userData);
   const { data, isLoading, isFetching, isError, error } = useQuery(
     POST_DATA,
-    getAllPosts
+    getAllPosts,
+    { refetchOnWindowFocus: false, refetchInterval: 10 * 60 * 1000 }
   );
   // states
   const [selectedRows, setSelectedRows] = useState([]);

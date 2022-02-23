@@ -170,9 +170,24 @@ const updateUserProfile = asyncHandler(async (req, res) => {
  */
 const updateUserProfileById = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
+  let image;
+  if (req.file) {
+    let storedImage = fs.readFileSync(
+      path.join(__rootDirname, process.env.FILE_UPLOAD_PATH, req.file.filename)
+    );
+    image = {
+      data: await compressImage(storedImage),
+      contentType: "image/*",
+    };
+  }
   if (user) {
     user.name = req.body.name || user.name;
     user.email = req.body.email || user.email;
+    user.bio = req.body.bio || user.bio;
+    user.facebookId = req.body.facebookId || user.facebookId;
+    user.linkedinId = req.body.linkedinId || user.linkedinId;
+    user.twitterId = req.body.twitterId || user.twitterId;
+    user.image = image || user.image;
     if (req.body.password) {
       user.password = req.body.password;
     }
@@ -181,6 +196,11 @@ const updateUserProfileById = asyncHandler(async (req, res) => {
       _id: updatedUser._id,
       name: updatedUser.name,
       email: updatedUser.email,
+      bio: updatedUser.bio,
+      facebookId: updatedUser.facebookId,
+      linkedinId: updatedUser.linkedinId,
+      twitterId: updatedUser.twitterId,
+      image: updatedUser.image,
       isAdmin: updatedUser.isAdmin,
       token: generateToken(updatedUser._id),
     });

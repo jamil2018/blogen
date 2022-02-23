@@ -30,6 +30,8 @@ router
   .get(protect, getUserProfile)
   .put(uploads.single("image"), protect, updateUserProfile);
 
-router.route("/profile/:id").put(protect, checkAdmin, updateUserProfileById);
+router
+  .route("/profile/:id")
+  .put(uploads.single("image"), protect, checkAdmin, updateUserProfileById);
 
 export default router;
