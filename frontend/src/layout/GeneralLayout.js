@@ -118,7 +118,10 @@ const GeneralLayout = ({ children }) => {
       </Container>
       {/* Modals */}
       <UserModal open={openLoginModal} onClose={() => setOpenLoginModal(false)}>
-        <LoginScreen handleModalClose={() => modalCloseHandler("LOGIN")} />
+        <LoginScreen
+          handleModalClose={() => modalCloseHandler("LOGIN")}
+          openRegistrationModal={() => setOpenRegistrationModal(true)}
+        />
       </UserModal>
       <UserModal
         open={openRegistrationModal}
@@ -126,6 +129,7 @@ const GeneralLayout = ({ children }) => {
         expanded={true}
       >
         <RegisterScreen
+          openLoginModal={() => setOpenLoginModal(true)}
           handleModalClose={() => modalCloseHandler("REGISTER")}
         />
       </UserModal>

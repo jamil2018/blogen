@@ -15,6 +15,20 @@ export const getAllPosts = async () => {
   }
 };
 
+export const getLatestPosts = async () => {
+  try {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const { data } = await axios.get("/api/posts/latest", config);
+    return data;
+  } catch (err) {
+    throw new Error(`Error while fetching data. Error Message: ${err.message}`);
+  }
+};
+
 export const getAllPostsByAuthorId = async (authorId) => {
   try {
     const { userData } = store.getState();

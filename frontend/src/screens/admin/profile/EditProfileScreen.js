@@ -3,7 +3,7 @@ import { useFormik } from "formik";
 import { useMutation, useQueryClient } from "react-query";
 import CreateIcon from "@material-ui/icons/Create";
 import * as yup from "yup";
-import { updateUser, updateUserById } from "../../../data/userQueryFunctions";
+import { updateUser } from "../../../data/userQueryFunctions";
 import { sanitizeSocialURL } from "../../../utils/dataFormat";
 import FacebookIcon from "@material-ui/icons/Facebook";
 import LinkedInIcon from "@material-ui/icons/LinkedIn";

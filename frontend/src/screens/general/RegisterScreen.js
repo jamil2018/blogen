@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   Grid,
+  Link,
   makeStyles,
   TextField,
   Typography,
@@ -84,7 +85,7 @@ const validationSchema = yup.object({
   image: yup.mixed(),
 });
 
-const RegisterScreen = ({ handleModalClose }) => {
+const RegisterScreen = ({ handleModalClose, openLoginModal }) => {
   // states
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -356,6 +357,18 @@ const RegisterScreen = ({ handleModalClose }) => {
                 </Grid>
               </Grid>
             </Grid>
+            <Typography variant="subtitle1" component="span">
+              Already have an account?{" "}
+              <Link
+                href="#"
+                onClick={() => {
+                  handleModalClose();
+                  setTimeout(() => openLoginModal(), 150);
+                }}
+              >
+                Sign In
+              </Link>
+            </Typography>
             <Button
               color="primary"
               variant="outlined"

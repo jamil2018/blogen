@@ -138,7 +138,7 @@ const LoginScreen = ({ handleModalClose, openRegistrationModal }) => {
                 href="#"
                 onClick={() => {
                   handleModalClose();
-                  openRegistrationModal();
+                  setTimeout(() => openRegistrationModal(), 150);
                 }}
               >
                 Sign Up

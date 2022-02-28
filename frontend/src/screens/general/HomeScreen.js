@@ -1,12 +1,21 @@
-import { Button, Divider, Grid, Typography } from "@material-ui/core";
+import {
+  Button,
+  CircularProgress,
+  Divider,
+  Grid,
+  Typography,
+} from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import homeBg from "../../assets/homeBg.svg";
 import AutorenewIcon from "@material-ui/icons/Autorenew";
-import { Link } from "react-router-dom";
 import UserModal from "../../components/UserModal";
 import LoginScreen from "./LoginScreen";
 import RegisterScreen from "./RegisterScreen";
 import { useState } from "react";
+import PostSummaryCard from "../../components/PostSummaryCard";
+import { useQuery } from "react-query";
+import { POST_DATA } from "../../definitions/reactQueryConstants/queryConstants";
+import { getAllPosts, getLatestPosts } from "../../data/postQueryFunctions";
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -25,14 +34,21 @@ const useStyles = makeStyles((theme) => ({
   latestArticlesHeaderText: {
     marginLeft: theme.spacing(0.3),
   },
-  latestArticles: {
+  latestArticlesContainer: {
     margin: theme.spacing(4, 0),
+  },
+  latestArticleHeader: {
+    marginBottom: theme.spacing(2),
   },
 }));
 
 const HomeScreen = () => {
   const classes = useStyles();
-
+  const { data, isLoading, isFetching, isError, error } = useQuery(
+    POST_DATA,
+    getLatestPosts,
+    { refetchOnWindowFocus: false, refetchInterval: 10 * 60 * 1000 }
+  );
   // states
   const [openLoginModal, setOpenLoginModal] = useState(false);
   const [openRegistrationModal, setOpenRegistrationModal] = useState(false);
@@ -84,8 +100,12 @@ const HomeScreen = () => {
         </Grid>
       </header>
       <Divider />
-      <section className={classes.latestArticles}>
-        <Grid container alignItems="center">
+      <section className={classes.latestArticlesContainer}>
+        <Grid
+          container
+          alignItems="center"
+          className={classes.latestArticleHeader}
+        >
           <AutorenewIcon />
           <Typography
             className={classes.latestArticlesHeaderText}
@@ -96,11 +116,34 @@ const HomeScreen = () => {
             LATEST ARTICLES
           </Typography>
         </Grid>
-        <Grid
-          container
-          justifyContent="space-between"
-          alignItems="center"
-        ></Grid>
+        {isLoading || isFetching ? (
+          <Grid container alignItems="center" justifyContent="center">
+            <CircularProgress />
+          </Grid>
+        ) : (
+          <Grid
+            container
+            justifyContent="space-between"
+            spacing={2}
+            alignItems="center"
+          >
+            {data.map((post) => (
+              <Grid item xs={4}>
+                <PostSummaryCard
+                  key={post.id}
+                  postId={post._id}
+                  authorImage={post.author.image.data.data}
+                  authorName={post.author.name}
+                  postTitle={post.title}
+                  publishDate={post.createdAt}
+                  description={post.description}
+                />
+              </Grid>
+            ))}
+            <Grid item xs={4}></Grid>
+            <Grid item xs={4}></Grid>
+          </Grid>
+        )}
       </section>
       {/* Modals */}
       <UserModal open={openLoginModal} onClose={() => setOpenLoginModal(false)}>
@@ -115,6 +158,7 @@ const HomeScreen = () => {
         expanded={true}
       >
         <RegisterScreen
+          openLoginModal={() => setOpenLoginModal(true)}
           handleModalClose={() => modalCloseHandler("REGISTER")}
         />
       </UserModal>

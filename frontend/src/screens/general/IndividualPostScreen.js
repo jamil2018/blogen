@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import { grey } from "@material-ui/core/colors";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 import PostCommentDeck from "../../components/PostCommentDeck";
@@ -16,7 +16,11 @@ import PostTagDeck from "../../components/PostTagDeck";
 import { getPostById } from "../../data/postQueryFunctions";
 import { SINGLE_POST_DATA } from "../../definitions/reactQueryConstants/queryConstants";
 import CreateCommentScreen from "./CreateCommentScreen";
-import { getAuthorNameInitials } from "../../utils/dataFormat";
+import {
+  calculateReadingTime,
+  convertToText,
+  getAuthorNameInitials,
+} from "../../utils/dataFormat";
 import { getPostFormattedDate } from "../../utils/dateUtils";
 import { getBase64ImageURL } from "../../utils/imageConvertion";
 import ReactQuill from "react-quill";
@@ -36,7 +40,11 @@ const useStyles = makeStyles((theme) => ({
   authorInfoContainer: {
     marginTop: theme.spacing(2),
   },
-  postDate: {
+  postMeta: {
+    color: grey[500],
+    marginLeft: theme.spacing(2),
+  },
+  postReadingTime: {
     color: grey[500],
     marginLeft: theme.spacing(2),
   },
@@ -73,12 +81,18 @@ const IndividualPostScreen = () => {
   const [showDeleteCommentModal, setShowDeleteCommentModal] = useState(false);
   const [showEditCommentModal, setShowEditCommentModal] = useState(false);
   const [modificationCommentId, setModificationCommentId] = useState(null);
+
   const { postId } = useParams();
   const classes = useStyles();
   const { isLoading, data } = useQuery(
     [SINGLE_POST_DATA, postId],
     ({ queryKey }) => getPostById(queryKey[1])
   );
+
+  // effects
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // action handlers
   const handleDeleteComment = (commentId) => {
@@ -123,8 +137,9 @@ const IndividualPostScreen = () => {
               >
                 {data.author.name}
               </Typography>
-              <Typography variant="subtitle2" className={classes.postDate}>
-                {getPostFormattedDate(data.createdAt)}
+              <Typography variant="subtitle2" className={classes.postMeta}>
+                {getPostFormattedDate(data.createdAt)} ·{" "}
+                {calculateReadingTime(convertToText(data.description))} min read
               </Typography>
             </Grid>
           </Grid>

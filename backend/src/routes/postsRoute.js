@@ -17,6 +17,7 @@ import {
   getCuratedPostsCount,
   getCuratedPostsCountByAuthorId,
   getPostCommentById,
+  getLatestPosts,
 } from "../controllers/postsController.js";
 
 const router = Router();
@@ -27,6 +28,7 @@ router
   .post(protect, uploads.single("image"), createNewPost)
   .delete(protect, deleteMultiplePostsById);
 
+router.route("/latest").get(getLatestPosts);
 router.route("/find").get(findPosts);
 router.route("/curated").get(getCuratedPostsCount);
 router.route("/curated/:author").get(protect, getCuratedPostsCountByAuthorId);

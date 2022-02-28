@@ -3,6 +3,9 @@ import { grey, orange } from "@material-ui/core/colors";
 
 const theme = createTheme({
   palette: {
+    background: {
+      default: "#ffffff",
+    },
     primary: {
       light: orange["600"],
       main: orange["800"],

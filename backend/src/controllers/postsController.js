@@ -15,7 +15,7 @@ import { compressImage } from "../utils/compressImage.js";
 const getAllPosts = asyncHandler(async (req, res) => {
   const posts = await Post.find()
     .select("title summary author category tags image")
-    .populate("author", "name")
+    .populate("author", "name image")
     .populate("category", "title");
   return res.status(200).json(posts);
 });
@@ -28,7 +28,7 @@ const getAllPosts = asyncHandler(async (req, res) => {
 const getPostById = asyncHandler(async (req, res) => {
   const post = await Post.findById(req.params.id)
     .select("title description summary author category tags image createdAt")
-    .populate("author", "name")
+    .populate("author", "name image")
     .populate("category", "title");
 
   if (post) {
@@ -37,6 +37,22 @@ const getPostById = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Invalid post iD");
   }
+});
+
+/**
+ * @desc get last 6 posts
+ * @route GET /api/posts/latest
+ * @access public
+ */
+const getLatestPosts = asyncHandler(async (req, res) => {
+  const posts = await Post.find()
+    .sort({ createdAt: -1 })
+    .limit(6)
+    .select("title summary description author category tags image createdAt")
+    .populate("author", "name image")
+    .populate("category", "title");
+
+  return res.status(200).json(posts);
 });
 
 /**
@@ -354,6 +370,7 @@ const getCuratedPostsCountByAuthorId = asyncHandler(async (req, res) => {
 
 export {
   getAllPosts,
+  getLatestPosts,
   createNewPost,
   getPostById,
   updatePost,

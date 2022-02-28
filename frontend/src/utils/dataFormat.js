@@ -1,3 +1,5 @@
+import * as h2p from "html2plaintext";
+
 export const formatDate = (data) => {
   return data.map((d) => {
     d.createdAt = new Date(d.createdAt).toLocaleDateString();
@@ -60,6 +62,17 @@ export const sanitizeSocialURL = (url) => {
   if (url.includes(urlHandles.twitterAlt)) {
     return url.replace(urlHandles.twitterAlt, "");
   }
-  console.log(url);
   return url;
+};
+
+export const countWords = (str) => {
+  return str.trim().split(/\s+/).length;
+};
+
+export const calculateReadingTime = (str) => {
+  return Math.ceil(countWords(str) / 200);
+};
+
+export const convertToText = (html) => {
+  return h2p(html);
 };
