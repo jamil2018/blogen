@@ -13,10 +13,19 @@ import { compressImage } from "../utils/compressImage.js";
  * @access public
  */
 const getAllPosts = asyncHandler(async (req, res) => {
-  const posts = await Post.find()
-    .select("title summary author category tags image")
-    .populate("author", "name image")
-    .populate("category", "title");
+  const { page = 1, limit = 10 } = req.query;
+  const posts = await Post.paginate(
+    {},
+    {
+      select: "title description summary image tags category author",
+      populate: [
+        { path: "category", select: "title" },
+        { path: "author", select: "name image" },
+      ],
+      page: page,
+      limit: limit,
+    }
+  );
   return res.status(200).json(posts);
 });
 

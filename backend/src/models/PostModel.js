@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2";
 
 const postSchema = new mongoose.Schema(
   {
@@ -44,5 +45,7 @@ const postSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+postSchema.plugin(mongoosePaginate);
 
 export default mongoose.model("Post", postSchema);
