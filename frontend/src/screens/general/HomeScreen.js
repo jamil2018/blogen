@@ -28,6 +28,7 @@ import { getBase64ImageURL } from "../../utils/imageConvertion";
 import { calculateReadingTime } from "../../utils/dataFormat";
 import { getAllCategories } from "../../data/categoryQueryFunctions";
 import { Chip } from "@material-ui/core";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -66,6 +67,9 @@ const useStyles = makeStyles((theme) => ({
   categoryChip: {
     marginRight: theme.spacing(2),
     margin: theme.spacing(1, 0),
+    "&:hover": {
+      cursor: "pointer",
+    },
   },
 }));
 
@@ -296,6 +300,9 @@ const HomeScreen = () => {
             ) : (
               allCategoryData.map((category) => (
                 <Chip
+                  key={category._id}
+                  component={Link}
+                  to={`/posts/search/categories/${category.title}`}
                   className={classes.categoryChip}
                   label={category.title}
                   variant="outlined"

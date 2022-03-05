@@ -23,6 +23,7 @@ import EditUserPostScreen from "./screens/user/posts/EditUserPostScreen";
 import GeneralLayout from "./layout/GeneralLayout";
 import IndividualPostScreen from "./screens/general/IndividualPostScreen";
 import AuthorListScreen from "./screens/general/AuthorListScreen";
+import PostsByCategoryScreen from "./screens/general/PostsByCategoryScreen";
 
 const App = () => {
   const client = new QueryClient();
@@ -66,7 +67,15 @@ const App = () => {
                 <Route path="/admin/profile" component={AdminProfile} />
               </AdminLayout>
             </Route>
-            <Route exact path={["/", "/posts/:postId", "/authors"]}>
+            <Route
+              exact
+              path={[
+                "/",
+                "/posts/:postId",
+                "/authors",
+                "/posts/search/categories/:categoryName",
+              ]}
+            >
               <GeneralLayout>
                 <Route exact path="/" component={HomeScreen} />
                 <Route
@@ -75,6 +84,11 @@ const App = () => {
                   component={IndividualPostScreen}
                 />
                 <Route exact path="/authors" component={AuthorListScreen} />
+                <Route
+                  exact
+                  path="/posts/search/categories/:categoryName"
+                  component={PostsByCategoryScreen}
+                />
               </GeneralLayout>
             </Route>
           </Router>

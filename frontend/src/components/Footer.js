@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(8),
   },
   footerTextContainer: {
-    margin: theme.spacing(4, 0),
+    margin: theme.spacing(1.5, 0),
   },
   footerTextHeader: {
     marginBottom: theme.spacing(1),
@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: theme.typography.fontWeightLight,
   },
   footerNavigationContainer: {
-    marginTop: theme.spacing(4),
+    marginTop: theme.spacing(1.5),
   },
   footerLogoImage: {
     width: theme.spacing(6),
