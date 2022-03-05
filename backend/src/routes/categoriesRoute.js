@@ -15,7 +15,7 @@ const router = Router();
 
 router
   .route("/")
-  .get(protect, getAllCategories)
+  .get(getAllCategories)
   .post(protect, checkAdmin, createNewCategory)
   .delete(protect, checkAdmin, deleteMultipleCategoryById);
 
@@ -24,7 +24,7 @@ router.route("/curated").get(protect, checkAdmin, getCuratedCategoryCount);
 
 router
   .route("/:id")
-  .get(protect, getCategoryById)
+  .get(getCategoryById)
   .put(protect, checkAdmin, updateCategory)
   .delete(protect, checkAdmin, deleteCategory);
 

@@ -5,7 +5,8 @@ import Fade from "@material-ui/core/Fade";
 import Backdrop from "@material-ui/core/Backdrop";
 import Modal from "@material-ui/core/Modal";
 import CloseIcon from "@material-ui/icons/Close";
-import { Box, IconButton } from "@material-ui/core";
+import Box from "@material-ui/core/Box";
+import IconButton from "@material-ui/core/IconButton";
 
 const useStyles = makeStyles((theme) => ({
   modal: {

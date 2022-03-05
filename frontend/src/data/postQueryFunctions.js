@@ -15,6 +15,23 @@ export const getAllPosts = async () => {
   }
 };
 
+export const getPaginatedPosts = async ({ page, limit }) => {
+  try {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const { data } = await axios.get(
+      `/api/posts/paginated?page=${page}&limit=${limit}`,
+      config
+    );
+    return data;
+  } catch (err) {
+    throw new Error(`Error while fetching data. Error Message: ${err.message}`);
+  }
+};
+
 export const getLatestPosts = async () => {
   try {
     const config = {

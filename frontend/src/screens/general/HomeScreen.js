@@ -1,21 +1,33 @@
-import {
-  Button,
-  CircularProgress,
-  Divider,
-  Grid,
-  Typography,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/styles";
+import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import Divider from "@material-ui/core/Divider";
+import Grid from "@material-ui/core/Grid";
+import makeStyles from "@material-ui/styles/makeStyles";
 import homeBg from "../../assets/homeBg.svg";
 import AutorenewIcon from "@material-ui/icons/Autorenew";
 import UserModal from "../../components/UserModal";
 import LoginScreen from "./LoginScreen";
 import RegisterScreen from "./RegisterScreen";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import PostSummaryCard from "../../components/PostSummaryCard";
 import { useQuery } from "react-query";
-import { POST_DATA } from "../../definitions/reactQueryConstants/queryConstants";
-import { getAllPosts, getLatestPosts } from "../../data/postQueryFunctions";
+import { Pagination } from "@material-ui/lab";
+import {
+  CATEGORY_DATA,
+  LATEST_POST_DATA,
+  PAGINATED_POST_DATA,
+} from "../../definitions/reactQueryConstants/queryConstants";
+import {
+  getLatestPosts,
+  getPaginatedPosts,
+} from "../../data/postQueryFunctions";
+import Alert from "@material-ui/lab/Alert";
+import ExpandedPostSummaryCard from "../../components/ExpandedPostSummaryCard";
+import { getBase64ImageURL } from "../../utils/imageConvertion";
+import { calculateReadingTime } from "../../utils/dataFormat";
+import { getAllCategories } from "../../data/categoryQueryFunctions";
+import { Chip } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -36,35 +48,94 @@ const useStyles = makeStyles((theme) => ({
   },
   latestArticlesContainer: {
     margin: theme.spacing(4, 0),
+    marginBottom: theme.spacing(8),
   },
   latestArticleHeader: {
     marginBottom: theme.spacing(2),
   },
+  allPostsContainer: {
+    margin: theme.spacing(2, 0),
+  },
+  categorySectionTitle: {
+    marginTop: theme.spacing(3),
+    fontSize: theme.typography.pxToRem(16),
+  },
+  paginationContainer: {
+    marginTop: theme.spacing(8),
+  },
+  categoryChip: {
+    marginRight: theme.spacing(2),
+    margin: theme.spacing(1, 0),
+  },
 }));
 
 const HomeScreen = () => {
-  const classes = useStyles();
-  const { data, isLoading, isFetching, isError, error } = useQuery(
-    POST_DATA,
-    getLatestPosts,
-    { refetchOnWindowFocus: false, refetchInterval: 10 * 60 * 1000 }
-  );
-  // states
+  //#region states
   const [openLoginModal, setOpenLoginModal] = useState(false);
   const [openRegistrationModal, setOpenRegistrationModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  //#endregion
 
-  const modalCloseHandler = (modalType) => {
-    switch (modalType) {
-      case "LOGIN":
-        setOpenLoginModal(false);
-        break;
-      case "REGISTER":
-        setOpenRegistrationModal(false);
-        break;
-      default:
-        return;
+  //#region refs
+  const allPostsContainerRef = useRef(null);
+  //#endregion
+
+  const classes = useStyles();
+
+  //#region data queries
+  const {
+    data: latestPostData,
+    isLoading: latestPostDataLoading,
+    isFetching: latestPostDataFetching,
+    isError: latestPostDataError,
+  } = useQuery(LATEST_POST_DATA, getLatestPosts, {
+    refetchOnWindowFocus: false,
+    refetchInterval: 10 * 60 * 1000,
+  });
+  const {
+    data: allPostData,
+    isLoading: allPostDataLoading,
+    isFetching: allPostDataFetching,
+    isError: allPostDataError,
+  } = useQuery(
+    [PAGINATED_POST_DATA, { page: currentPage, limit: 5 }],
+    ({ queryKey }) => getPaginatedPosts(queryKey[1]),
+    {
+      refetchOnWindowFocus: false,
+      refetchInterval: 10 * 60 * 1000,
     }
+  );
+  const {
+    data: allCategoryData,
+    isLoading: allCategoryDataLoading,
+    isFetching: allCategoryDataFectching,
+    isError: allCategoryDataError,
+  } = useQuery(CATEGORY_DATA, getAllCategories, {
+    refetchOnWindowFocus: false,
+    refetchInterval: 10 * 60 * 1000,
+  });
+  //#endregion
+
+  //#region action handlers
+  const handleLoginModalOpen = useCallback(() => {
+    setOpenLoginModal(true);
+  }, []);
+  const handleLoginModalClose = useCallback(() => {
+    setOpenLoginModal(false);
+  }, []);
+  const handleRegistrationModalOpen = useCallback(() => {
+    setOpenRegistrationModal(true);
+  }, []);
+  const handleRegistrationModalClose = useCallback(() => {
+    setOpenRegistrationModal(false);
+  }, []);
+
+  const handlePageChange = (_, page) => {
+    setCurrentPage(page);
+    window.scrollTo(0, allPostsContainerRef.current.offsetTop);
   };
+  //#endregion
+
   return (
     <>
       <header className={classes.header}>
@@ -116,9 +187,17 @@ const HomeScreen = () => {
             LATEST ARTICLES
           </Typography>
         </Grid>
-        {isLoading || isFetching ? (
+        {latestPostDataLoading || latestPostDataFetching ? (
           <Grid container alignItems="center" justifyContent="center">
             <CircularProgress />
+          </Grid>
+        ) : latestPostDataError ? (
+          <Grid container alignItems="center" justifyContent="center">
+            <Typography variant="h6" component="h4" gutterBottom>
+              <Alert className={classes.root} severity="error">
+                Error occurred while fetching data
+              </Alert>
+            </Typography>
           </Grid>
         ) : (
           <Grid
@@ -127,7 +206,7 @@ const HomeScreen = () => {
             spacing={2}
             alignItems="center"
           >
-            {data.map((post) => (
+            {latestPostData.map((post) => (
               <Grid item xs={4}>
                 <PostSummaryCard
                   key={post.id}
@@ -140,26 +219,107 @@ const HomeScreen = () => {
                 />
               </Grid>
             ))}
-            <Grid item xs={4}></Grid>
-            <Grid item xs={4}></Grid>
           </Grid>
         )}
       </section>
+      <Divider />
+      <section className={classes.allPostsContainer} ref={allPostsContainerRef}>
+        <Grid
+          spacing={10}
+          container
+          justifyContent="center"
+          alignItems="flex-start"
+        >
+          <Grid item xs={8}>
+            {allPostDataLoading || allPostDataFetching ? (
+              <Grid container alignItems="center" justifyContent="center">
+                <CircularProgress />
+              </Grid>
+            ) : allPostDataError ? (
+              <Grid container alignItems="center" justifyContent="center">
+                <Typography variant="h6" component="h4" gutterBottom>
+                  <Alert className={classes.root} severity="error">
+                    Error occurred while fetching data
+                  </Alert>
+                </Typography>
+              </Grid>
+            ) : (
+              <>
+                {allPostData.docs.map((post) => (
+                  <ExpandedPostSummaryCard
+                    authorImage={getBase64ImageURL(post.author.image.data.data)}
+                    authorName={post.author.name}
+                    postId={post._id}
+                    postTitle={post.title}
+                    postSummary={post.summary}
+                    postCreationDate={post.createdAt}
+                    postReadingTime={calculateReadingTime(post.description)}
+                    postTags={post.tags}
+                    postImage={getBase64ImageURL(post.image.data.data)}
+                  />
+                ))}
+                <Grid
+                  className={classes.paginationContainer}
+                  container
+                  justifyContent="center"
+                >
+                  <Pagination
+                    count={allPostData.totalPages}
+                    page={currentPage}
+                    onChange={handlePageChange}
+                  />
+                </Grid>
+              </>
+            )}
+          </Grid>
+          <Grid item xs={4}>
+            <Typography
+              className={classes.categorySectionTitle}
+              variant="h6"
+              component="h4"
+              gutterBottom
+            >
+              DISCOVER MORE OF WHAT MATTERS TO YOU
+            </Typography>
+            {allCategoryDataLoading || allCategoryDataFectching ? (
+              <Grid container alignItems="center" justifyContent="center">
+                <CircularProgress />
+              </Grid>
+            ) : allCategoryDataError ? (
+              <Grid container alignItems="center" justifyContent="center">
+                <Typography variant="h6" component="h4" gutterBottom>
+                  <Alert className={classes.root} severity="error">
+                    Error occurred while fetching data
+                  </Alert>
+                </Typography>
+              </Grid>
+            ) : (
+              allCategoryData.map((category) => (
+                <Chip
+                  className={classes.categoryChip}
+                  label={category.title}
+                  variant="outlined"
+                />
+              ))
+            )}
+          </Grid>
+        </Grid>
+      </section>
       {/* Modals */}
-      <UserModal open={openLoginModal} onClose={() => setOpenLoginModal(false)}>
+      <UserModal open={openLoginModal} onClose={handleLoginModalClose}>
         <LoginScreen
-          openRegistrationModal={() => setOpenRegistrationModal(true)}
-          handleModalClose={() => modalCloseHandler("LOGIN")}
+          openRegistrationModal={handleRegistrationModalOpen}
+          handleModalClose={handleLoginModalClose}
         />
       </UserModal>
       <UserModal
         open={openRegistrationModal}
-        onClose={() => setOpenRegistrationModal(false)}
+        onClose={handleRegistrationModalClose}
         expanded={true}
       >
         <RegisterScreen
-          openLoginModal={() => setOpenLoginModal(true)}
-          handleModalClose={() => modalCloseHandler("REGISTER")}
+          openLoginModal={handleLoginModalOpen}
+          handleModalClose={handleRegistrationModalClose}
         />
       </UserModal>
     </>

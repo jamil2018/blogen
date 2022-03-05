@@ -13,11 +13,24 @@ import { compressImage } from "../utils/compressImage.js";
  * @access public
  */
 const getAllPosts = asyncHandler(async (req, res) => {
+  const posts = await Post.find()
+    .select("title summary author category tags image")
+    .populate("author", "name image")
+    .populate("category", "title");
+  return res.status(200).json(posts);
+});
+
+/**
+ * @desc get paginated posts
+ * @route GET /api/posts/paginated
+ * @access public
+ */
+const getPaginatedPosts = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
   const posts = await Post.paginate(
     {},
     {
-      select: "title description summary image tags category author",
+      select: "title description summary image tags category author createdAt",
       populate: [
         { path: "category", select: "title" },
         { path: "author", select: "name image" },
@@ -379,6 +392,7 @@ const getCuratedPostsCountByAuthorId = asyncHandler(async (req, res) => {
 
 export {
   getAllPosts,
+  getPaginatedPosts,
   getLatestPosts,
   createNewPost,
   getPostById,
