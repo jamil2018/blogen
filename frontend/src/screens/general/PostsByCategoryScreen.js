@@ -11,6 +11,8 @@ import { getPostFormattedDate } from "../../utils/dateUtils";
 import { getBase64ImageURL } from "../../utils/imageConvertion";
 import notFoundImage from "../../assets/notFound.svg";
 import { useEffect } from "react";
+import ExpandedPostSummaryLoaderDeck from "../../components/ExpandedPostSummaryLoaderDeck";
+import PostSummaryCardLoaderDeck from "../../components/PostSummaryCardLoaderDeck";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -60,14 +62,7 @@ const PostsByCategoryScreen = () => {
       <Divider />
       <div className={classes.postsContainer}>
         {isLoading || isFetching ? (
-          <Grid
-            className={classes.loader}
-            container
-            justifyContent="center"
-            alignItems="center"
-          >
-            <CircularProgress />
-          </Grid>
+          <ExpandedPostSummaryLoaderDeck count={5} />
         ) : isError ? (
           <Grid container alignItems="center" justifyContent="center">
             <Typography variant="h6" component="h4" gutterBottom>
@@ -76,7 +71,7 @@ const PostsByCategoryScreen = () => {
               </Alert>
             </Typography>
           </Grid>
-        ) : data < 1 ? (
+        ) : data.length < 1 ? (
           <Grid container justifyContent="space-between" alignItems="center">
             <Grid item xs={6}>
               <img

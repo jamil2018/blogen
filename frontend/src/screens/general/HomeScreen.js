@@ -12,7 +12,7 @@ import RegisterScreen from "./RegisterScreen";
 import { useCallback, useRef, useState } from "react";
 import PostSummaryCard from "../../components/PostSummaryCard";
 import { useQuery } from "react-query";
-import { Pagination } from "@material-ui/lab";
+import { Pagination, Skeleton } from "@material-ui/lab";
 import {
   CATEGORY_DATA,
   LATEST_POST_DATA,
@@ -29,6 +29,8 @@ import { calculateReadingTime } from "../../utils/dataFormat";
 import { getAllCategories } from "../../data/categoryQueryFunctions";
 import { Chip } from "@material-ui/core";
 import { Link } from "react-router-dom";
+import ExpandedPostSummaryLoaderDeck from "../../components/ExpandedPostSummaryLoaderDeck";
+import PostSummaryCardLoaderDeck from "../../components/PostSummaryCardLoaderDeck";
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -192,9 +194,7 @@ const HomeScreen = () => {
           </Typography>
         </Grid>
         {latestPostDataLoading || latestPostDataFetching ? (
-          <Grid container alignItems="center" justifyContent="center">
-            <CircularProgress />
-          </Grid>
+          <PostSummaryCardLoaderDeck count={6} />
         ) : latestPostDataError ? (
           <Grid container alignItems="center" justifyContent="center">
             <Typography variant="h6" component="h4" gutterBottom>
@@ -236,9 +236,7 @@ const HomeScreen = () => {
         >
           <Grid item xs={8}>
             {allPostDataLoading || allPostDataFetching ? (
-              <Grid container alignItems="center" justifyContent="center">
-                <CircularProgress />
-              </Grid>
+              <ExpandedPostSummaryLoaderDeck count={5} />
             ) : allPostDataError ? (
               <Grid container alignItems="center" justifyContent="center">
                 <Typography variant="h6" component="h4" gutterBottom>
