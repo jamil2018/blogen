@@ -13,6 +13,7 @@ import notFoundImage from "../../assets/notFound.svg";
 import { useEffect } from "react";
 import ExpandedPostSummaryLoaderDeck from "../../components/ExpandedPostSummaryLoaderDeck";
 import PostSummaryCardLoaderDeck from "../../components/PostSummaryCardLoaderDeck";
+import CategoryLoaderDeck from "../../components/CategoryLoaderDeck";
 
 const useStyles = makeStyles((theme) => ({
   container: {

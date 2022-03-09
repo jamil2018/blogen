@@ -31,6 +31,8 @@ import { Chip } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import ExpandedPostSummaryLoaderDeck from "../../components/ExpandedPostSummaryLoaderDeck";
 import PostSummaryCardLoaderDeck from "../../components/PostSummaryCardLoaderDeck";
+import CategoryLoaderDeck from "../../components/CategoryLoaderDeck";
+import { grey } from "@material-ui/core/colors";
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -71,6 +73,7 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(1, 0),
     "&:hover": {
       cursor: "pointer",
+      backgroundColor: grey[100],
     },
   },
 }));
@@ -284,9 +287,7 @@ const HomeScreen = () => {
               DISCOVER MORE OF WHAT MATTERS TO YOU
             </Typography>
             {allCategoryDataLoading || allCategoryDataFectching ? (
-              <Grid container alignItems="center" justifyContent="center">
-                <CircularProgress />
-              </Grid>
+              <CategoryLoaderDeck count={8} />
             ) : allCategoryDataError ? (
               <Grid container alignItems="center" justifyContent="center">
                 <Typography variant="h6" component="h4" gutterBottom>

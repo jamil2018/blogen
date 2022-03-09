@@ -34,6 +34,11 @@ const useStyles = makeStyles((theme) => ({
   },
   tagsChip: {
     marginRight: theme.spacing(1),
+    backgroundColor: grey[200],
+    "&:hover": {
+      cursor: "pointer",
+      backgroundColor: grey[300],
+    },
   },
   postImage: {
     width: "100%",
