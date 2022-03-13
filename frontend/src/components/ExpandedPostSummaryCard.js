@@ -35,6 +35,8 @@ const useStyles = makeStyles((theme) => ({
   tagsChip: {
     marginRight: theme.spacing(1),
     backgroundColor: grey[200],
+    textDecoration: "none",
+    color: theme.palette.text.primary,
     "&:hover": {
       cursor: "pointer",
       backgroundColor: grey[300],
@@ -107,7 +109,13 @@ const ExpandedPostSummaryCard = ({
             </Typography>{" "}
             ·{" "}
             {postTags.map((tag) => (
-              <Chip className={classes.tagsChip} size="small" label={tag} />
+              <Chip
+                component={Link}
+                to={`/posts/search/tags/${tag}`}
+                className={classes.tagsChip}
+                size="small"
+                label={tag}
+              />
             ))}
           </Box>
         </Grid>

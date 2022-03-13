@@ -80,10 +80,28 @@ export const getPostById = async (postId) => {
   }
 };
 
-export const getPostCategoryName = async ({ categoryName }) => {
+export const getPostByCategoryName = async ({ categoryName }) => {
   try {
     const reqBody = {
       category: categoryName,
+    };
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      params: reqBody,
+    };
+    const { data } = await axios.get(`/api/posts/find`, config);
+    return data;
+  } catch (err) {
+    throw new Error(`Error while fetching data. Error Message: ${err.message}`);
+  }
+};
+
+export const getPostByTagName = async ({ tagName }) => {
+  try {
+    const reqBody = {
+      tag: tagName,
     };
     const config = {
       headers: {

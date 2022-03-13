@@ -4,7 +4,10 @@ import { Alert } from "@material-ui/lab";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 import ExpandedPostSummaryCard from "../../components/ExpandedPostSummaryCard";
-import { getPostByCategoryName } from "../../data/postQueryFunctions";
+import {
+  getPostByTagName,
+  getPostCategoryName,
+} from "../../data/postQueryFunctions";
 import { POST_DATA } from "../../definitions/reactQueryConstants/queryConstants";
 import { calculateReadingTime } from "../../utils/dataFormat";
 import { getPostFormattedDate } from "../../utils/dateUtils";
@@ -32,12 +35,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const PostsByCategoryScreen = () => {
+const PostsByTagScreen = () => {
   const classes = useStyles();
-  const { categoryName } = useParams();
+  const { tagName } = useParams();
   const { data, isLoading, isFetching, isError } = useQuery(
-    [POST_DATA, { categoryName }],
-    ({ queryKey }) => getPostByCategoryName(queryKey[1]),
+    [POST_DATA, { tagName }],
+    ({ queryKey }) => getPostByTagName(queryKey[1]),
     {
       refetchOnWindowFocus: false,
       refetchInterval: 10 * 60 * 1000,
@@ -56,7 +59,7 @@ const PostsByCategoryScreen = () => {
         variant="h3"
         component="h1"
       >
-        {categoryName}
+        {tagName}
       </Typography>
       <Divider />
       <div className={classes.postsContainer}>
@@ -81,7 +84,7 @@ const PostsByCategoryScreen = () => {
             </Grid>
             <Grid item xs={6}>
               <Typography variant="h5" component="h4" gutterBottom>
-                No posts found under this category
+                No posts found under this tag
               </Typography>
             </Grid>
           </Grid>
@@ -111,4 +114,4 @@ const PostsByCategoryScreen = () => {
   );
 };
 
-export default PostsByCategoryScreen;
+export default PostsByTagScreen;

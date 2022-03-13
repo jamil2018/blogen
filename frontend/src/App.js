@@ -24,6 +24,7 @@ import GeneralLayout from "./layout/GeneralLayout";
 import IndividualPostScreen from "./screens/general/IndividualPostScreen";
 import AuthorListScreen from "./screens/general/AuthorListScreen";
 import PostsByCategoryScreen from "./screens/general/PostsByCategoryScreen";
+import PostsByTagScreen from "./screens/general/PostByTagScreen";
 
 const App = () => {
   const client = new QueryClient();
@@ -74,6 +75,7 @@ const App = () => {
                 "/posts/:postId",
                 "/authors",
                 "/posts/search/categories/:categoryName",
+                "/posts/search/tags/:tagName",
               ]}
             >
               <GeneralLayout>
@@ -88,6 +90,11 @@ const App = () => {
                   exact
                   path="/posts/search/categories/:categoryName"
                   component={PostsByCategoryScreen}
+                />
+                <Route
+                  exact
+                  path="/posts/search/tags/:tagName"
+                  component={PostsByTagScreen}
                 />
               </GeneralLayout>
             </Route>

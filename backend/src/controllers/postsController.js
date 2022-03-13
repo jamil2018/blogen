@@ -325,7 +325,7 @@ const deleteComment = asyncHandler(async (req, res) => {
  * @access public
  */
 const findPosts = asyncHandler(async (req, res) => {
-  const { category, tags, title } = req.query;
+  const { category, tag, title } = req.query;
   const postQuery = {};
   if (title) {
     postQuery.title = { $regex: title, $options: "i" };
@@ -334,8 +334,8 @@ const findPosts = asyncHandler(async (req, res) => {
     const categoryData = await Category.findOne({ title: category });
     postQuery.category = categoryData._id;
   }
-  if (tags) {
-    postQuery.tags = { $in: tags };
+  if (tag) {
+    postQuery.tags = tag;
   }
   const posts = await Post.find(postQuery)
     .populate("author", "name image")

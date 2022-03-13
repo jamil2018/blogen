@@ -1,6 +1,5 @@
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import Divider from "@material-ui/core/Divider";
 import Grid from "@material-ui/core/Grid";
 import makeStyles from "@material-ui/styles/makeStyles";
@@ -12,7 +11,7 @@ import RegisterScreen from "./RegisterScreen";
 import { useCallback, useRef, useState } from "react";
 import PostSummaryCard from "../../components/PostSummaryCard";
 import { useQuery } from "react-query";
-import { Pagination, Skeleton } from "@material-ui/lab";
+import { Pagination } from "@material-ui/lab";
 import {
   CATEGORY_DATA,
   LATEST_POST_DATA,
@@ -33,6 +32,7 @@ import ExpandedPostSummaryLoaderDeck from "../../components/ExpandedPostSummaryL
 import PostSummaryCardLoaderDeck from "../../components/PostSummaryCardLoaderDeck";
 import CategoryLoaderDeck from "../../components/CategoryLoaderDeck";
 import { grey } from "@material-ui/core/colors";
+import HomeAllPostsDeck from "../../components/HomeAllPostsDeck";
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -139,10 +139,10 @@ const HomeScreen = () => {
     setOpenRegistrationModal(false);
   }, []);
 
-  const handlePageChange = (_, page) => {
+  const handlePageChange = useCallback((_, page) => {
     setCurrentPage(page);
     window.scrollTo(0, allPostsContainerRef.current.offsetTop);
-  };
+  }, []);
   //#endregion
 
   return (
@@ -250,19 +250,7 @@ const HomeScreen = () => {
               </Grid>
             ) : (
               <>
-                {allPostData.docs.map((post) => (
-                  <ExpandedPostSummaryCard
-                    authorImage={getBase64ImageURL(post.author.image.data.data)}
-                    authorName={post.author.name}
-                    postId={post._id}
-                    postTitle={post.title}
-                    postSummary={post.summary}
-                    postCreationDate={post.createdAt}
-                    postReadingTime={calculateReadingTime(post.description)}
-                    postTags={post.tags}
-                    postImage={getBase64ImageURL(post.image.data.data)}
-                  />
-                ))}
+                <HomeAllPostsDeck posts={allPostData.docs} />
                 <Grid
                   className={classes.paginationContainer}
                   container
