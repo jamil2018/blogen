@@ -25,6 +25,7 @@ import IndividualPostScreen from "./screens/general/IndividualPostScreen";
 import AuthorListScreen from "./screens/general/AuthorListScreen";
 import PostsByCategoryScreen from "./screens/general/PostsByCategoryScreen";
 import PostsByTagScreen from "./screens/general/PostByTagScreen";
+import AuthorProfileScreen from "./screens/general/AuthorProfileScreen";
 
 const App = () => {
   const client = new QueryClient();
@@ -74,6 +75,7 @@ const App = () => {
                 "/",
                 "/posts/:postId",
                 "/authors",
+                "/authors/:authorId",
                 "/posts/search/categories/:categoryName",
                 "/posts/search/tags/:tagName",
               ]}
@@ -95,6 +97,11 @@ const App = () => {
                   exact
                   path="/posts/search/tags/:tagName"
                   component={PostsByTagScreen}
+                />
+                <Route
+                  exact
+                  path="/authors/:authorId"
+                  component={AuthorProfileScreen}
                 />
               </GeneralLayout>
             </Route>

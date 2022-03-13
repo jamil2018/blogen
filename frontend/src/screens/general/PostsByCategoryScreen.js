@@ -19,6 +19,7 @@ const useStyles = makeStyles((theme) => ({
   },
   categoryTitle: {
     marginBottom: theme.spacing(4),
+    textTransform: "capitalize",
   },
   postsContainer: {
     margin: theme.spacing(2, 0),

@@ -4,10 +4,7 @@ import { Alert } from "@material-ui/lab";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 import ExpandedPostSummaryCard from "../../components/ExpandedPostSummaryCard";
-import {
-  getPostByTagName,
-  getPostCategoryName,
-} from "../../data/postQueryFunctions";
+import { getPostByTagName } from "../../data/postQueryFunctions";
 import { POST_DATA } from "../../definitions/reactQueryConstants/queryConstants";
 import { calculateReadingTime } from "../../utils/dataFormat";
 import { getPostFormattedDate } from "../../utils/dateUtils";
@@ -20,8 +17,9 @@ const useStyles = makeStyles((theme) => ({
   container: {
     margin: theme.spacing(2, 0),
   },
-  categoryTitle: {
+  title: {
     marginBottom: theme.spacing(4),
+    textTransform: "capitalize",
   },
   postsContainer: {
     margin: theme.spacing(2, 0),
@@ -54,7 +52,7 @@ const PostsByTagScreen = () => {
   return (
     <section className={classes.container}>
       <Typography
-        className={classes.categoryTitle}
+        className={classes.title}
         gutterBottom
         variant="h3"
         component="h1"

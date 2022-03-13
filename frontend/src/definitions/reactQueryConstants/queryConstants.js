@@ -16,3 +16,7 @@ export const PAGINATED_POST_DATA = "paginatedPosts";
 // comments
 export const COMMENT_DATA = "comments";
 export const SINGLE_COMMENT_DATA = "comment";
+
+// author
+export const AUTHOR_DATA = "authors";
+export const SINGLE_AUTHOR_DATA = "author";
