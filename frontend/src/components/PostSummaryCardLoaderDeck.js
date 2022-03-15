@@ -1,7 +1,8 @@
 import { Grid } from "@material-ui/core";
+import { memo } from "react";
 import PostSummaryCardLoader from "./PostSummaryCardLoader";
 
-const PostSummaryCardLoaderDeck = ({ count }) => {
+const PostSummaryCardLoaderDeck = memo(({ count }) => {
   return (
     <Grid
       container
@@ -16,6 +17,6 @@ const PostSummaryCardLoaderDeck = ({ count }) => {
       ))}
     </Grid>
   );
-};
+});
 
 export default PostSummaryCardLoaderDeck;

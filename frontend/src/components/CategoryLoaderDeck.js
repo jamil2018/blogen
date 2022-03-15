@@ -1,5 +1,6 @@
 import { Grid, makeStyles } from "@material-ui/core";
 import { Skeleton } from "@material-ui/lab";
+import { memo } from "react";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -8,7 +9,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CategoryLoaderDeck = ({ count }) => {
+const CategoryLoaderDeck = memo(({ count }) => {
   const classes = useStyles();
   return (
     <Grid container>
@@ -22,6 +23,6 @@ const CategoryLoaderDeck = ({ count }) => {
       ))}
     </Grid>
   );
-};
+});
 
 export default CategoryLoaderDeck;

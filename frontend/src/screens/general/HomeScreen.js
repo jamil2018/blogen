@@ -33,6 +33,8 @@ import PostSummaryCardLoaderDeck from "../../components/PostSummaryCardLoaderDec
 import CategoryLoaderDeck from "../../components/CategoryLoaderDeck";
 import { grey } from "@material-ui/core/colors";
 import HomeAllPostsDeck from "../../components/HomeAllPostsDeck";
+import HomeLatestPostsDeck from "../../components/HomeLatestPostsDeck";
+import HomeCategoriesDeck from "../../components/HomeCategoriesDeck";
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -67,14 +69,6 @@ const useStyles = makeStyles((theme) => ({
   },
   paginationContainer: {
     marginTop: theme.spacing(8),
-  },
-  categoryChip: {
-    marginRight: theme.spacing(2),
-    margin: theme.spacing(1, 0),
-    "&:hover": {
-      cursor: "pointer",
-      backgroundColor: grey[100],
-    },
   },
 }));
 
@@ -207,26 +201,7 @@ const HomeScreen = () => {
             </Typography>
           </Grid>
         ) : (
-          <Grid
-            container
-            justifyContent="space-between"
-            spacing={2}
-            alignItems="center"
-          >
-            {latestPostData.map((post) => (
-              <Grid item xs={4}>
-                <PostSummaryCard
-                  key={post.id}
-                  postId={post._id}
-                  authorImage={post.author.image.data.data}
-                  authorName={post.author.name}
-                  postTitle={post.title}
-                  publishDate={post.createdAt}
-                  description={post.description}
-                />
-              </Grid>
-            ))}
-          </Grid>
+          <HomeLatestPostsDeck posts={latestPostData} />
         )}
       </section>
       <Divider />
@@ -285,16 +260,7 @@ const HomeScreen = () => {
                 </Typography>
               </Grid>
             ) : (
-              allCategoryData.map((category) => (
-                <Chip
-                  key={category._id}
-                  component={Link}
-                  to={`/posts/search/categories/${category.title}`}
-                  className={classes.categoryChip}
-                  label={category.title}
-                  variant="outlined"
-                />
-              ))
+              <HomeCategoriesDeck categories={allCategoryData} />
             )}
           </Grid>
         </Grid>

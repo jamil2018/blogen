@@ -1,6 +1,7 @@
+import { memo } from "react";
 import ExpandedPostSummaryLoader from "./ExpandedPostSummaryLoader";
 
-const ExpandedPostSummaryLoaderDeck = ({ count }) => {
+const ExpandedPostSummaryLoaderDeck = memo(({ count }) => {
   return (
     <>
       {Array.from(Array(count).keys()).map((_) => (
@@ -8,6 +9,6 @@ const ExpandedPostSummaryLoaderDeck = ({ count }) => {
       ))}
     </>
   );
-};
+});
 
 export default ExpandedPostSummaryLoaderDeck;
