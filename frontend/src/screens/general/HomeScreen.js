@@ -218,7 +218,7 @@ const HomeScreen = () => {
             ) : allPostDataError ? (
               <Grid container alignItems="center" justifyContent="center">
                 <Typography variant="h6" component="h4" gutterBottom>
-                  <Alert className={classes.root} severity="error">
+                  <Alert severity="error">
                     Error occurred while fetching data
                   </Alert>
                 </Typography>
