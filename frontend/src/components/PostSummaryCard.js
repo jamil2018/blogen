@@ -1,11 +1,9 @@
 import { Avatar, Card, CardContent, Grid, Typography } from "@material-ui/core";
-import { grey } from "@material-ui/core/colors";
 import { makeStyles } from "@material-ui/styles";
 import { Link } from "react-router-dom";
 import {
   calculateReadingTime,
   convertToText,
-  formatDate,
   getAuthorNameInitials,
 } from "../utils/dataFormat";
 import { getPostFormattedDate } from "../utils/dateUtils";
@@ -25,10 +23,15 @@ const useStyles = makeStyles((theme) => ({
     display: "block",
     color: theme.palette.text.primary,
   },
+  authorName: {
+    textDecoration: "none",
+    color: theme.palette.text.primary,
+  },
 }));
 
 const PostSummaryCard = ({
   postId,
+  authorId,
   authorImage,
   authorName,
   postTitle,
@@ -37,7 +40,7 @@ const PostSummaryCard = ({
 }) => {
   const classes = useStyles();
   return (
-    <Card variant="outlined">
+    <Card variant="outlined" elevation={0}>
       <CardContent>
         <Grid
           container
@@ -55,7 +58,14 @@ const PostSummaryCard = ({
               {getAuthorNameInitials(authorName)}
             </Avatar>
           )}
-          <Typography variant="caption">{authorName}</Typography>
+          <Typography
+            className={classes.authorName}
+            variant="caption"
+            component={Link}
+            to={`/authors/${authorId}`}
+          >
+            {authorName}
+          </Typography>
         </Grid>
         <Typography
           className={classes.postTitle}

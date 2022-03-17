@@ -20,6 +20,10 @@ const useStyles = makeStyles((theme) => ({
   authorInfoContainer: {
     marginBottom: theme.spacing(2),
   },
+  authorName: {
+    textDecoration: "none",
+    color: theme.palette.text.primary,
+  },
   postTitle: {
     textDecoration: "none",
     color: theme.palette.text.primary,
@@ -50,6 +54,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ExpandedPostSummaryCard = ({
+  authorId,
   authorName,
   authorImage,
   postId,
@@ -81,7 +86,14 @@ const ExpandedPostSummaryCard = ({
               alt={authorName}
               src={authorImage}
             />
-            <Typography variant="body2">{authorName}</Typography>
+            <Typography
+              component={Link}
+              to={`/authors/${authorId}`}
+              className={classes.authorName}
+              variant="body2"
+            >
+              {authorName}
+            </Typography>
           </Grid>
           <Box
             className={classes.postTitle}
@@ -108,8 +120,9 @@ const ExpandedPostSummaryCard = ({
               {postReadingTime} mins
             </Typography>{" "}
             ·{" "}
-            {postTags.map((tag) => (
+            {postTags.map((tag, index) => (
               <Chip
+                key={index}
                 component={Link}
                 to={`/posts/search/tags/${tag}`}
                 className={classes.tagsChip}

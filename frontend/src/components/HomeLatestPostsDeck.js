@@ -11,10 +11,10 @@ const HomeLatestPostsDeck = memo(({ posts }) => {
       alignItems="center"
     >
       {posts.map((post) => (
-        <Grid item xs={4}>
+        <Grid key={post._id} item xs={4}>
           <PostSummaryCard
-            key={post.id}
             postId={post._id}
+            authorId={post.author._id}
             authorImage={post.author.image.data.data}
             authorName={post.author.name}
             postTitle={post.title}

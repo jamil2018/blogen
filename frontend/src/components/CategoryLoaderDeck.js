@@ -15,6 +15,7 @@ const CategoryLoaderDeck = memo(({ count }) => {
     <Grid container>
       {Array.from(Array(count).keys()).map((i) => (
         <Skeleton
+          key={i}
           variant="rect"
           width={60}
           height={20}

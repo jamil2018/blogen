@@ -47,6 +47,7 @@ const UserModal = ({ children, open, onClose, expanded = false }) => {
           className={
             expanded ? classes.modalContentExpanded : classes.modalContent
           }
+          elevation={0}
         >
           <Grid container justifyContent="flex-end">
             <IconButton aria-label="close" onClick={onClose} size="small">

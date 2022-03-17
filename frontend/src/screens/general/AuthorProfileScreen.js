@@ -12,6 +12,8 @@ import {
   IconButton,
   makeStyles,
   Typography,
+  Divider,
+  Box,
 } from "@material-ui/core";
 import MailIcon from "@material-ui/icons/Mail";
 import LinkedInIcon from "@material-ui/icons/LinkedIn";
@@ -20,6 +22,10 @@ import TwitterIcon from "@material-ui/icons/Twitter";
 import { Alert, Skeleton } from "@material-ui/lab";
 import { getBase64ImageURL } from "../../utils/imageConvertion";
 import { getAuthorNameInitials } from "../../utils/dataFormat";
+import HomeAllPostsDeck from "../../components/HomeAllPostsDeck";
+import ExpandedPostSummaryLoaderDeck from "../../components/ExpandedPostSummaryLoaderDeck";
+import { grey } from "@material-ui/core/colors";
+import { useEffect } from "react";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -27,15 +33,34 @@ const useStyles = makeStyles((theme) => ({
     minHeight: "45vh",
   },
   leftContainer: {
-    marginRight: theme.spacing(2),
+    paddingRight: theme.spacing(4),
   },
   rightContainer: {
     borderLeft: `1px solid ${theme.palette.divider}`,
     height: "inherit",
     padding: theme.spacing(2, 3),
   },
+  postsContainer: {
+    maxHeight: "70vh",
+    overflowY: "auto",
+    overflowX: "hidden",
+    padding: theme.spacing(2, 3, 2, 0),
+    marginTop: theme.spacing(2),
+    "&::-webkit-scrollbar": {
+      width: "0.4em",
+    },
+    "&::-webkit-scrollbar-track": {
+      backgroundColor: grey[200],
+    },
+    "&::-webkit-scrollbar-thumb": {
+      backgroundColor: theme.palette.primary.main,
+    },
+  },
   authorName: {
     fontWeight: theme.typography.fontWeightBold,
+  },
+  authorNameLoader: {
+    marginTop: theme.spacing(2),
   },
   avatar: {
     height: theme.spacing(10),
@@ -45,12 +70,24 @@ const useStyles = makeStyles((theme) => ({
   socialLinks: {
     marginTop: theme.spacing(3),
   },
+  socialLinkLoaderContainer: {
+    marginTop: theme.spacing(3),
+  },
+  socialLinkLoader: {
+    marginRight: theme.spacing(4),
+  },
 }));
 
 const AuthorProfileScreen = () => {
   const { authorId } = useParams();
   const classes = useStyles();
 
+  // effects
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  // data queries
   const {
     data: authorData,
     isLoading: isAuthorDataLoading,
@@ -73,29 +110,86 @@ const AuthorProfileScreen = () => {
       container
       justifyContent="space-between"
     >
-      <Grid item xs={9}>
-        {isAuthorDataLoading || isAuthorPostDataLoading ? (
+      <Grid item xs={9} className={classes.leftContainer}>
+        {isAuthorDataLoading ? (
           <Skeleton variant="text" height={40} width={"50%"} />
-        ) : isAuthorDataError || isAuthorPostDataError ? (
+        ) : isAuthorDataError ? (
           <Grid container alignItems="center" justifyContent="center">
             <Typography variant="h6" component="h4" gutterBottom>
               <Alert severity="error">Error occurred while fetching data</Alert>
             </Typography>
           </Grid>
         ) : (
-          <Typography
-            className={classes.authorName}
-            variant="h4"
-            component="h1"
-          >
-            {authorData.name}
-          </Typography>
+          <>
+            <Typography
+              className={classes.authorName}
+              variant="h4"
+              component="h1"
+              gutterBottom
+            >
+              {authorData.name}
+            </Typography>
+            <Divider />
+          </>
+        )}
+        {isAuthorPostDataLoading ? (
+          <ExpandedPostSummaryLoaderDeck count={5} />
+        ) : isAuthorPostDataError ? (
+          <Grid container alignItems="center" justifyContent="center">
+            <Typography variant="h6" component="h4" gutterBottom>
+              <Alert severity="error">Error occurred while fetching data</Alert>
+            </Typography>
+          </Grid>
+        ) : (
+          <Box className={classes.postsContainer}>
+            <HomeAllPostsDeck posts={authorPostData} />
+          </Box>
         )}
       </Grid>
       <Grid className={classes.rightContainer} item xs={3}>
-        {isAuthorDataLoading || isAuthorPostDataLoading ? (
-          <Skeleton variant="circle" height={100} width={100} />
-        ) : isAuthorDataError || isAuthorPostDataError ? (
+        {isAuthorDataLoading ? (
+          <>
+            <Skeleton variant="circle" height={90} width={90} />
+            <Skeleton
+              className={classes.authorNameLoader}
+              variant="text"
+              height={20}
+              width={"50%"}
+            />
+            <Skeleton variant="text" height={20} width={"75%"} />
+            <Grid
+              container
+              alignItems="center"
+              justifyContent="flex-start"
+              className={classes.socialLinkLoaderContainer}
+            >
+              <Skeleton
+                className={classes.socialLinkLoader}
+                variant="rect"
+                height={15}
+                width={25}
+              />
+              <Skeleton
+                className={classes.socialLinkLoader}
+                variant="rect"
+                height={15}
+                width={25}
+              />
+              <Skeleton
+                className={classes.socialLinkLoader}
+                variant="rect"
+                height={15}
+                width={25}
+              />
+              <Skeleton
+                className={classes.socialLinkLoader}
+                variant="rect"
+                height={15}
+                width={25}
+              />
+            </Grid>
+          </>
+        ) : isAuthorDataError ? (
           <Grid container alignItems="center" justifyContent="center">
             <Typography variant="h6" component="h4" gutterBottom>
               <Alert severity="error">Error occurred while fetching data</Alert>

@@ -356,7 +356,7 @@ const getPostsByAuthorId = asyncHandler(async (req, res) => {
         _id: req.params.aid,
       },
     })
-      .populate("author", "name")
+      .populate("author", "name image")
       .populate("category", "title");
     return res.status(200).json(posts);
   } else {

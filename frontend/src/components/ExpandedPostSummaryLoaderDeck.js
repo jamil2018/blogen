@@ -4,8 +4,8 @@ import ExpandedPostSummaryLoader from "./ExpandedPostSummaryLoader";
 const ExpandedPostSummaryLoaderDeck = memo(({ count }) => {
   return (
     <>
-      {Array.from(Array(count).keys()).map((_) => (
-        <ExpandedPostSummaryLoader />
+      {Array.from(Array(count).keys()).map((_, index) => (
+        <ExpandedPostSummaryLoader key={index} />
       ))}
     </>
   );

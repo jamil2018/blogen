@@ -6,6 +6,8 @@ import ExpandedPostSummaryCard from "./ExpandedPostSummaryCard";
 const HomeAllPostsDeck = memo(({ posts }) => {
   return posts.map((post) => (
     <ExpandedPostSummaryCard
+      key={post._id}
+      authorId={post.author._id}
       authorImage={getBase64ImageURL(post.author.image.data.data)}
       authorName={post.author.name}
       postId={post._id}
