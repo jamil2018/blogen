@@ -10,6 +10,7 @@ import {
   SINGLE_COMMENT_DATA,
 } from "../../definitions/reactQueryConstants/queryConstants";
 import { Button, makeStyles, TextField } from "@material-ui/core";
+import { memo } from "react";
 
 const validationSchema = yup.object({
   text: yup
@@ -23,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const EditCommentScreen = ({ postId, commentId, modalCloseHandler }) => {
+const EditCommentScreen = memo(({ postId, commentId, modalCloseHandler }) => {
   const classes = useStyles();
   const queryClient = useQueryClient();
   const { isLoading, isError, data } = useQuery(
@@ -78,6 +79,6 @@ const EditCommentScreen = ({ postId, commentId, modalCloseHandler }) => {
       </form>
     </>
   );
-};
+});
 
 export default EditCommentScreen;

@@ -8,6 +8,7 @@ import LockOpenIcon from "@material-ui/icons/LockOpen";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import CategoryIcon from "@material-ui/icons/Category";
 import PersonIcon from "@material-ui/icons/Person";
+import InfoIcon from "@material-ui/icons/Info";
 import { Avatar, Container, makeStyles } from "@material-ui/core";
 import Footer from "../components/Footer";
 import { useDispatch, useSelector } from "react-redux";
@@ -50,6 +51,13 @@ const GeneralLayout = ({ children }) => {
   return (
     <>
       <Navbar headerText="Blogen">
+        <NavLink
+          text="about us"
+          isLink={true}
+          to="/about"
+          icon={<InfoIcon />}
+          variant="text"
+        />
         <NavLink
           text="categories"
           isLink={true}

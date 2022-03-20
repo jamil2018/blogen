@@ -43,7 +43,7 @@ const Footer = () => {
           className={classes.footerTextContainer}
           container
           justifyContent="space-between"
-          alignItems="center"
+          alignItems="flex-start"
         >
           <Grid item xs={12} sm={3}>
             <Typography
@@ -54,9 +54,7 @@ const Footer = () => {
               Learn More.
             </Typography>
             <Typography className={classes.footerTextBody} variant="subtitle2">
-              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ut,
-              odit. Totam atque, laudantium quibusdam, cumque qui, illo tempora
-              voluptate eos id at dolore sunt neque.
+              Check out our about us page and learn more about us.
             </Typography>
           </Grid>
           <Grid item xs={12} sm={3}>
@@ -68,9 +66,9 @@ const Footer = () => {
               Customize your account.
             </Typography>
             <Typography className={classes.footerTextBody} variant="subtitle2">
-              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ut,
-              odit. Totam atque, laudantium quibusdam, cumque qui, illo tempora
-              voluptate eos id at dolore sunt neque.
+              Make the blogen experience yours. Customize your profile to
+              connect to your readers. Update your bio and add your social media
+              links.
             </Typography>
           </Grid>
           <Grid item xs={12} sm={3}>
@@ -82,9 +80,8 @@ const Footer = () => {
               Write a story.
             </Typography>
             <Typography className={classes.footerTextBody} variant="subtitle2">
-              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ut,
-              odit. Totam atque, laudantium quibusdam, cumque qui, illo tempora
-              voluptate eos id at dolore sunt neque.
+              Sign up and start writing your own stories. Join with a community
+              of creative writers.
             </Typography>
           </Grid>
         </Grid>

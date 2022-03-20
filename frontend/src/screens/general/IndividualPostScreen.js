@@ -4,17 +4,22 @@ import {
   Container,
   Divider,
   Grid,
+  IconButton,
   makeStyles,
   Typography,
 } from "@material-ui/core";
 import { grey } from "@material-ui/core/colors";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import PostCommentDeck from "../../components/PostCommentDeck";
 import PostTagDeck from "../../components/PostTagDeck";
 import { getPostById } from "../../data/postQueryFunctions";
-import { SINGLE_POST_DATA } from "../../definitions/reactQueryConstants/queryConstants";
+import {
+  COMMENT_DATA,
+  SINGLE_AUTHOR_DATA,
+  SINGLE_POST_DATA,
+} from "../../definitions/reactQueryConstants/queryConstants";
 import CreateCommentScreen from "./CreateCommentScreen";
 import {
   calculateReadingTime,
@@ -29,6 +34,14 @@ import DeleteCommentScreen from "./DeleteCommentScreen";
 import AdminModal from "../../components/AdminModal";
 import ErrorIcon from "@material-ui/icons/Error";
 import EditCommentScreen from "./EditCommentScreen";
+import MailIcon from "@material-ui/icons/Mail";
+import LinkedInIcon from "@material-ui/icons/LinkedIn";
+import FacebookIcon from "@material-ui/icons/Facebook";
+import TwitterIcon from "@material-ui/icons/Twitter";
+import { getUserById } from "../../data/userQueryFunctions";
+import IndividualPostLoader from "../../components/IndividualPostLoader";
+import PostCommentLoader from "../../components/PostCommentLoader";
+import { getCommentsByPostId } from "../../data/commentQueryFunctions";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -36,6 +49,11 @@ const useStyles = makeStyles((theme) => ({
   },
   authorName: {
     marginLeft: theme.spacing(2),
+    textDecoration: "none",
+  },
+  avatar: {
+    height: theme.spacing(5),
+    width: theme.spacing(5),
   },
   authorInfoContainer: {
     marginTop: theme.spacing(2),
@@ -52,6 +70,9 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     marginTop: theme.spacing(8),
     marginBottom: theme.spacing(4),
+  },
+  socialLinks: {
+    marginTop: theme.spacing(2),
   },
   postContent: {
     "& .ql-container": {
@@ -88,7 +109,19 @@ const IndividualPostScreen = () => {
     [SINGLE_POST_DATA, postId],
     ({ queryKey }) => getPostById(queryKey[1])
   );
-
+  const {
+    isLoading: isPostCommentLoading,
+    data: postCommentData,
+    isFetching: isPostCommentFetching,
+  } = useQuery([COMMENT_DATA, postId], ({ queryKey }) =>
+    getCommentsByPostId(queryKey[1])
+  );
+  const authorId = data?.author._id;
+  const { isLoading: isAuthorDataLoading, data: authorData } = useQuery(
+    [SINGLE_AUTHOR_DATA, authorId],
+    ({ queryKey }) => getUserById(queryKey[1]),
+    { enabled: !!authorId }
+  );
   // effects
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -106,41 +139,107 @@ const IndividualPostScreen = () => {
   };
   return (
     <Container maxWidth="md" className={classes.container}>
-      {isLoading ? (
+      {isLoading || isAuthorDataLoading ? (
         <Grid
           className={classes.loader}
           container
           alignItems="center"
           justifyContent="center"
         >
-          <CircularProgress />
+          <IndividualPostLoader />
         </Grid>
       ) : (
         <>
           <Typography variant="h2" component="h1">
             {data.title}
           </Typography>
-          <Grid
-            container
-            justifyContent="flex-start"
-            alignItems="center"
-            className={classes.authorInfoContainer}
-          >
+          <Grid container alignItems="center" justifyContent="space-between">
             <Grid item>
-              <Avatar>{getAuthorNameInitials(data.author.name)}</Avatar>
+              <Grid
+                container
+                justifyContent="flex-start"
+                alignItems="center"
+                className={classes.authorInfoContainer}
+              >
+                <Grid item>
+                  {authorData.image ? (
+                    <Avatar
+                      alt="user profile image"
+                      className={classes.avatar}
+                      src={getBase64ImageURL(authorData.image.data.data)}
+                    />
+                  ) : (
+                    <Avatar alt="user profile image" className={classes.avatar}>
+                      {getAuthorNameInitials(authorData.name)}
+                    </Avatar>
+                  )}
+                </Grid>
+                <Grid item>
+                  <Typography
+                    color="primary"
+                    variant="subtitle2"
+                    className={classes.authorName}
+                    component={Link}
+                    to={`/authors/${data.author._id}`}
+                  >
+                    {data.author.name}
+                  </Typography>
+                  <Typography variant="subtitle2" className={classes.postMeta}>
+                    {getPostFormattedDate(data.createdAt)} ·{" "}
+                    {calculateReadingTime(convertToText(data.description))} min
+                    read
+                  </Typography>
+                </Grid>
+              </Grid>
             </Grid>
             <Grid item>
-              <Typography
-                color="primary"
-                variant="subtitle2"
-                className={classes.authorName}
+              <Grid
+                className={classes.socialLinks}
+                container
+                alignItems="center"
+                justifyContent="flex-start"
               >
-                {data.author.name}
-              </Typography>
-              <Typography variant="subtitle2" className={classes.postMeta}>
-                {getPostFormattedDate(data.createdAt)} ·{" "}
-                {calculateReadingTime(convertToText(data.description))} min read
-              </Typography>
+                <IconButton
+                  aria-label="email author"
+                  to="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.open(`mailto:${authorData.email}`);
+                  }}
+                  component={Link}
+                  color="primary"
+                >
+                  <MailIcon />
+                </IconButton>
+                <IconButton
+                  aria-label="email author"
+                  href={`https://www.facebook.com/${authorData.facebookId}`}
+                  component="a"
+                  target="_blank"
+                  color="primary"
+                >
+                  <FacebookIcon />
+                </IconButton>
+                <IconButton
+                  aria-label="email author"
+                  href={`https://twitter.com/${authorData.twitterId}`}
+                  component="a"
+                  target="_blank"
+                  color="primary"
+                >
+                  <TwitterIcon />
+                </IconButton>
+                <IconButton
+                  aria-label="email author"
+                  href={`https://www.linkedin.com/in/${authorData.linkedinId}`}
+                  component="a"
+                  target="_blank"
+                  color="primary"
+                  edge="end"
+                >
+                  <LinkedInIcon />
+                </IconButton>
+              </Grid>
             </Grid>
           </Grid>
           <img
@@ -167,11 +266,16 @@ const IndividualPostScreen = () => {
           >
             See what others say about this post
           </Typography>
-          <PostCommentDeck
-            postId={postId}
-            deleteHandler={(commentId) => handleDeleteComment(commentId)}
-            editHandler={(commentId) => handleEditComment(commentId)}
-          />
+          {isPostCommentLoading || isPostCommentFetching ? (
+            <PostCommentLoader />
+          ) : (
+            <PostCommentDeck
+              comments={postCommentData}
+              postId={postId}
+              deleteHandler={(commentId) => handleDeleteComment(commentId)}
+              editHandler={(commentId) => handleEditComment(commentId)}
+            />
+          )}
           <CreateCommentScreen postId={postId} />
         </>
       )}

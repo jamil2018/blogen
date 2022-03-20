@@ -1,4 +1,5 @@
 import { Box, makeStyles } from "@material-ui/core";
+import { orange } from "@material-ui/core/colors";
 import PostTag from "./PostTag";
 
 const useStyles = makeStyles((theme) => ({
@@ -10,6 +11,11 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: theme.spacing(2),
     "&:first-child": {
       marginLeft: 0,
+    },
+    textDecoration: "none",
+    "&:hover": {
+      cursor: "pointer",
+      backgroundColor: orange[50],
     },
   },
 }));

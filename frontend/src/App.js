@@ -1,5 +1,5 @@
 import { Provider } from "react-redux";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { ThemeProvider, CssBaseline } from "@material-ui/core";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
@@ -26,6 +26,7 @@ import AuthorListScreen from "./screens/general/AuthorListScreen";
 import PostsByCategoryScreen from "./screens/general/PostsByCategoryScreen";
 import PostsByTagScreen from "./screens/general/PostByTagScreen";
 import AuthorProfileScreen from "./screens/general/AuthorProfileScreen";
+import NotFound from "./screens/general/NotFound";
 
 const App = () => {
   const client = new QueryClient();
@@ -35,76 +36,83 @@ const App = () => {
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <Router>
-            <Route path="/user">
-              <UserLayout>
-                <Route exact path="/user/dashboard" component={UserDashboard} />
-                <Route exact path="/user/posts" component={UserPosts} />
-                <Route
-                  exact
-                  path="/user/posts/create"
-                  component={UserCreatePostScreen}
-                />
-                <Route path="/user/profile" component={UserProfile} />
-                <Route
-                  path="/user/posts/edit/:editPostId"
-                  component={EditUserPostScreen}
-                />
-              </UserLayout>
-            </Route>
-            <Route path="/admin">
-              <AdminLayout>
-                <Route exact path="/admin" component={AdminHomeScreen} />
-                <Route path="/admin/users" component={AdminUsers} />
-                <Route path="/admin/categories" component={AdminCategories} />
-                <Route
-                  path="/admin/posts/create"
-                  component={CreatePostScreen}
-                  exact
-                />
-                <Route
-                  path="/admin/posts/edit/:editPostId"
-                  component={EditPostScreen}
-                />
-                <Route path="/admin/posts" component={AdminPosts} exact />
-                <Route path="/admin/profile" component={AdminProfile} />
-              </AdminLayout>
-            </Route>
-            <Route
-              exact
-              path={[
-                "/",
-                "/posts/:postId",
-                "/authors",
-                "/authors/:authorId",
-                "/posts/search/categories/:categoryName",
-                "/posts/search/tags/:tagName",
-              ]}
-            >
-              <GeneralLayout>
-                <Route exact path="/" component={HomeScreen} />
-                <Route
-                  exact
-                  path="/posts/:postId"
-                  component={IndividualPostScreen}
-                />
-                <Route exact path="/authors" component={AuthorListScreen} />
-                <Route
-                  exact
-                  path="/posts/search/categories/:categoryName"
-                  component={PostsByCategoryScreen}
-                />
-                <Route
-                  exact
-                  path="/posts/search/tags/:tagName"
-                  component={PostsByTagScreen}
-                />
-                <Route
-                  exact
-                  path="/authors/:authorId"
-                  component={AuthorProfileScreen}
-                />
-              </GeneralLayout>
-            </Route>
+            <Switch>
+              <Route path="/user">
+                <UserLayout>
+                  <Route
+                    exact
+                    path="/user/dashboard"
+                    component={UserDashboard}
+                  />
+                  <Route exact path="/user/posts" component={UserPosts} />
+                  <Route
+                    exact
+                    path="/user/posts/create"
+                    component={UserCreatePostScreen}
+                  />
+                  <Route path="/user/profile" component={UserProfile} />
+                  <Route
+                    path="/user/posts/edit/:editPostId"
+                    component={EditUserPostScreen}
+                  />
+                </UserLayout>
+              </Route>
+              <Route path="/admin">
+                <AdminLayout>
+                  <Route exact path="/admin" component={AdminHomeScreen} />
+                  <Route path="/admin/users" component={AdminUsers} />
+                  <Route path="/admin/categories" component={AdminCategories} />
+                  <Route
+                    path="/admin/posts/create"
+                    component={CreatePostScreen}
+                    exact
+                  />
+                  <Route
+                    path="/admin/posts/edit/:editPostId"
+                    component={EditPostScreen}
+                  />
+                  <Route path="/admin/posts" component={AdminPosts} exact />
+                  <Route path="/admin/profile" component={AdminProfile} />
+                </AdminLayout>
+              </Route>
+              <Route
+                exact
+                path={[
+                  "/",
+                  "/posts/:postId",
+                  "/authors",
+                  "/authors/:authorId",
+                  "/posts/search/categories/:categoryName",
+                  "/posts/search/tags/:tagName",
+                ]}
+              >
+                <GeneralLayout>
+                  <Route exact path="/" component={HomeScreen} />
+                  <Route
+                    exact
+                    path="/posts/:postId"
+                    component={IndividualPostScreen}
+                  />
+                  <Route exact path="/authors" component={AuthorListScreen} />
+                  <Route
+                    exact
+                    path="/posts/search/categories/:categoryName"
+                    component={PostsByCategoryScreen}
+                  />
+                  <Route
+                    exact
+                    path="/posts/search/tags/:tagName"
+                    component={PostsByTagScreen}
+                  />
+                  <Route
+                    exact
+                    path="/authors/:authorId"
+                    component={AuthorProfileScreen}
+                  />
+                </GeneralLayout>
+              </Route>
+              <Route path="*" component={NotFound} />
+            </Switch>
           </Router>
         </ThemeProvider>
         <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />

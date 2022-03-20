@@ -1,15 +1,7 @@
-import {
-  Box,
-  CircularProgress,
-  Grid,
-  makeStyles,
-  Typography,
-} from "@material-ui/core";
+import { Box, makeStyles, Typography } from "@material-ui/core";
 import { grey } from "@material-ui/core/colors";
-import { useQuery } from "react-query";
+import { memo } from "react";
 import { useSelector } from "react-redux";
-import { getCommentsByPostId } from "../data/commentQueryFunctions";
-import { COMMENT_DATA } from "../definitions/reactQueryConstants/queryConstants";
 import PostComment from "./PostComment";
 
 const useStyles = makeStyles((theme) => ({
@@ -31,52 +23,40 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const PostCommentDeck = ({ postId, editHandler, deleteHandler }) => {
+const PostCommentDeck = memo(({ comments, editHandler, deleteHandler }) => {
   // user data
   const { user } = useSelector((state) => state.userData);
 
   // classes
   const classes = useStyles();
 
-  // query
-  const { isLoading, data, isFetching } = useQuery(
-    [COMMENT_DATA, postId],
-    ({ queryKey }) => getCommentsByPostId(queryKey[1])
-  );
-
   return (
     <>
-      {isLoading || isFetching ? (
-        <Grid container justify="center" alignItems="center">
-          <CircularProgress />
-        </Grid>
-      ) : (
-        <Box className={classes.container}>
-          {data.length > 0 ? (
-            data.map((comment) => (
-              <PostComment
-                key={comment._id}
-                showCommentActions={
-                  user._id === comment.author._id ? true : false
-                }
-                authorId={comment.author._id}
-                authorName={comment.author.name}
-                commentText={comment.text}
-                editHandler={() => {
-                  editHandler(comment._id);
-                }}
-                deleteHandler={() => {
-                  deleteHandler(comment._id);
-                }}
-              />
-            ))
-          ) : (
-            <Typography variant="subtitle1">No comments yet...</Typography>
-          )}
-        </Box>
-      )}
+      <Box className={classes.container}>
+        {comments.length > 0 ? (
+          comments.map((comment) => (
+            <PostComment
+              key={comment._id}
+              showCommentActions={
+                user._id === comment.author._id ? true : false
+              }
+              authorId={comment.author._id}
+              authorName={comment.author.name}
+              commentText={comment.text}
+              editHandler={() => {
+                editHandler(comment._id);
+              }}
+              deleteHandler={() => {
+                deleteHandler(comment._id);
+              }}
+            />
+          ))
+        ) : (
+          <Typography variant="subtitle1">No comments yet...</Typography>
+        )}
+      </Box>
     </>
   );
-};
+});
 
 export default PostCommentDeck;
