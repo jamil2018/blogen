@@ -24,8 +24,8 @@ const PostTagDeck = ({ tags }) => {
   const classes = useStyles();
   return (
     <Box className={classes.tagsContainer}>
-      {tags.map((tag) => (
-        <PostTag text={tag} className={classes.chip} />
+      {tags.map((tag, index) => (
+        <PostTag key={index} text={tag} className={classes.chip} />
       ))}
     </Box>
   );

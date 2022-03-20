@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
 const CreateCommentScreen = ({ postId, showSuccessAlertHandler }) => {
   const queryClient = useQueryClient();
   const { user } = useSelector((state) => state.userData);
-  const mutation = useMutation(createCommentByPostId, {
+  const { isLoading, mutate } = useMutation(createCommentByPostId, {
     onSuccess: () => {
       queryClient.invalidateQueries(COMMENT_DATA);
       formik.values.text = "";
@@ -37,39 +37,68 @@ const CreateCommentScreen = ({ postId, showSuccessAlertHandler }) => {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      mutation.mutate({ postId, values });
+      mutate({ postId, values });
     },
   });
-
   return (
     <Box>
       <Alert severity="warning" className={user._id ? classes.hideAlert : ""}>
         You need to be logged in to post comments
       </Alert>
       <form onSubmit={formik.handleSubmit} className={classes.formContent}>
-        <TextField
-          fullWidth
-          variant="outlined"
-          id="text"
-          name="text"
-          label="Post a comment"
-          value={formik.values.text}
-          onChange={formik.handleChange}
-          error={formik.touched.text && Boolean(formik.errors.text)}
-          helperText={(formik.touched.text && formik.errors.text) || " "}
-          size="small"
-          multiline={true}
-          rows={5}
-          disabled={user._id ? false : true}
-        />
-        <Button
-          color="primary"
-          variant="outlined"
-          type="submit"
-          disabled={user._id ? false : true}
-        >
-          Save
-        </Button>
+        {user._id ? (
+          <>
+            <TextField
+              fullWidth
+              variant="outlined"
+              id="text"
+              name="text"
+              label="Post a comment"
+              value={formik.values.text}
+              onChange={formik.handleChange}
+              error={formik.touched.text && Boolean(formik.errors.text)}
+              helperText={(formik.touched.text && formik.errors.text) || " "}
+              size="small"
+              multiline={true}
+              rows={5}
+              disabled={!isLoading ? false : true}
+            />
+            <Button
+              color="primary"
+              variant="outlined"
+              type="submit"
+              disabled={!isLoading ? false : true}
+            >
+              Save
+            </Button>
+          </>
+        ) : (
+          <>
+            <TextField
+              fullWidth
+              variant="outlined"
+              id="text"
+              name="text"
+              label="Post a comment"
+              value={formik.values.text}
+              onChange={formik.handleChange}
+              error={formik.touched.text && Boolean(formik.errors.text)}
+              helperText={(formik.touched.text && formik.errors.text) || " "}
+              size="small"
+              multiline={true}
+              rows={5}
+              disabled={true}
+            />
+            <Button
+              color="primary"
+              variant="outlined"
+              type="submit"
+              disabled={true}
+            >
+              Save
+            </Button>
+          </>
+        )}
       </form>
     </Box>
   );
