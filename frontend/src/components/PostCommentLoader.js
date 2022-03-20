@@ -4,6 +4,7 @@ import { makeStyles } from "@material-ui/styles";
 const useStyles = makeStyles((theme) => ({
   container: {
     paddingRight: theme.spacing(2),
+    marginBottom: theme.spacing(4),
   },
   comment: {
     marginBottom: theme.spacing(2),

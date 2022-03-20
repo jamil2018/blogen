@@ -11,7 +11,9 @@ import { grey } from "@material-ui/core/colors";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import { memo } from "react";
+import { Link } from "react-router-dom";
 import { getAuthorNameInitials } from "../utils/dataFormat";
+import { getBase64ImageURL } from "../utils/imageConvertion";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -21,6 +23,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(1),
     color: grey[500],
     fontWeight: theme.typography.fontWeightLight,
+    textDecoration: "none",
   },
   commentTextContainer: {
     alignSelf: "flex-start",
@@ -35,6 +38,7 @@ const useStyles = makeStyles((theme) => ({
 
 const PostComment = memo(
   ({
+    authorImage,
     authorId,
     authorName,
     commentText,
@@ -54,8 +58,23 @@ const PostComment = memo(
                 justifyContent="center"
                 alignItems="center"
               >
-                <Avatar>{getAuthorNameInitials(authorName)}</Avatar>
-                <Typography variant="subtitle2" className={classes.authorText}>
+                {authorImage ? (
+                  <Avatar
+                    alt="user profile image"
+                    className={classes.avatar}
+                    src={getBase64ImageURL(authorImage.data.data)}
+                  />
+                ) : (
+                  <Avatar alt="user profile image" className={classes.avatar}>
+                    {getAuthorNameInitials(authorName)}
+                  </Avatar>
+                )}
+                <Typography
+                  component={Link}
+                  to={`/authors/${authorId}`}
+                  variant="subtitle2"
+                  className={classes.authorText}
+                >
                   {authorName}
                 </Typography>
               </Grid>

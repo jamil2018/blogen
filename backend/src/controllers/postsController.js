@@ -204,7 +204,7 @@ const getPostComments = asyncHandler(async (req, res) => {
     path: "comments",
     populate: {
       path: "author",
-      select: "name",
+      select: "name image",
     },
   });
   if (post) {
