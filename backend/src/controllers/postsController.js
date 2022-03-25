@@ -335,11 +335,27 @@ const findPosts = asyncHandler(async (req, res) => {
     postQuery.category = categoryData._id;
   }
   if (tag) {
-    postQuery.tags = tag;
+    postQuery.tags = { $regex: tag, $options: "i" };
   }
   const posts = await Post.find(postQuery)
     .populate("author", "name image")
     .populate("category", "title");
+  return res.status(200).json(posts);
+});
+
+/**
+ * @desc search posts
+ * @route GET /api/posts/search
+ * @access public
+ */
+const searchPosts = asyncHandler(async (req, res) => {
+  const { query } = req.query;
+  const posts = await Post.find({
+    $or: [
+      { title: { $regex: query, $options: "i" } },
+      { description: { $regex: query, $options: "i" } },
+    ],
+  }).select("title");
   return res.status(200).json(posts);
 });
 
@@ -408,4 +424,5 @@ export {
   deleteMultiplePostsById,
   getCuratedPostsCount,
   getCuratedPostsCountByAuthorId,
+  searchPosts,
 };

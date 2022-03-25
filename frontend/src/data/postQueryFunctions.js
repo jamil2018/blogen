@@ -206,3 +206,18 @@ export const getCuratedPostListByAuthor = async () => {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
   }
 };
+
+export const searchPosts = async (searchQuery) => {
+  try {
+    if (searchQuery.length > 1) {
+      const { data } = await axios.get(
+        `/api/posts/search?query=${searchQuery}`
+      );
+      return data;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    throw new Error(`Error while fetching data. Error Message: ${err.message}`);
+  }
+};

@@ -16,6 +16,7 @@
     "base-64": "^1.0.0",
     "formik": "^2.2.9",
     "html2plaintext": "^2.1.4",
+    "lodash": "^4.17.21",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-query": "^3.17.2",

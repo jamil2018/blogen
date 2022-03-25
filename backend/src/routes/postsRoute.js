@@ -19,6 +19,7 @@ import {
   getPostCommentById,
   getLatestPosts,
   getPaginatedPosts,
+  searchPosts,
 } from "../controllers/postsController.js";
 
 const router = Router();
@@ -34,6 +35,8 @@ router.route("/paginated").get(getPaginatedPosts);
 router.route("/latest").get(getLatestPosts);
 
 router.route("/find").get(findPosts);
+
+router.route("/search").get(searchPosts);
 
 router.route("/curated").get(getCuratedPostsCount);
 

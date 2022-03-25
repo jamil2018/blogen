@@ -10,11 +10,18 @@ import {
   makeStyles,
   Toolbar,
   Typography,
+  CircularProgress,
+  Fade,
 } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import AppIcon from "../assets/appIcon.svg";
 import SearchIcon from "@material-ui/icons/Search";
 import SearchLink from "./SearchLink";
+import { debounce } from "lodash";
+import { useRef, useState } from "react";
+import { useQuery } from "react-query";
+import { SEARCH_POST_DATA } from "../definitions/reactQueryConstants/queryConstants";
+import { searchPosts } from "../data/postQueryFunctions";
 
 const useStyles = makeStyles((theme) => ({
   headerText: {
@@ -74,12 +81,52 @@ const useStyles = makeStyles((theme) => ({
   searchResult: {
     position: "absolute",
     width: "100%",
-    marginTop: "0.5rem",
+    // marginTop: "0.5rem",
   },
 }));
 
 const Navbar = ({ headerText, children }) => {
   const classes = useStyles();
+
+  // states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSearchResultWindow, setShowSearchResultWindow] = useState(false);
+  const [isHoveringOnSearchResult, setIsHoveringOnSearchResult] =
+    useState(false);
+
+  // action handlers
+  const manageSearchInput = (e) => setSearchQuery(e?.target?.value);
+  const debouncedInput = debounce(manageSearchInput, 1000);
+  const handleSearchInput = (e) => {
+    if (e.target.value === "") {
+      setShowSearchResultWindow(false);
+    } else {
+      setShowSearchResultWindow(true);
+    }
+    debouncedInput(e);
+  };
+  const hideSearchResultWindowHandler = () => {
+    setShowSearchResultWindow(false);
+  };
+  const showSearchResultWindowHandler = () => {
+    if (searchQuery !== "") {
+      setShowSearchResultWindow(true);
+    }
+  };
+  const handleSearchContainerBlur = () => {
+    if (isHoveringOnSearchResult === false) {
+      setShowSearchResultWindow(false);
+    }
+  };
+  // data fetch
+  const { isLoading, data } = useQuery(
+    [SEARCH_POST_DATA, searchQuery],
+    ({ queryKey }) => searchPosts(queryKey[1]),
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
+
   return (
     <AppBar
       position="static"
@@ -113,7 +160,12 @@ const Navbar = ({ headerText, children }) => {
                   </Grid>
                 </Box>
                 <Box>
-                  <Box className={classes.search}>
+                  <Box
+                    className={classes.search}
+                    onMouseEnter={() => setIsHoveringOnSearchResult(true)}
+                    onMouseLeave={() => setIsHoveringOnSearchResult(false)}
+                    onBlur={handleSearchContainerBlur}
+                  >
                     <Box className={classes.searchIcon}>
                       <SearchIcon />
                     </Box>
@@ -124,15 +176,40 @@ const Navbar = ({ headerText, children }) => {
                         input: classes.inputInput,
                       }}
                       inputProps={{ "aria-label": "search" }}
-                      onChange={(e) => console.log(e.target.value)}
+                      onChange={handleSearchInput}
+                      onFocus={showSearchResultWindowHandler}
                     />
-                    <Card className={classes.searchResult} hidden={true}>
-                      <CardContent>
-                        <SearchLink to="/">hello 01</SearchLink>
-                        <SearchLink to="/">hello 02</SearchLink>
-                        <SearchLink to="/">hello 03</SearchLink>
-                      </CardContent>
-                    </Card>
+                    <Fade in={showSearchResultWindow}>
+                      <Card className={classes.searchResult}>
+                        <CardContent>
+                          {isLoading ? (
+                            <Grid
+                              container
+                              justifyContent="center"
+                              alignItems="center"
+                            >
+                              <CircularProgress />
+                            </Grid>
+                          ) : (
+                            <>
+                              {data?.map((post) => (
+                                <SearchLink
+                                  onClick={hideSearchResultWindowHandler}
+                                  to={`/posts/${post._id}`}
+                                >
+                                  {post.title}
+                                </SearchLink>
+                              ))}
+                              {data?.length === 0 && (
+                                <Typography variant="subtitle1">
+                                  No results found
+                                </Typography>
+                              )}
+                            </>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </Fade>
                   </Box>
                 </Box>
               </Grid>

@@ -106,6 +106,7 @@ const HomeScreen = () => {
     {
       refetchOnWindowFocus: false,
       refetchInterval: 10 * 60 * 1000,
+      keepPreviousData: true,
     }
   );
   const {

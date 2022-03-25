@@ -20,10 +20,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SearchLink = ({ children, to }) => {
+const SearchLink = ({ children, to, onClick }) => {
   const classes = useStyles();
   return (
-    <Link className={classes.root} component={RouterLink} to={to}>
+    <Link
+      onClick={onClick}
+      className={classes.root}
+      component={RouterLink}
+      to={to}
+    >
       {children}
     </Link>
   );
