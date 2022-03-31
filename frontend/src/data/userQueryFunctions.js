@@ -37,6 +37,19 @@ export const getAllUsers = async () => {
   }
 };
 
+export const getLatestUsers = async () => {
+  try {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const { data } = await axios.get("/api/users/latest", config);
+    return data;
+  } catch (err) {
+    throw new Error(`Error while fetching data. Error Message: ${err.message}`);
+  }
+};
 export const createUser = async (userData) => {
   try {
     const formData = new FormData();

@@ -10,6 +10,7 @@ import {
   updateUserProfileById,
   deleteUsersById,
   getCuratedUserCount,
+  getLatestUsers,
 } from "../controllers/usersController.js";
 import { uploads } from "../middlewares/fileStorageMiddleware.js";
 
@@ -21,6 +22,7 @@ router
   .get(getAllUsers)
   .delete(protect, checkAdmin, deleteUsersById);
 
+router.route("/latest").get(getLatestUsers);
 router.route("/curated").get(getCuratedUserCount);
 router.route("/login").post(authUser);
 router.route("/:id").get(getUserById);

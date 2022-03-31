@@ -54,6 +54,7 @@ const useStyles = makeStyles((theme) => ({
   avatar: {
     height: theme.spacing(5),
     width: theme.spacing(5),
+    zIndex: -100,
   },
   authorInfoContainer: {
     marginTop: theme.spacing(2),

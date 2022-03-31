@@ -17,6 +17,19 @@ const getAllUsers = asyncHandler(async (req, res) => {
 });
 
 /**
+ * @desc get last 9 created users
+ * @route GET /api/users/latest
+ * @access public
+ */
+const getLatestUsers = asyncHandler(async (req, res) => {
+  const users = await User.find({ isAdmin: false })
+    .sort({ createdAt: -1 })
+    .limit(9)
+    .select("-password");
+  return res.status(200).json(users);
+});
+
+/**
  * @desc get user by id
  * @route GET /api/user/:id
  * @access public
@@ -244,4 +257,5 @@ export {
   updateUserProfileById,
   deleteUsersById,
   getCuratedUserCount,
+  getLatestUsers,
 };

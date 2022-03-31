@@ -127,7 +127,7 @@ const ExpandedPostSummaryCard = ({
                 to={`/posts/search/tags/${tag}`}
                 className={classes.tagsChip}
                 size="small"
-                label={tag}
+                label={tag.toLowerCase()}
               />
             ))}
           </Box>
