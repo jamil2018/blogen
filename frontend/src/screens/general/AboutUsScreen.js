@@ -10,7 +10,7 @@ import {
 import BlogenLogo from "../../assets/appIcon.svg";
 import { useQuery } from "react-query";
 import { getLatestUsers } from "../../data/userQueryFunctions";
-import { USER_DATA } from "../../definitions/reactQueryConstants/queryConstants";
+import { DETAILED_USER_DATA } from "../../definitions/reactQueryConstants/queryConstants";
 import UserSummaryCardDeck from "../../components/UserSummaryCardDeck";
 import { Alert } from "@material-ui/lab";
 import { grey } from "@material-ui/core/colors";
@@ -62,10 +62,14 @@ const AboutUsScreen = () => {
   const [openRegistrationModal, setOpenRegistrationModal] = useState(false);
 
   // data queries
-  const { data, isLoading, isError } = useQuery(USER_DATA, getLatestUsers, {
-    refetchOnWindowFocus: false,
-    refetchInterval: 10 * 60 * 1000,
-  });
+  const { data, isLoading, isError } = useQuery(
+    DETAILED_USER_DATA,
+    getLatestUsers,
+    {
+      refetchOnWindowFocus: false,
+      refetchInterval: 10 * 60 * 1000,
+    }
+  );
 
   // handlers
   const handleLoginModalOpen = useCallback(() => {
