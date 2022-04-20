@@ -76,12 +76,9 @@ const GeneralLayout = ({ children }) => {
           <ItemMenu
             isIconButton={true}
             menuButtonContent={
-              user.image.data ? (
+              user.imageURL ? (
                 <>
-                  <Avatar
-                    src={getBase64ImageURL(user.image.data.data)}
-                    alt={user.name}
-                  />
+                  <Avatar src={user.imageURL} alt={user.name} />
                   <ArrowDropDownIcon />
                 </>
               ) : (

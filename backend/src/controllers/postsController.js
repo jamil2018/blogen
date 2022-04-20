@@ -5,7 +5,13 @@ import path from "path";
 import Post from "../models/PostModel.js";
 import Category from "../models/CategoryModel.js";
 import User from "../models/UserModel.js";
-import { compressImage } from "../utils/compressImage.js";
+import { getStorageController } from "../config/firebaseConfig.js";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytes,
+} from "firebase/storage";
 
 /**
  * @desc get all posts
@@ -14,8 +20,8 @@ import { compressImage } from "../utils/compressImage.js";
  */
 const getAllPosts = asyncHandler(async (req, res) => {
   const posts = await Post.find()
-    .select("title summary author category tags image")
-    .populate("author", "name image")
+    .select("title summary author category tags imageURL")
+    .populate("author", "name imageURL imageFileName")
     .populate("category", "title");
   return res.status(200).json(posts);
 });
@@ -30,10 +36,11 @@ const getPaginatedPosts = asyncHandler(async (req, res) => {
   const posts = await Post.paginate(
     {},
     {
-      select: "title description summary image tags category author createdAt",
+      select:
+        "title description summary tags category author createdAt imageURL",
       populate: [
         { path: "category", select: "title" },
-        { path: "author", select: "name image" },
+        { path: "author", select: "name imageURL imageFileName" },
       ],
       page: page,
       limit: limit,
@@ -49,8 +56,10 @@ const getPaginatedPosts = asyncHandler(async (req, res) => {
  */
 const getPostById = asyncHandler(async (req, res) => {
   const post = await Post.findById(req.params.id)
-    .select("title description summary author category tags image createdAt")
-    .populate("author", "name image")
+    .select(
+      "title description summary author category tags createdAt imageURL imageFileName"
+    )
+    .populate("author", "name imageURL imageFileName")
     .populate("category", "title");
 
   if (post) {
@@ -70,8 +79,8 @@ const getLatestPosts = asyncHandler(async (req, res) => {
   const posts = await Post.find()
     .sort({ createdAt: -1 })
     .limit(6)
-    .select("title summary description author category tags image createdAt")
-    .populate("author", "name image")
+    .select("title summary description author category tags createdAt imageURL")
+    .populate("author", "name imageURL imageFileName")
     .populate("category", "title");
 
   return res.status(200).json(posts);
@@ -84,17 +93,31 @@ const getLatestPosts = asyncHandler(async (req, res) => {
  */
 const createNewPost = asyncHandler(async (req, res) => {
   const { title, description, summary, category, tags } = req.body;
-  const tagsArr = tags.split(",");
   const author = req.user._id;
-  let image;
+  let tagsArr = [];
+  let imageURL;
+  let imageFileName;
+  if (tags) {
+    if (tags.includes(",")) {
+      tagsArr = tags.split(",").map((tag) => tag.trim());
+    } else {
+      tagsArr.push(tags);
+    }
+  }
+
   if (req.file) {
-    let storedImage = fs.readFileSync(
+    const storage = getStorageController(
+      process.env.FIREBASE_API_KEY,
+      process.env.FIREBASE_AUTH_DOMAIN,
+      process.env.FIREBASE_STORAGE_BUCKET
+    );
+    const storageRef = ref(storage, req.file.filename);
+    imageFileName = req.file.filename;
+    const storedImage = fs.readFileSync(
       path.join(__rootDirname, process.env.FILE_UPLOAD_PATH, req.file.filename)
     );
-    image = {
-      data: await compressImage(storedImage),
-      contentType: "image/*",
-    };
+    const uploadSnapshot = await uploadBytes(storageRef, storedImage);
+    imageURL = await getDownloadURL(uploadSnapshot.ref);
   }
   const post = await Post.create({
     title,
@@ -103,8 +126,10 @@ const createNewPost = asyncHandler(async (req, res) => {
     summary,
     category,
     tags: tagsArr,
-    image,
+    imageURL,
+    imageFileName,
   });
+
   if (post) {
     return res.status(201).json({
       _id: post._id,
@@ -115,6 +140,8 @@ const createNewPost = asyncHandler(async (req, res) => {
       summary: post.summary,
       category: post.category,
       tags: post.tags,
+      imageURL: post.imageURL,
+      imageFileName: post.imageFileName,
     });
   } else {
     res.status(400);
@@ -129,20 +156,29 @@ const createNewPost = asyncHandler(async (req, res) => {
  */
 const updatePost = asyncHandler(async (req, res) => {
   const post = await Post.findById(req.params.id);
-  let image;
+  let imageFileName;
+  let imageURL;
   if (req.file) {
-    let storedImage = fs.readFileSync(
+    const storage = getStorageController(
+      process.env.FIREBASE_API_KEY,
+      process.env.FIREBASE_AUTH_DOMAIN,
+      process.env.FIREBASE_STORAGE_BUCKET
+    );
+    const oldImageStorageRef = ref(storage, post.imageFileName);
+    const storageRef = ref(storage, req.file.filename);
+    const storedImage = fs.readFileSync(
       path.join(__rootDirname, process.env.FILE_UPLOAD_PATH, req.file.filename)
     );
-    image = {
-      data: await compressImage(storedImage),
-      contentType: "image/*",
-    };
+    await deleteObject(oldImageStorageRef);
+    const uploadSnapshot = await uploadBytes(storageRef, storedImage);
+    imageFileName = req.file.filename;
+    imageURL = await getDownloadURL(uploadSnapshot.ref);
   }
   if (post) {
     post.title = req.body.title || post.title;
     post.description = req.body.description || post.description;
-    post.image = image || post.image;
+    post.imageURL = imageURL || post.imageURL;
+    post.imageFileName = imageFileName || post.imageFileName;
     post.summary = req.body.summary || post.summary;
     post.category = req.body.category || post.category;
     post.tags = req.body.tags || post.tags;
@@ -151,7 +187,8 @@ const updatePost = asyncHandler(async (req, res) => {
       _id: updatedPost._id,
       title: updatedPost.title,
       description: updatedPost.description,
-      image: updatedPost.image,
+      imageURL: updatedPost.imageURL,
+      imageFileName: updatedPost.imageFileName,
       summary: updatedPost.summary,
       category: updatedPost.category,
       tags: [updatedPost.tags],
@@ -184,6 +221,24 @@ const deletePost = asyncHandler(async (req, res) => {
  * @access private
  */
 const deleteMultiplePostsById = asyncHandler(async (req, res) => {
+  const deleteMarkedPostImages = await Post.find({
+    _id: { $in: req.body.id },
+  }).select("imageFileName");
+  const storage = getStorageController(
+    process.env.FIREBASE_API_KEY,
+    process.env.FIREBASE_AUTH_DOMAIN,
+    process.env.FIREBASE_STORAGE_BUCKET
+  );
+  deleteMarkedPostImages.forEach(async (post) => {
+    if (post.imageFileName) {
+      try {
+        const storageRef = ref(storage, post.imageFileName);
+        await deleteObject(storageRef);
+      } catch (err) {
+        throw new Error("Failed to delete object from firebase.");
+      }
+    }
+  });
   const { deletedCount } = await Post.deleteMany({
     _id: { $in: req.body.id },
   });
@@ -204,7 +259,7 @@ const getPostComments = asyncHandler(async (req, res) => {
     path: "comments",
     populate: {
       path: "author",
-      select: "name image",
+      select: "name imageURL imageFileName",
     },
   });
   if (post) {
@@ -338,7 +393,7 @@ const findPosts = asyncHandler(async (req, res) => {
     postQuery.tags = { $regex: tag, $options: "i" };
   }
   const posts = await Post.find(postQuery)
-    .populate("author", "name image")
+    .populate("author", "name imageURL imageFileName")
     .populate("category", "title");
   return res.status(200).json(posts);
 });
@@ -372,7 +427,7 @@ const getPostsByAuthorId = asyncHandler(async (req, res) => {
         _id: req.params.aid,
       },
     })
-      .populate("author", "name image")
+      .populate("author", "name imageURL imageFileName")
       .populate("category", "title");
     return res.status(200).json(posts);
   } else {

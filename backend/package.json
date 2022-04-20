@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "engines": {
-    "node": "14.x"
+    "node": "16.x"
   },
   "scripts": {
     "start": "node .",
@@ -17,9 +17,11 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "colors": "^1.4.0",
+    "cors": "^2.8.5",
     "dotenv": "^9.0.1",
     "express": "^4.17.1",
     "express-async-handler": "^1.1.4",
+    "firebase": "^9.6.10",
     "helmet": "^4.6.0",
     "imagemin": "^8.0.1",
     "imagemin-giflossy": "^5.1.10",

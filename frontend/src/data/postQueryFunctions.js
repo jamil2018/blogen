@@ -142,7 +142,7 @@ export const createPost = async (postData) => {
 
 export const updatePostById = async (updatedPostData) => {
   try {
-    const { postId, values } = updatedPostData;
+    const { postId, values: postData } = updatedPostData;
     const { userData } = store.getState();
     const { user } = userData;
     const config = {
@@ -151,7 +151,14 @@ export const updatePostById = async (updatedPostData) => {
         Authorization: `Bearer ${user.token}`,
       },
     };
-    const { data } = await axios.put(`/api/posts/${postId}`, values, config);
+    const formData = new FormData();
+    formData.append("title", postData.title);
+    formData.append("description", postData.description);
+    formData.append("summary", postData.summary);
+    formData.append("category", postData.category);
+    formData.append("tags", postData.tags);
+    formData.append("image", postData.image);
+    const { data } = await axios.put(`/api/posts/${postId}`, formData, config);
     return data;
   } catch (err) {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);

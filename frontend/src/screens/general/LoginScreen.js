@@ -19,7 +19,7 @@ import { storeUserData } from "../../redux/slices/userDataSlice";
 const useStyles = makeStyles((theme) => ({
   image: {
     width: "100%",
-    height: "40vh",
+    height: "35vh",
     padding: theme.spacing(1),
   },
   button: {
@@ -79,7 +79,12 @@ const LoginScreen = ({ handleModalClose, openRegistrationModal }) => {
     },
   });
   return (
-    <Grid container spacing={3} justifyContent="space-between">
+    <Grid
+      container
+      spacing={3}
+      justifyContent="space-between"
+      alignItems="center"
+    >
       <Grid item xs={6}>
         <img
           className={classes.image}

@@ -8,7 +8,8 @@ const HomeAllPostsDeck = memo(({ posts }) => {
     <ExpandedPostSummaryCard
       key={post._id}
       authorId={post.author._id}
-      authorImage={getBase64ImageURL(post.author.image.data.data)}
+      authorImageURL={post.author.imageURL}
+      authorImageFileName={post.author.imageFileName}
       authorName={post.author.name}
       postId={post._id}
       postTitle={post.title}
@@ -16,7 +17,7 @@ const HomeAllPostsDeck = memo(({ posts }) => {
       postCreationDate={post.createdAt}
       postReadingTime={calculateReadingTime(post.description)}
       postTags={post.tags}
-      postImage={getBase64ImageURL(post.image.data.data)}
+      postImageURL={post.imageURL}
     />
   ));
 });

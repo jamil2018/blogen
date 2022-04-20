@@ -126,12 +126,18 @@ const AdminUsers = (props) => {
   };
 
   if (!isLoading && !isError && !isFetching && data.length > 0) {
-    rows = data.map((user) => ({
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      isAdmin: user.isAdmin,
-    }));
+    rows = data
+      .filter((user) => !user.isAdmin)
+      .map((user) => ({
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        bio: user.bio,
+        linkedinId: user.linkedinId,
+        twitterId: user.twitterId,
+        facebookId: user.facebookId,
+      }));
   }
 
   return (

@@ -4,6 +4,7 @@ import colors from "colors";
 import helmet from "helmet";
 import morgan from "morgan";
 import path from "path";
+import cors from "cors";
 import { fileURLToPath } from "url";
 
 import dbConfig from "./src/config/dbConfig.js";
@@ -21,6 +22,7 @@ const __rootDirname = path.dirname(fileURLToPath(import.meta.url));
 global.__rootDirname = __rootDirname;
 // middlewares
 app.use(express.json());
+app.use(cors());
 app.use(helmet());
 if (process.env.NODE_ENV === "DEVELOPMENT") app.use(morgan("dev"));
 

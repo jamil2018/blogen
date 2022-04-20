@@ -34,7 +34,7 @@ const ExpandedPostSummaryLoader = () => {
       justifyContent="space-between"
       className={classes.container}
     >
-      <Grid item xs={9}>
+      <Grid item xs={8}>
         <Grid
           className={classes.authorInfoContainer}
           container
@@ -52,7 +52,7 @@ const ExpandedPostSummaryLoader = () => {
           <Skeleton variant="text" width={50} />
         </Grid>
       </Grid>
-      <Grid item xs={3}>
+      <Grid item xs={4}>
         <Skeleton variant="rect" width={"100%"} height={160} />
       </Grid>
     </Grid>

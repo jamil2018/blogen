@@ -91,17 +91,18 @@ const PostsByCategoryScreen = () => {
             <>
               <ExpandedPostSummaryCard
                 key={post._id}
-                authorImage={getBase64ImageURL(post.author.image.data.data)}
+                authorImageURL={post.author.imageURL}
+                authorId={post.author._id}
                 authorName={post.author.name}
                 postTitle={post.title}
                 postDescription={post.description}
                 postSummary={post.summary}
-                postImage={getBase64ImageURL(post.image.data.data)}
                 postCategory={post.category.title}
                 postTags={post.tags}
                 postId={post._id}
                 postCreationDate={getPostFormattedDate(post.createdAt)}
                 postReadingTime={calculateReadingTime(post.description)}
+                postImageURL={post.imageURL}
               />
               <Divider />
             </>

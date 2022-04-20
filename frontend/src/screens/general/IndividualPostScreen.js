@@ -1,6 +1,5 @@
 import {
   Avatar,
-  CircularProgress,
   Container,
   Divider,
   Grid,
@@ -42,6 +41,7 @@ import { getUserById } from "../../data/userQueryFunctions";
 import IndividualPostLoader from "../../components/IndividualPostLoader";
 import PostCommentLoader from "../../components/PostCommentLoader";
 import { getCommentsByPostId } from "../../data/commentQueryFunctions";
+import { modules } from "../../definitions/editorModules";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -108,20 +108,28 @@ const IndividualPostScreen = () => {
   const classes = useStyles();
   const { isLoading, data } = useQuery(
     [SINGLE_POST_DATA, postId],
-    ({ queryKey }) => getPostById(queryKey[1])
+    ({ queryKey }) => getPostById(queryKey[1]),
+    {
+      refetchOnWindowFocus: false,
+    }
   );
   const {
     isLoading: isPostCommentLoading,
     data: postCommentData,
     isFetching: isPostCommentFetching,
-  } = useQuery([COMMENT_DATA, postId], ({ queryKey }) =>
-    getCommentsByPostId(queryKey[1])
+  } = useQuery(
+    [COMMENT_DATA, postId],
+    ({ queryKey }) => getCommentsByPostId(queryKey[1]),
+    {
+      refetchOnWindowFocus: false,
+      refetchInterval: 5 * 60 * 1000,
+    }
   );
   const authorId = data?.author._id;
   const { isLoading: isAuthorDataLoading, data: authorData } = useQuery(
     [SINGLE_AUTHOR_DATA, authorId],
     ({ queryKey }) => getUserById(queryKey[1]),
-    { enabled: !!authorId }
+    { enabled: !!authorId, refetchOnWindowFocus: false }
   );
   // effects
   useEffect(() => {
@@ -163,11 +171,11 @@ const IndividualPostScreen = () => {
                 className={classes.authorInfoContainer}
               >
                 <Grid item>
-                  {authorData.image ? (
+                  {authorData.imageURL ? (
                     <Avatar
                       alt="user profile image"
                       className={classes.avatar}
-                      src={getBase64ImageURL(authorData.image.data.data)}
+                      src={authorData.imageURL}
                     />
                   ) : (
                     <Avatar alt="user profile image" className={classes.avatar}>
@@ -243,11 +251,7 @@ const IndividualPostScreen = () => {
               </Grid>
             </Grid>
           </Grid>
-          <img
-            className={classes.postImg}
-            src={getBase64ImageURL(data.image.data.data)}
-            alt="post"
-          />
+          <img className={classes.postImg} src={data.imageURL} alt="post" />
           <ReactQuill
             theme="bubble"
             value={data.description}
@@ -255,6 +259,7 @@ const IndividualPostScreen = () => {
             placeholder="Description"
             className={classes.postContent}
             name="description"
+            modules={modules}
             readOnly
           />
           <PostTagDeck tags={data.tags} />

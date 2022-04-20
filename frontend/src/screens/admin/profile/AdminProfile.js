@@ -85,11 +85,11 @@ const AdminProfile = () => {
         </Typography>
       ) : (
         <>
-          {data.image ? (
+          {data.imageURL ? (
             <Avatar
               alt="user profile image"
               className={classes.avatar}
-              src={getBase64ImageURL(data.image.data.data)}
+              src={data.imageURL}
             />
           ) : (
             <Avatar alt="user profile image" className={classes.avatar}>

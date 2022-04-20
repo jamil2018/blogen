@@ -11,9 +11,11 @@ const postSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    image: {
-      data: Buffer,
-      contentType: String,
+    imageURL: {
+      type: String,
+    },
+    imageFileName: {
+      type: String,
     },
     author: {
       type: mongoose.Schema.Types.ObjectId,

@@ -98,89 +98,95 @@ const AdminHomeScreen = () => {
       ) : (
         <>
           <Grid container alignItems="center" justifyContent="space-between">
-            <Card className={classes.card}>
-              <CardContent>
-                <Typography
-                  gutterBottom
-                  align="center"
-                  variant="h5"
-                  component="h2"
-                >
-                  Posts
-                </Typography>
-                {isPostDataLoading || isPostDataFetching ? (
-                  <Grid container justify="center">
-                    <CircularProgress size={25} color="primary" />
-                  </Grid>
-                ) : (
+            <Grid item xs={3} className={classes.cardItem}>
+              <Card className={classes.card} variant="outlined">
+                <CardContent className={classes.cardContent}>
                   <Typography
-                    color="primary"
+                    gutterBottom
                     align="center"
-                    variant="h6"
-                    component="p"
+                    variant="h5"
+                    component="h2"
                   >
-                    {postData.length}
+                    Posts
                   </Typography>
-                )}
-              </CardContent>
-            </Card>
-            <Card className={classes.card}>
-              <CardContent>
-                <Typography
-                  gutterBottom
-                  align="center"
-                  variant="h5"
-                  component="h2"
-                >
-                  Users
-                </Typography>
-                {isUserDataLoading || isUserDataFetching ? (
-                  <Grid container justify="center">
-                    <CircularProgress size={25} color="primary" />
-                  </Grid>
-                ) : (
+                  {isPostDataLoading || isPostDataFetching ? (
+                    <Grid container justify="center">
+                      <CircularProgress size={25} color="primary" />
+                    </Grid>
+                  ) : (
+                    <Typography
+                      color="primary"
+                      align="center"
+                      variant="h6"
+                      component="p"
+                    >
+                      {postData.length}
+                    </Typography>
+                  )}
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={3} className={classes.cardItem}>
+              <Card className={classes.card} variant="outlined">
+                <CardContent>
                   <Typography
-                    color="primary"
+                    gutterBottom
                     align="center"
-                    variant="h6"
-                    component="p"
+                    variant="h5"
+                    component="h2"
                   >
-                    {userData.length}
+                    Users
                   </Typography>
-                )}
-              </CardContent>
-            </Card>
-            <Card className={classes.card}>
-              <CardContent>
-                <Typography
-                  gutterBottom
-                  align="center"
-                  variant="h5"
-                  component="h2"
-                >
-                  Categories
-                </Typography>
-                {isCategoryDataLoading || isCategoryDataFetching ? (
-                  <Grid container justify="center">
-                    <CircularProgress size={25} color="primary" />
-                  </Grid>
-                ) : (
+                  {isUserDataLoading || isUserDataFetching ? (
+                    <Grid container justify="center">
+                      <CircularProgress size={25} color="primary" />
+                    </Grid>
+                  ) : (
+                    <Typography
+                      color="primary"
+                      align="center"
+                      variant="h6"
+                      component="p"
+                    >
+                      {userData.length}
+                    </Typography>
+                  )}
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={3} className={classes.cardItem}>
+              <Card className={classes.card} variant="outlined">
+                <CardContent>
                   <Typography
-                    color="primary"
+                    gutterBottom
                     align="center"
-                    variant="h6"
-                    component="p"
+                    variant="h5"
+                    component="h2"
                   >
-                    {categoryData.length}
+                    Categories
                   </Typography>
-                )}
-              </CardContent>
-            </Card>
+                  {isCategoryDataLoading || isCategoryDataFetching ? (
+                    <Grid container justify="center">
+                      <CircularProgress size={25} color="primary" />
+                    </Grid>
+                  ) : (
+                    <Typography
+                      color="primary"
+                      align="center"
+                      variant="h6"
+                      component="p"
+                    >
+                      {categoryData.length}
+                    </Typography>
+                  )}
+                </CardContent>
+              </Card>
+            </Grid>
           </Grid>
           <Grid container justifyContent="space-between" alignItems="center">
             <Grid item xs={12} sm={5} className={classes.chartContainer}>
               <ResponsiveContainer width="100%" height="100%">
-                <Card>
+                <Card variant="outlined">
                   <CardContent>
                     <Typography
                       variant="h6"
@@ -208,7 +214,7 @@ const AdminHomeScreen = () => {
             </Grid>
             <Grid item xs={12} sm={5} className={classes.chartContainer}>
               <ResponsiveContainer width="100%" height="100%">
-                <Card>
+                <Card variant="outlined">
                   <CardContent>
                     <Typography
                       variant="h6"

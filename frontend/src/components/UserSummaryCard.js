@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   container: {
-    width: "24vw",
+    width: "100%",
     height: "20vh",
   },
   imageContainer: {
@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const UserSummaryCard = ({ userProfileImage, name, bio, authorId }) => {
+const UserSummaryCard = ({ userProfileImageURL, name, bio, authorId }) => {
   const classes = useStyles();
   return (
     <Card className={classes.container}>
@@ -36,7 +36,7 @@ const UserSummaryCard = ({ userProfileImage, name, bio, authorId }) => {
           <Grid item xs={5} className={classes.imageContainer}>
             <img
               className={classes.image}
-              src={userProfileImage}
+              src={userProfileImageURL}
               alt="user profile"
             />
           </Grid>

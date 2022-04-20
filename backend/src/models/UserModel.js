@@ -32,9 +32,11 @@ const userSchema = new mongoose.Schema(
     twitterId: {
       type: String,
     },
-    image: {
-      data: Buffer,
-      contentType: String,
+    imageURL: {
+      type: String,
+    },
+    imageFileName: {
+      type: String,
     },
   },
   { timestamps: true }

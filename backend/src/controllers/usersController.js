@@ -5,6 +5,13 @@ import generateToken from "../utils/generateToken.js";
 import fs from "fs";
 import path from "path";
 import { compressImage } from "../utils/compressImage.js";
+import { getStorageController } from "../config/firebaseConfig.js";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytes,
+} from "firebase/storage";
 
 /**
  * @desc get all users
@@ -46,15 +53,21 @@ const getUserById = asyncHandler(async (req, res) => {
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password, bio, facebookId, linkedinId, twitterId } =
     req.body;
-  let image;
+  let imageURL;
+  let imageFileName;
   if (req.file) {
-    let storedImage = fs.readFileSync(
+    const storage = getStorageController(
+      process.env.FIREBASE_API_KEY,
+      process.env.FIREBASE_AUTH_DOMAIN,
+      process.env.FIREBASE_STORAGE_BUCKET
+    );
+    const storageRef = ref(storage, req.file.filename);
+    imageFileName = req.file.filename;
+    const storedImage = fs.readFileSync(
       path.join(__rootDirname, process.env.FILE_UPLOAD_PATH, req.file.filename)
     );
-    image = {
-      data: await compressImage(storedImage),
-      contentType: "image/*",
-    };
+    const uploadSnapshot = await uploadBytes(storageRef, storedImage);
+    imageURL = await getDownloadURL(uploadSnapshot.ref);
   }
   const userExists = await User.findOne({ email });
   if (userExists) {
@@ -69,7 +82,8 @@ const registerUser = asyncHandler(async (req, res) => {
     facebookId,
     linkedinId,
     twitterId,
-    image,
+    imageURL,
+    imageFileName,
   });
   if (user) {
     res.status(201).json({
@@ -77,7 +91,8 @@ const registerUser = asyncHandler(async (req, res) => {
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
-      image: user.image,
+      imageURL: user.imageURL,
+      imageFileName: user.imageFileName,
       token: generateToken(user._id),
     });
   } else {
@@ -100,7 +115,8 @@ const authUser = asyncHandler(async (req, res) => {
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
-      image: user.image,
+      imageURL: user.imageURL,
+      imageFileName: user.imageFileName,
       token: generateToken(user._id),
     });
   } else {
@@ -136,15 +152,23 @@ const getUserProfile = asyncHandler(async (req, res) => {
  */
 const updateUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
-  let image;
+  let imageURL;
+  let imageFileName;
   if (req.file) {
-    let storedImage = fs.readFileSync(
+    const storage = getStorageController(
+      process.env.FIREBASE_API_KEY,
+      process.env.FIREBASE_AUTH_DOMAIN,
+      process.env.FIREBASE_STORAGE_BUCKET
+    );
+    const oldImageStorageRef = ref(storage, post.imageFileName);
+    const storageRef = ref(storage, req.file.filename);
+    const storedImage = fs.readFileSync(
       path.join(__rootDirname, process.env.FILE_UPLOAD_PATH, req.file.filename)
     );
-    image = {
-      data: await compressImage(storedImage),
-      contentType: "image/*",
-    };
+    await deleteObject(oldImageStorageRef);
+    const uploadSnapshot = await uploadBytes(storageRef, storedImage);
+    imageFileName = req.file.filename;
+    imageURL = await getDownloadURL(uploadSnapshot.ref);
   }
   if (user) {
     user.name = req.body.name || user.name;
@@ -153,7 +177,8 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     user.facebookId = req.body.facebookId || user.facebookId;
     user.linkedinId = req.body.linkedinId || user.linkedinId;
     user.twitterId = req.body.twitterId || user.twitterId;
-    user.image = image || user.image;
+    user.imageURL = imageURL || user.imageURL;
+    user.imageFileName = imageFileName || user.imageFileName;
     if (req.body.password) {
       user.password = req.body.password;
     }
@@ -166,7 +191,8 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       facebookId: updatedUser.facebookId,
       linkedinId: updatedUser.linkedinId,
       twitterId: updatedUser.twitterId,
-      image: updatedUser.image,
+      imageURL: updatedUser.imageURL,
+      imageFileName: updatedUser.imageFileName,
       isAdmin: updatedUser.isAdmin,
       token: generateToken(updatedUser._id),
     });
@@ -183,15 +209,23 @@ const updateUserProfile = asyncHandler(async (req, res) => {
  */
 const updateUserProfileById = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
-  let image;
+  let imageURL;
+  let imageFileName;
   if (req.file) {
-    let storedImage = fs.readFileSync(
+    const storage = getStorageController(
+      process.env.FIREBASE_API_KEY,
+      process.env.FIREBASE_AUTH_DOMAIN,
+      process.env.FIREBASE_STORAGE_BUCKET
+    );
+    const oldImageStorageRef = ref(storage, post.imageFileName);
+    const storageRef = ref(storage, req.file.filename);
+    const storedImage = fs.readFileSync(
       path.join(__rootDirname, process.env.FILE_UPLOAD_PATH, req.file.filename)
     );
-    image = {
-      data: await compressImage(storedImage),
-      contentType: "image/*",
-    };
+    await deleteObject(oldImageStorageRef);
+    const uploadSnapshot = await uploadBytes(storageRef, storedImage);
+    imageFileName = req.file.filename;
+    imageURL = await getDownloadURL(uploadSnapshot.ref);
   }
   if (user) {
     user.name = req.body.name || user.name;
@@ -200,7 +234,8 @@ const updateUserProfileById = asyncHandler(async (req, res) => {
     user.facebookId = req.body.facebookId || user.facebookId;
     user.linkedinId = req.body.linkedinId || user.linkedinId;
     user.twitterId = req.body.twitterId || user.twitterId;
-    user.image = image || user.image;
+    user.imageURL = imageURL || user.imageURL;
+    user.imageFileName = imageFileName || user.imageFileName;
     if (req.body.password) {
       user.password = req.body.password;
     }
@@ -213,7 +248,8 @@ const updateUserProfileById = asyncHandler(async (req, res) => {
       facebookId: updatedUser.facebookId,
       linkedinId: updatedUser.linkedinId,
       twitterId: updatedUser.twitterId,
-      image: updatedUser.image,
+      imageURL: updatedUser.imageURL,
+      imageFileName: updatedUser.imageFileName,
       isAdmin: updatedUser.isAdmin,
       token: generateToken(updatedUser._id),
     });
@@ -229,6 +265,24 @@ const updateUserProfileById = asyncHandler(async (req, res) => {
  * @access private
  */
 const deleteUsersById = asyncHandler(async (req, res) => {
+  const deleteMarkedPostImages = await Post.find({
+    _id: { $in: req.body.id },
+  }).select("imageFileName");
+  const storage = getStorageController(
+    process.env.FIREBASE_API_KEY,
+    process.env.FIREBASE_AUTH_DOMAIN,
+    process.env.FIREBASE_STORAGE_BUCKET
+  );
+  deleteMarkedPostImages.forEach(async (post) => {
+    if (post.imageFileName) {
+      try {
+        const storageRef = ref(storage, post.imageFileName);
+        await deleteObject(storageRef);
+      } catch (err) {
+        throw new Error("Failed to delete object from firebase.");
+      }
+    }
+  });
   const { deletedCount } = await User.deleteMany({ _id: { $in: req.body.id } });
   if (deletedCount > 0) {
     return res.status(200).json({ message: "All users have been deleted" });

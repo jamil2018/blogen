@@ -14,7 +14,7 @@ const UserSummaryCardDeck = memo(({ users }) => {
       {users.map((user) => (
         <Grid item xs={4}>
           <UserSummaryCard
-            userProfileImage={getBase64ImageURL(user.image.data.data)}
+            userProfileImageURL={user.imageURL}
             name={user.name}
             bio={user.bio}
             authorId={user._id}

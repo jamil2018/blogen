@@ -10,6 +10,9 @@ import { getPostFormattedDate } from "../utils/dateUtils";
 import { getBase64ImageURL } from "../utils/imageConvertion";
 
 const useStyles = makeStyles((theme) => ({
+  container: {
+    height: theme.spacing(20),
+  },
   avatar: {
     width: theme.spacing(3),
     height: theme.spacing(3),
@@ -32,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
 const PostSummaryCard = ({
   postId,
   authorId,
-  authorImage,
+  authorImageURL,
   authorName,
   postTitle,
   publishDate,
@@ -40,17 +43,17 @@ const PostSummaryCard = ({
 }) => {
   const classes = useStyles();
   return (
-    <Card variant="outlined" elevation={0}>
+    <Card className={classes.container} variant="outlined" elevation={0}>
       <CardContent>
         <Grid
           container
           alignItems="center"
           className={classes.authorInfoContainer}
         >
-          {authorImage ? (
+          {authorImageURL ? (
             <Avatar
               className={classes.avatar}
-              src={getBase64ImageURL(authorImage)}
+              src={authorImageURL}
               alt={authorName}
             />
           ) : (
@@ -69,7 +72,7 @@ const PostSummaryCard = ({
         </Grid>
         <Typography
           className={classes.postTitle}
-          variant="h5"
+          variant="h6"
           gutterBottom
           component={Link}
           to={`/posts/${postId}`}

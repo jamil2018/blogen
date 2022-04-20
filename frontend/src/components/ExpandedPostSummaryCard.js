@@ -56,14 +56,14 @@ const useStyles = makeStyles((theme) => ({
 const ExpandedPostSummaryCard = ({
   authorId,
   authorName,
-  authorImage,
+  authorImageURL,
   postId,
   postTitle,
-  postImage,
   postSummary,
   postCreationDate,
   postReadingTime,
   postTags,
+  postImageURL,
 }) => {
   const classes = useStyles();
 
@@ -75,7 +75,7 @@ const ExpandedPostSummaryCard = ({
         justifyContent="space-between"
         alignItems="center"
       >
-        <Grid item xs={9}>
+        <Grid item xs={8}>
           <Grid
             className={classes.authorInfoContainer}
             container
@@ -84,7 +84,7 @@ const ExpandedPostSummaryCard = ({
             <Avatar
               className={classes.avatar}
               alt={authorName}
-              src={authorImage}
+              src={authorImageURL}
             />
             <Typography
               component={Link}
@@ -132,8 +132,12 @@ const ExpandedPostSummaryCard = ({
             ))}
           </Box>
         </Grid>
-        <Grid item xs={3}>
-          <img className={classes.postImage} src={postImage} alt={postTitle} />
+        <Grid item xs={4}>
+          <img
+            className={classes.postImage}
+            src={postImageURL}
+            alt={postTitle}
+          />
         </Grid>
       </Grid>
     </Box>

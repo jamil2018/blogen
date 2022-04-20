@@ -1,4 +1,14 @@
+import hljs from "highlight.js";
+import "highlight.js/styles/night-owl.css";
+
+hljs.configure({
+  languages: ["javascript", "ruby", "python", "rust"],
+});
+
 export const modules = {
+  syntax: {
+    highlight: (text) => hljs.highlightAuto(text).value,
+  },
   toolbar: [
     [{ header: [1, 2, 3, 4, 5, 6, false] }],
     ["bold", "italic", "underline", "strike"],

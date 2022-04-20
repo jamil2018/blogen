@@ -4,18 +4,13 @@ import PostSummaryCard from "./PostSummaryCard";
 
 const HomeLatestPostsDeck = memo(({ posts }) => {
   return (
-    <Grid
-      container
-      justifyContent="space-between"
-      spacing={2}
-      alignItems="center"
-    >
+    <Grid container justifyContent="flex-start" spacing={2} alignItems="center">
       {posts.map((post) => (
         <Grid key={post._id} item xs={4}>
           <PostSummaryCard
             postId={post._id}
             authorId={post.author._id}
-            authorImage={post.author.image.data.data}
+            authorImageURL={post.author.imageURL}
             authorName={post.author.name}
             postTitle={post.title}
             publishDate={post.createdAt}

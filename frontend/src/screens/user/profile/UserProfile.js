@@ -88,7 +88,7 @@ const UserProfile = () => {
           <Avatar
             alt="user profile image"
             className={classes.avatar}
-            src={getBase64ImageURL(data.image.data.data)}
+            src={data.imageURL}
           />
           <AdminProfileDataRow title="Name" value={data.name} />
           <AdminProfileDataRow title="Email" value={data.email} />
