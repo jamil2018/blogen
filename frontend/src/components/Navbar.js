@@ -18,15 +18,23 @@ import AppIcon from "../assets/appIcon.svg";
 import SearchIcon from "@material-ui/icons/Search";
 import SearchLink from "./SearchLink";
 import { debounce } from "lodash";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "react-query";
 import { SEARCH_POST_DATA } from "../definitions/reactQueryConstants/queryConstants";
 import { searchPosts } from "../data/postQueryFunctions";
 
 const useStyles = makeStyles((theme) => ({
+  mobileContainer: {
+    [theme.breakpoints.down("sm")]: {
+      padding: 0,
+    },
+  },
   headerText: {
     letterSpacing: theme.spacing(0.5),
     fontWeight: theme.typography.fontWeightLight,
+    [theme.breakpoints.down("xs")]: {
+      display: "none",
+    },
   },
   headerLink: {
     textDecoration: "none",
@@ -81,11 +89,16 @@ const useStyles = makeStyles((theme) => ({
   searchResult: {
     position: "absolute",
     width: "100%",
-    // marginTop: "0.5rem",
+  },
+  searchMobile: {
+    [theme.breakpoints.down("xs")]: {
+      maxWidth: "66.66%",
+      flexBasis: "66.66%",
+    },
   },
 }));
 
-const Navbar = ({ headerText, children }) => {
+const Navbar = ({ headerText, closeDrawerHandler, children }) => {
   const classes = useStyles();
 
   // states
@@ -135,31 +148,33 @@ const Navbar = ({ headerText, children }) => {
       elevation={false}
     >
       <Toolbar>
-        <Container maxWidth="lg">
+        <Container maxWidth="lg" className={classes.mobileContainer}>
           <Grid container justifyContent="space-between" alignItems="center">
-            <Grid item>
+            <Grid item xs={9} lg={5}>
               <Grid container justifyContent="flex-start" alignItems="center">
-                <Box className={classes.headerLink} component={Link} to="/">
-                  <Grid
-                    container
-                    justifyContent="flex-start"
-                    alignItems="center"
-                  >
-                    <img
-                      className={classes.headerImage}
-                      src={AppIcon}
-                      alt="App Icon"
-                    />
-                    <Typography
-                      variant="h6"
-                      color="primary"
-                      className={classes.headerText}
+                <Grid item xs={1} sm={3}>
+                  <Box className={classes.headerLink} component={Link} to="/">
+                    <Grid
+                      container
+                      justifyContent="flex-start"
+                      alignItems="center"
                     >
-                      {headerText}
-                    </Typography>
-                  </Grid>
-                </Box>
-                <Box>
+                      <img
+                        className={classes.headerImage}
+                        src={AppIcon}
+                        alt="App Icon"
+                      />
+                      <Typography
+                        variant="h6"
+                        color="primary"
+                        className={classes.headerText}
+                      >
+                        {headerText}
+                      </Typography>
+                    </Grid>
+                  </Box>
+                </Grid>
+                <Box className={classes.searchMobile}>
                   <Box
                     className={classes.search}
                     onMouseEnter={() => setIsHoveringOnSearchResult(true)}

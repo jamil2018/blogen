@@ -7,8 +7,24 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const NavLink = ({ text, handler, icon, variant, isLink, to }) => {
+const NavLink = ({
+  text,
+  handler,
+  icon,
+  variant,
+  isLink,
+  to,
+  closeDrawerHandler,
+}) => {
   const classes = useStyles();
+
+  // action handler
+  const handleClick = () => {
+    if (closeDrawerHandler) {
+      closeDrawerHandler();
+    }
+    handler();
+  };
   return isLink ? (
     <Button
       variant={variant}
@@ -17,6 +33,7 @@ const NavLink = ({ text, handler, icon, variant, isLink, to }) => {
       startIcon={icon}
       component={Link}
       to={to}
+      {...(closeDrawerHandler && { onClick: closeDrawerHandler })}
     >
       {text}
     </Button>
@@ -26,7 +43,7 @@ const NavLink = ({ text, handler, icon, variant, isLink, to }) => {
       color="primary"
       className={classes.navLink}
       startIcon={icon}
-      onClick={handler}
+      onClick={handleClick}
     >
       {text}
     </Button>
