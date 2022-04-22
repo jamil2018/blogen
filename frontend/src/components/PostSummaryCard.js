@@ -25,6 +25,9 @@ const useStyles = makeStyles((theme) => ({
     textDecoration: "none",
     display: "block",
     color: theme.palette.text.primary,
+    [theme.breakpoints.down("sm")]: {
+      fontSize: theme.typography.subtitle1.fontSize,
+    },
   },
   authorName: {
     textDecoration: "none",

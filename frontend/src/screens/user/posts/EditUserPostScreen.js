@@ -118,7 +118,7 @@ const EditUserPostScreen = () => {
     formik.initialValues.summary = userData.summary;
     formik.initialValues.category = userData.category._id;
     formik.initialValues.tags = userData.tags.join(",");
-    formik.initialValues.image = userData.image;
+    formik.initialValues.image = userData.imageFileName;
   }
   return (
     <>

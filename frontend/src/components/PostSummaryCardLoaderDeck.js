@@ -11,7 +11,7 @@ const PostSummaryCardLoaderDeck = memo(({ count }) => {
       spacing={2}
     >
       {Array.from(Array(count).keys()).map((_, index) => (
-        <Grid key={index} item xs={4}>
+        <Grid key={index} item xs={12} sm={4}>
           <PostSummaryCardLoader />
         </Grid>
       ))}

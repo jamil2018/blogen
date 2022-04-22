@@ -9,7 +9,6 @@ import UserModal from "../../components/UserModal";
 import LoginScreen from "./LoginScreen";
 import RegisterScreen from "./RegisterScreen";
 import { useCallback, useRef, useState } from "react";
-import PostSummaryCard from "../../components/PostSummaryCard";
 import { useQuery } from "react-query";
 import { Pagination } from "@material-ui/lab";
 import {
@@ -22,16 +21,10 @@ import {
   getPaginatedPosts,
 } from "../../data/postQueryFunctions";
 import Alert from "@material-ui/lab/Alert";
-import ExpandedPostSummaryCard from "../../components/ExpandedPostSummaryCard";
-import { getBase64ImageURL } from "../../utils/imageConvertion";
-import { calculateReadingTime } from "../../utils/dataFormat";
 import { getAllCategories } from "../../data/categoryQueryFunctions";
-import { Chip } from "@material-ui/core";
-import { Link } from "react-router-dom";
 import ExpandedPostSummaryLoaderDeck from "../../components/ExpandedPostSummaryLoaderDeck";
 import PostSummaryCardLoaderDeck from "../../components/PostSummaryCardLoaderDeck";
 import CategoryLoaderDeck from "../../components/CategoryLoaderDeck";
-import { grey } from "@material-ui/core/colors";
 import HomeAllPostsDeck from "../../components/HomeAllPostsDeck";
 import HomeLatestPostsDeck from "../../components/HomeLatestPostsDeck";
 import HomeCategoriesDeck from "../../components/HomeCategoriesDeck";
@@ -40,8 +33,22 @@ const useStyles = makeStyles((theme) => ({
   header: {
     margin: theme.spacing(4, 0),
   },
+  headerTitle: {
+    [theme.breakpoints.down("xs")]: {
+      fontSize: theme.typography.h4.fontSize,
+      textAlign: "center",
+    },
+    [theme.breakpoints.down("sm")]: {
+      fontSize: theme.typography.h3.fontSize,
+    },
+  },
   headerContent: {
     marginBottom: theme.spacing(6),
+  },
+  headerContentContainer: {
+    [theme.breakpoints.down("xs")]: {
+      flexDirection: "column-reverse",
+    },
   },
   homeBg: {
     width: "100%",
@@ -49,6 +56,17 @@ const useStyles = makeStyles((theme) => ({
   },
   subHeader: {
     fontWeight: theme.typography.fontWeightLight,
+    [theme.breakpoints.down("xs")]: {
+      textAlign: "center",
+    },
+    [theme.breakpoints.down("sm")]: {
+      fontSize: theme.typography.subtitle1.fontSize,
+    },
+  },
+  headerCallContainer: {
+    [theme.breakpoints.down("xs")]: {
+      justifyContent: "center",
+    },
   },
   latestArticlesHeaderText: {
     marginLeft: theme.spacing(0.3),
@@ -66,6 +84,14 @@ const useStyles = makeStyles((theme) => ({
   categorySectionTitle: {
     marginTop: theme.spacing(3),
     fontSize: theme.typography.pxToRem(16),
+    [theme.breakpoints.down("xs")]: {
+      textAlign: "center",
+    },
+  },
+  categoriesContainer: {
+    [theme.breakpoints.down("xs")]: {
+      justifyContent: "center",
+    },
   },
   paginationContainer: {
     marginTop: theme.spacing(8),
@@ -143,10 +169,20 @@ const HomeScreen = () => {
   return (
     <>
       <header className={classes.header}>
-        <Grid container justifyContent="space-between" alignItems="center">
-          <Grid item xs={6}>
+        <Grid
+          container
+          justifyContent="space-between"
+          alignItems="center"
+          className={classes.headerContentContainer}
+        >
+          <Grid item xs={12} sm={6}>
             <div className={classes.headerContent}>
-              <Typography variant="h2" component="h1" gutterBottom>
+              <Typography
+                variant="h2"
+                component="h1"
+                gutterBottom
+                className={classes.headerTitle}
+              >
                 Blogen is a place where creative minds grow
               </Typography>
               <Typography
@@ -157,15 +193,17 @@ const HomeScreen = () => {
                 Share your knowledge and get inspired
               </Typography>
             </div>
-            <Button
-              onClick={() => setOpenLoginModal("true")}
-              variant="contained"
-              color="primary"
-            >
-              Start Sharing
-            </Button>
+            <Grid container className={classes.headerCallContainer}>
+              <Button
+                onClick={() => setOpenLoginModal("true")}
+                variant="contained"
+                color="primary"
+              >
+                Start Sharing
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12} sm={6}>
             <img
               className={classes.homeBg}
               src={homeBg}
@@ -213,7 +251,7 @@ const HomeScreen = () => {
           justifyContent="center"
           alignItems="flex-start"
         >
-          <Grid item xs={8}>
+          <Grid item xs={12} sm={8}>
             {allPostDataLoading || allPostDataFetching ? (
               <ExpandedPostSummaryLoaderDeck count={5} />
             ) : allPostDataError ? (
@@ -241,7 +279,7 @@ const HomeScreen = () => {
               </>
             )}
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={12} sm={4}>
             <Typography
               className={classes.categorySectionTitle}
               variant="h6"
@@ -261,7 +299,9 @@ const HomeScreen = () => {
                 </Typography>
               </Grid>
             ) : (
-              <HomeCategoriesDeck categories={allCategoryData} />
+              <Grid container className={classes.categoriesContainer}>
+                <HomeCategoriesDeck categories={allCategoryData} />
+              </Grid>
             )}
           </Grid>
         </Grid>

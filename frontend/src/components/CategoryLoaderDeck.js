@@ -7,12 +7,17 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(3),
     marginBottom: theme.spacing(2),
   },
+  container: {
+    [theme.breakpoints.down("xs")]: {
+      justifyContent: "center",
+    },
+  },
 }));
 
 const CategoryLoaderDeck = memo(({ count }) => {
   const classes = useStyles();
   return (
-    <Grid container>
+    <Grid container className={classes.container}>
       {Array.from(Array(count).keys()).map((i) => (
         <Skeleton
           key={i}

@@ -11,6 +11,11 @@ import { getPostFormattedDate } from "../utils/dateUtils";
 const useStyles = makeStyles((theme) => ({
   container: {
     margin: theme.spacing(4, 0),
+    [theme.breakpoints.down("xs")]: {
+      flexDirection: "column-reverse",
+      marginBottom: theme.spacing(4),
+      marginTop: theme.spacing(1),
+    },
   },
   avatar: {
     width: theme.spacing(3),
@@ -19,6 +24,16 @@ const useStyles = makeStyles((theme) => ({
   },
   authorInfoContainer: {
     marginBottom: theme.spacing(2),
+    [theme.breakpoints.down("xs")]: {
+      display: "none",
+    },
+  },
+  authorInfoContainerMobile: {
+    display: "none",
+    [theme.breakpoints.down("xs")]: {
+      display: "flex",
+      margin: theme.spacing(1, 0),
+    },
   },
   authorName: {
     textDecoration: "none",
@@ -68,14 +83,34 @@ const ExpandedPostSummaryCard = ({
   const classes = useStyles();
 
   return (
-    <Box className={classes.container}>
+    <>
+      <Grid
+        className={classes.authorInfoContainerMobile}
+        container
+        alignItems="center"
+      >
+        <Avatar
+          className={classes.avatar}
+          alt={authorName}
+          src={authorImageURL}
+        />
+        <Typography
+          component={Link}
+          to={`/authors/${authorId}`}
+          className={classes.authorName}
+          variant="body2"
+        >
+          {authorName}
+        </Typography>
+      </Grid>
       <Grid
         spacing={2}
         container
         justifyContent="space-between"
         alignItems="center"
+        className={classes.container}
       >
-        <Grid item xs={8}>
+        <Grid item xs={12} sm={8}>
           <Grid
             className={classes.authorInfoContainer}
             container
@@ -132,7 +167,7 @@ const ExpandedPostSummaryCard = ({
             ))}
           </Box>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} sm={4}>
           <img
             className={classes.postImage}
             src={postImageURL}
@@ -140,7 +175,7 @@ const ExpandedPostSummaryCard = ({
           />
         </Grid>
       </Grid>
-    </Box>
+    </>
   );
 };
 
