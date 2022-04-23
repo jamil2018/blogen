@@ -197,11 +197,11 @@ const AuthorProfileScreen = () => {
           </Grid>
         ) : (
           <>
-            {authorData.image ? (
+            {authorData.imageURL ? (
               <Avatar
                 alt="user profile image"
                 className={classes.avatar}
-                src={getBase64ImageURL(authorData.image.data.data)}
+                src={authorData.imageURL}
               />
             ) : (
               <Avatar alt="user profile image" className={classes.avatar}>

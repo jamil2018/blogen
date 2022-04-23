@@ -40,7 +40,7 @@ const PostCommentDeck = memo(({ comments, editHandler, deleteHandler }) => {
               showCommentActions={
                 user._id === comment.author._id ? true : false
               }
-              authorImage={comment.author.image}
+              authorImageURL={comment.author.imageURL}
               authorId={comment.author._id}
               authorName={comment.author.name}
               commentText={comment.text}

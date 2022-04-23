@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
 
 const PostComment = memo(
   ({
-    authorImage,
+    authorImageURL,
     authorId,
     authorName,
     commentText,
@@ -58,11 +58,11 @@ const PostComment = memo(
                 justifyContent="center"
                 alignItems="center"
               >
-                {authorImage ? (
+                {authorImageURL ? (
                   <Avatar
                     alt="user profile image"
                     className={classes.avatar}
-                    src={getBase64ImageURL(authorImage.data.data)}
+                    src={authorImageURL}
                   />
                 ) : (
                   <Avatar alt="user profile image" className={classes.avatar}>
