@@ -38,10 +38,12 @@ app.use("/api/posts", postsRoute);
 const _dirname = path.resolve();
 
 if (process.env.NODE_ENV === "PRODUCTION") {
-  app.use(express.static(__rootDirname + "/build"));
+  app.use(express.static(__rootDirname + "/frontend/build"));
 
   app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__rootDirname, "build", "index.html"));
+    res.sendFile(
+      path.resolve(__rootDirname, "frontend", "build", "index.html")
+    );
   });
 }
 
