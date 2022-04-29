@@ -13,6 +13,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    overflowY: "auto",
   },
   modalContent: {
     width: "50vw",
