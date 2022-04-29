@@ -20,6 +20,7 @@ import {
   getLatestPosts,
   getPaginatedPosts,
   searchPosts,
+  searchPostResults,
 } from "../controllers/postsController.js";
 
 const router = Router();
@@ -36,6 +37,7 @@ router.route("/latest").get(getLatestPosts);
 
 router.route("/find").get(findPosts);
 
+router.route("/searchresult").get(searchPostResults);
 router.route("/search").get(searchPosts);
 
 router.route("/curated").get(getCuratedPostsCount);

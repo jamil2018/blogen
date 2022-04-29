@@ -415,6 +415,22 @@ const searchPosts = asyncHandler(async (req, res) => {
 });
 
 /**
+ * @desc search posts
+ * @route GET /api/posts/search/result
+ * @access public
+ */
+const searchPostResults = asyncHandler(async (req, res) => {
+  const { query } = req.query;
+  const posts = await Post.find({
+    $or: [
+      { title: { $regex: query, $options: "i" } },
+      { description: { $regex: query, $options: "i" } },
+    ],
+  }).populate("author", "name imageURL imageFileName");
+  return res.status(200).json(posts);
+});
+
+/**
  * @desc GET posts by author id
  * @route GET /api/posts/author/:aid
  * @access public
@@ -480,4 +496,5 @@ export {
   getCuratedPostsCount,
   getCuratedPostsCountByAuthorId,
   searchPosts,
+  searchPostResults,
 };

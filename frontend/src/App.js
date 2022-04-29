@@ -29,6 +29,7 @@ import AuthorProfileScreen from "./screens/general/AuthorProfileScreen";
 import NotFound from "./screens/general/NotFound";
 import AboutUsScreen from "./screens/general/AboutUsScreen";
 import CategoryListScreen from "./screens/general/CategoryListScreen";
+import SearchResultScreen from "./screens/general/SearchResultScreen";
 
 const App = () => {
   const client = new QueryClient();
@@ -88,6 +89,7 @@ const App = () => {
                   "/posts/search/tags/:tagName",
                   "/about",
                   "/categories",
+                  "/search/:searchQuery",
                 ]}
               >
                 <GeneralLayout>
@@ -118,6 +120,11 @@ const App = () => {
                     exact
                     path="/categories"
                     component={CategoryListScreen}
+                  />
+                  <Route
+                    exact
+                    path="/search/:searchQuery"
+                    component={SearchResultScreen}
                   />
                 </GeneralLayout>
               </Route>

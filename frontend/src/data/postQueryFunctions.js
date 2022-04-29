@@ -228,3 +228,14 @@ export const searchPosts = async (searchQuery) => {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
   }
 };
+
+export const searchPostResults = async (searchQuery) => {
+  try {
+    const { data } = await axios.get(
+      `/api/posts/searchresult?query=${searchQuery}`
+    );
+    return data;
+  } catch (err) {
+    throw new Error(`Error while fetching data. Error Message: ${err.message}`);
+  }
+};

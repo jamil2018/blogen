@@ -14,6 +14,7 @@ export const SINGLE_POST_DATA = "post";
 export const LATEST_POST_DATA = "latestPosts";
 export const PAGINATED_POST_DATA = "paginatedPosts";
 export const SEARCH_POST_DATA = "searchedPosts";
+export const SEARCH_POST_DATA_RESULTS = "searchPostResults";
 
 // comments
 export const COMMENT_DATA = "comments";

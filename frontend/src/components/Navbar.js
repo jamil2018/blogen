@@ -13,7 +13,7 @@ import {
   CircularProgress,
   Fade,
 } from "@material-ui/core";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import AppIcon from "../assets/appIcon.svg";
 import SearchIcon from "@material-ui/icons/Search";
 import SearchLink from "./SearchLink";
@@ -22,6 +22,8 @@ import { useState } from "react";
 import { useQuery } from "react-query";
 import { SEARCH_POST_DATA } from "../definitions/reactQueryConstants/queryConstants";
 import { searchPosts } from "../data/postQueryFunctions";
+import { useDispatch } from "react-redux";
+import { storeSearchQuery } from "../redux/slices/searchDataSlice";
 
 const useStyles = makeStyles((theme) => ({
   mobileContainer: {
@@ -100,7 +102,8 @@ const useStyles = makeStyles((theme) => ({
 
 const Navbar = ({ headerText, closeDrawerHandler, children }) => {
   const classes = useStyles();
-
+  const dispatch = useDispatch();
+  const history = useHistory();
   // states
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearchResultWindow, setShowSearchResultWindow] = useState(false);
@@ -108,8 +111,10 @@ const Navbar = ({ headerText, closeDrawerHandler, children }) => {
     useState(false);
 
   // action handlers
-  const manageSearchInput = (e) => setSearchQuery(e?.target?.value);
-  const debouncedInput = debounce(manageSearchInput, 1000);
+  const manageSearchInput = (e) => {
+    setSearchQuery(e?.target?.value);
+  };
+  const debouncedInput = debounce(manageSearchInput, 200);
   const handleSearchInput = (e) => {
     if (e.target.value === "") {
       setShowSearchResultWindow(false);
@@ -130,6 +135,10 @@ const Navbar = ({ headerText, closeDrawerHandler, children }) => {
     if (isHoveringOnSearchResult === false) {
       setShowSearchResultWindow(false);
     }
+  };
+  const handleSearchResultRequest = () => {
+    history.push(`/search/${searchQuery}`);
+    setShowSearchResultWindow(false);
   };
   // data fetch
   const { isLoading, data } = useQuery(
@@ -193,6 +202,9 @@ const Navbar = ({ headerText, closeDrawerHandler, children }) => {
                       inputProps={{ "aria-label": "search" }}
                       onChange={handleSearchInput}
                       onFocus={showSearchResultWindowHandler}
+                      onKeyDown={(e) => {
+                        e.key === "Enter" && handleSearchResultRequest();
+                      }}
                     />
                     <Fade in={showSearchResultWindow}>
                       <Card className={classes.searchResult}>

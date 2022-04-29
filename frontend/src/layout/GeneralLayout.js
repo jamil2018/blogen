@@ -195,32 +195,6 @@ const GeneralLayout = ({ children }) => {
                   closeDrawerHandler={() => setOpenDrawer(false)}
                 />
                 {user._id ? (
-                  // <ItemMenu
-                  //   isIconButton={true}
-                  //   menuButtonContent={
-                  //     user.imageURL ? (
-                  //       <>
-                  //         <Avatar src={user.imageURL} alt={user.name} />
-                  //         <ArrowDropDownIcon />
-                  //       </>
-                  //     ) : (
-                  //       <>
-                  //         <Avatar>{getAuthorNameInitials(user.name)}</Avatar>
-                  //         <ArrowDropDownIcon />
-                  //       </>
-                  //     )
-                  //   }
-                  // >
-                  //   <ItemMenuElement isLink={true} link="/user/dashboard">
-                  //     Dashboard
-                  //   </ItemMenuElement>
-                  //   <ItemMenuElement isLink={true} link="/user/profile">
-                  //     Profile
-                  //   </ItemMenuElement>
-                  //   <ItemMenuElement actionHandler={handleLogout}>
-                  //     Logout
-                  //   </ItemMenuElement>
-                  // </ItemMenu>
                   <>
                     <NavLink
                       text="dashboard"
