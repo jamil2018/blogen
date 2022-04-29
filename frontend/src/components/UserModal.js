@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
     width: "70vw",
     minHeight: "40vh",
     [theme.breakpoints.down("sm")]: {
-      width: "100%",
+      width: "95vw",
     },
   },
   closeIcon: {
