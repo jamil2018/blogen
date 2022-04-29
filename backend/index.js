@@ -23,16 +23,30 @@ global.__rootDirname = __rootDirname;
 // middlewares
 app.use(express.json());
 app.use(cors());
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  })
+);
 if (process.env.NODE_ENV === "DEVELOPMENT") app.use(morgan("dev"));
 
 // routes
 app.use("/api/users", usersRoute);
 app.use("/api/categories", categoriesRoute);
 app.use("/api/posts", postsRoute);
+
+const _dirname = path.resolve();
+
+if (process.env.NODE_ENV === "PRODUCTION") {
+  app.use(express.static(__rootDirname + "/build"));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__rootDirname, "build", "index.html"));
+  });
+}
+
 app.use(notFound);
 app.use(errorHandler);
-
 // start
 app.listen(PORT, () => {
   console.log(
