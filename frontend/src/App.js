@@ -28,6 +28,7 @@ import PostsByTagScreen from "./screens/general/PostByTagScreen";
 import AuthorProfileScreen from "./screens/general/AuthorProfileScreen";
 import NotFound from "./screens/general/NotFound";
 import AboutUsScreen from "./screens/general/AboutUsScreen";
+import CategoryListScreen from "./screens/general/CategoryListScreen";
 
 const App = () => {
   const client = new QueryClient();
@@ -86,6 +87,7 @@ const App = () => {
                   "/posts/search/categories/:categoryName",
                   "/posts/search/tags/:tagName",
                   "/about",
+                  "/categories",
                 ]}
               >
                 <GeneralLayout>
@@ -112,6 +114,11 @@ const App = () => {
                     component={AuthorProfileScreen}
                   />
                   <Route exact path="/about" component={AboutUsScreen} />
+                  <Route
+                    exact
+                    path="/categories"
+                    component={CategoryListScreen}
+                  />
                 </GeneralLayout>
               </Route>
               <Route path="*" component={NotFound} />

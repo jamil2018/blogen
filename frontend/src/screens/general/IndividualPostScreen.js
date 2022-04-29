@@ -47,6 +47,11 @@ const useStyles = makeStyles((theme) => ({
   container: {
     marginTop: theme.spacing(8),
   },
+  postTitle: {
+    [theme.breakpoints.down("sm")]: {
+      fontSize: theme.typography.h3.fontSize,
+    },
+  },
   authorName: {
     marginLeft: theme.spacing(2),
     textDecoration: "none",
@@ -74,6 +79,9 @@ const useStyles = makeStyles((theme) => ({
   },
   socialLinks: {
     marginTop: theme.spacing(2),
+    [theme.breakpoints.down("sm")]: {
+      display: "none",
+    },
   },
   postContent: {
     "& .ql-container": {
@@ -159,7 +167,7 @@ const IndividualPostScreen = () => {
         </Grid>
       ) : (
         <>
-          <Typography variant="h2" component="h1">
+          <Typography variant="h2" component="h1" className={classes.postTitle}>
             {data.title}
           </Typography>
           <Grid container alignItems="center" justifyContent="space-between">

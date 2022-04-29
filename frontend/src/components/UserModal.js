@@ -17,10 +17,17 @@ const useStyles = makeStyles((theme) => ({
   modalContent: {
     width: "50vw",
     minHeight: "40vh",
+    [theme.breakpoints.down("sm")]: {
+      width: "80vw",
+      margin: theme.spacing(0, 2),
+    },
   },
   modalContentExpanded: {
     width: "70vw",
     minHeight: "40vh",
+    [theme.breakpoints.down("sm")]: {
+      width: "100%",
+    },
   },
   closeIcon: {
     padding: theme.spacing(1),

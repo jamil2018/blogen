@@ -17,10 +17,16 @@ import { signInUser } from "../../data/userQueryFunctions";
 import { storeUserData } from "../../redux/slices/userDataSlice";
 
 const useStyles = makeStyles((theme) => ({
+  container: {
+    padding: theme.spacing(0, 2),
+  },
   image: {
     width: "100%",
     height: "35vh",
     padding: theme.spacing(1),
+    [theme.breakpoints.down("xs")]: {
+      display: "none",
+    },
   },
   button: {
     marginTop: theme.spacing(2),
@@ -84,15 +90,16 @@ const LoginScreen = ({ handleModalClose, openRegistrationModal }) => {
       spacing={3}
       justifyContent="space-between"
       alignItems="center"
+      className={classes.container}
     >
-      <Grid item xs={6}>
+      <Grid item xs={12} sm={6}>
         <img
           className={classes.image}
           src={LoginImg}
           alt="login prompter img"
         />
       </Grid>
-      <Grid item xs={6}>
+      <Grid item xs={12} sm={6}>
         <Typography variant="h5" component="h1">
           Sign In
         </Typography>

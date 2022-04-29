@@ -20,6 +20,11 @@ const useStyles = makeStyles((theme) => ({
   tag: {
     marginRight: theme.spacing(2),
   },
+  socialLinks: {
+    [theme.breakpoints.down("sm")]: {
+      display: "none",
+    },
+  },
 }));
 
 const IndividualPostLoader = () => {
@@ -49,7 +54,7 @@ const IndividualPostLoader = () => {
             </Grid>
           </Grid>
         </Grid>
-        <Grid item>
+        <Grid item className={classes.socialLinks}>
           <Grid container>
             <Skeleton className={classes.meta} variant="rect" width={25} />
             <Skeleton className={classes.meta} variant="rect" width={25} />
