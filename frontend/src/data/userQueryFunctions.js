@@ -1,6 +1,10 @@
 import axios from "axios";
 import { store } from "../redux/store";
 
+if (process.env.REACT_APP_NODE_ENV === "PRODUCTION") {
+  axios.defaults.baseURL = process.env.REACT_APP_PRODUCTION_API;
+}
+
 export const signInUser = async ({ email, password }) => {
   try {
     const config = {
