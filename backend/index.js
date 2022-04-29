@@ -35,15 +35,9 @@ app.use("/api/users", usersRoute);
 app.use("/api/categories", categoriesRoute);
 app.use("/api/posts", postsRoute);
 
-if (process.env.NODE_ENV === "PRODUCTION") {
-  app.use(express.static(__rootDirname + "/frontend/build"));
-
-  app.get("*", (req, res) => {
-    res.sendFile(
-      path.resolve(__rootDirname, "frontend", "build", "index.html")
-    );
-  });
-}
+app.use("/", (req, res) => {
+  res.send("server is running");
+});
 
 app.use(notFound);
 app.use(errorHandler);
