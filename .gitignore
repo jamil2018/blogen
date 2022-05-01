@@ -1,10 +1,5 @@
 node_modules
 .env
-backend/src/uploads/*jpg
-backend/src/uploads/*png
-backend/src/uploads/*jpeg
-backend/src/uploads/*gif
-backend/src/uploads/*svg
-backend/src/uploads/*jfif
+
 
 
