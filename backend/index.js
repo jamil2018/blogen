@@ -41,6 +41,7 @@ app.use("/", (req, res) => {
 
 app.use(notFound);
 app.use(errorHandler);
+
 // start
 app.listen(PORT, () => {
   console.log(
