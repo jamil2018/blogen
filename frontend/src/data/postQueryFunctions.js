@@ -1,5 +1,9 @@
 import axios from "axios";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { getStorageController } from "../config/firebaseConfig";
 import { store } from "../redux/store";
+import { v4 } from "uuid";
+import fileStorage from "../utils/fileStorage";
 
 if (process.env.REACT_APP_NODE_ENV === "PRODUCTION") {
   axios.defaults.baseURL = process.env.REACT_APP_PRODUCTION_API;
@@ -123,12 +127,14 @@ export const getPostByTagName = async ({ tagName }) => {
 export const createPost = async (postData) => {
   try {
     const formData = new FormData();
+    const [imageFileName, imageURL] = await fileStorage(postData.image);
     formData.append("title", postData.title);
     formData.append("description", postData.description);
     formData.append("summary", postData.summary);
     formData.append("category", postData.category);
     formData.append("tags", postData.tags);
-    formData.append("image", postData.image);
+    formData.append("imageURL", imageURL);
+    formData.append("imageFileName", imageFileName);
     const { userData } = store.getState();
     const { user } = userData;
     const config = {

@@ -92,32 +92,24 @@ const getLatestPosts = asyncHandler(async (req, res) => {
  * @access private
  */
 const createNewPost = asyncHandler(async (req, res) => {
-  const { title, description, summary, category, tags } = req.body;
+  const {
+    title,
+    description,
+    summary,
+    category,
+    tags,
+    imageURL,
+    imageFileName,
+  } = req.body;
+  console.log(req.body);
   const author = req.user._id;
   let tagsArr = [];
-  let imageURL;
-  let imageFileName;
   if (tags) {
     if (tags.includes(",")) {
       tagsArr = tags.split(",").map((tag) => tag.trim());
     } else {
       tagsArr.push(tags);
     }
-  }
-
-  if (req.file) {
-    const storage = getStorageController(
-      process.env.FIREBASE_API_KEY,
-      process.env.FIREBASE_AUTH_DOMAIN,
-      process.env.FIREBASE_STORAGE_BUCKET
-    );
-    const storageRef = ref(storage, req.file.filename);
-    imageFileName = req.file.filename;
-    const storedImage = fs.readFileSync(
-      path.join(__rootDirname, process.env.FILE_UPLOAD_PATH, req.file.filename)
-    );
-    const uploadSnapshot = await uploadBytes(storageRef, storedImage);
-    imageURL = await getDownloadURL(uploadSnapshot.ref);
   }
   const post = await Post.create({
     title,
@@ -129,7 +121,6 @@ const createNewPost = asyncHandler(async (req, res) => {
     imageURL,
     imageFileName,
   });
-
   if (post) {
     return res.status(201).json({
       _id: post._id,
