@@ -101,7 +101,6 @@ const createNewPost = asyncHandler(async (req, res) => {
     imageURL,
     imageFileName,
   } = req.body;
-  console.log(req.body);
   const author = req.user._id;
   let tagsArr = [];
   if (tags) {
@@ -147,32 +146,23 @@ const createNewPost = asyncHandler(async (req, res) => {
  */
 const updatePost = asyncHandler(async (req, res) => {
   const post = await Post.findById(req.params.id);
-  let imageFileName;
-  let imageURL;
-  if (req.file) {
+  if (req.body.imageURL || req.body.imageFileName) {
     const storage = getStorageController(
       process.env.FIREBASE_API_KEY,
       process.env.FIREBASE_AUTH_DOMAIN,
       process.env.FIREBASE_STORAGE_BUCKET
     );
     const oldImageStorageRef = ref(storage, post.imageFileName);
-    const storageRef = ref(storage, req.file.filename);
-    const storedImage = fs.readFileSync(
-      path.join(__rootDirname, process.env.FILE_UPLOAD_PATH, req.file.filename)
-    );
     await deleteObject(oldImageStorageRef);
-    const uploadSnapshot = await uploadBytes(storageRef, storedImage);
-    imageFileName = req.file.filename;
-    imageURL = await getDownloadURL(uploadSnapshot.ref);
   }
   if (post) {
     post.title = req.body.title || post.title;
     post.description = req.body.description || post.description;
-    post.imageURL = imageURL || post.imageURL;
-    post.imageFileName = imageFileName || post.imageFileName;
     post.summary = req.body.summary || post.summary;
     post.category = req.body.category || post.category;
     post.tags = req.body.tags || post.tags;
+    post.imageURL = req.body.imageURL || post.imageURL;
+    post.imageFileName = req.body.imageFileName || post.imageFileName;
     const updatedPost = await post.save();
     res.status(200).json({
       _id: updatedPost._id,
