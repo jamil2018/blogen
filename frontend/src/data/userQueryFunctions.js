@@ -58,12 +58,14 @@ export const getLatestUsers = async () => {
 export const createUser = async (userData) => {
   try {
     const formData = new FormData();
-    const [imageFileName, imageURL] = await fileStorage(userData.image);
+    if (userData.image?.file) {
+      const [imageFileName, imageURL] = await fileStorage(userData.image);
+      formData.append("imageURL", imageURL);
+      formData.append("imageFileName", imageFileName);
+    }
     formData.append("name", userData.name);
     formData.append("email", userData.email);
     formData.append("password", userData.password);
-    formData.append("imageURL", imageURL);
-    formData.append("imageFileName", imageFileName);
     formData.append("bio", userData.bio);
     formData.append("facebookId", userData.facebookId);
     formData.append("linkedinId", userData.linkedinId);
@@ -111,12 +113,16 @@ export const updateUser = async (updatedUserData) => {
       },
     };
     const formData = new FormData();
-    const [imageFileName, imageURL] = await fileStorage(updatedUserData.image);
+    if (updatedUserData.image?.name) {
+      const [imageFileName, imageURL] = await fileStorage(
+        updatedUserData.image
+      );
+      formData.append("imageURL", imageURL);
+      formData.append("imageFileName", imageFileName);
+    }
     formData.append("name", updatedUserData.name);
     formData.append("email", updatedUserData.email);
     formData.append("password", updatedUserData.password);
-    formData.append("imageURL", imageURL);
-    formData.append("imageFileName", imageFileName);
     formData.append("bio", updatedUserData.bio);
     formData.append("facebookId", updatedUserData.facebookId);
     formData.append("linkedinId", updatedUserData.linkedinId);
