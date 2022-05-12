@@ -62,6 +62,9 @@ export const createUser = async (userData) => {
       const [imageFileName, imageURL] = await fileStorage(userData.image);
       formData.append("imageURL", imageURL);
       formData.append("imageFileName", imageFileName);
+      console.log("imageFileName", imageFileName);
+      console.log("imageURL", imageURL);
+      console.log("user image", userData.image);
     }
     formData.append("name", userData.name);
     formData.append("email", userData.email);
