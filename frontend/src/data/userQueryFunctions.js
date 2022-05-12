@@ -1,5 +1,6 @@
 import axios from "axios";
 import { store } from "../redux/store";
+import fileStorage from "../utils/fileStorage";
 
 if (process.env.REACT_APP_NODE_ENV === "PRODUCTION") {
   axios.defaults.baseURL = process.env.REACT_APP_PRODUCTION_API;
@@ -57,10 +58,12 @@ export const getLatestUsers = async () => {
 export const createUser = async (userData) => {
   try {
     const formData = new FormData();
+    const [imageFileName, imageURL] = await fileStorage(userData.image);
     formData.append("name", userData.name);
     formData.append("email", userData.email);
     formData.append("password", userData.password);
-    formData.append("image", userData.image);
+    formData.append("imageURL", imageURL);
+    formData.append("imageFileName", imageFileName);
     formData.append("bio", userData.bio);
     formData.append("facebookId", userData.facebookId);
     formData.append("linkedinId", userData.linkedinId);
@@ -108,10 +111,12 @@ export const updateUser = async (updatedUserData) => {
       },
     };
     const formData = new FormData();
+    const [imageFileName, imageURL] = await fileStorage(updatedUserData.image);
     formData.append("name", updatedUserData.name);
     formData.append("email", updatedUserData.email);
     formData.append("password", updatedUserData.password);
-    formData.append("image", updatedUserData.image);
+    formData.append("imageURL", imageURL);
+    formData.append("imageFileName", imageFileName);
     formData.append("bio", updatedUserData.bio);
     formData.append("facebookId", updatedUserData.facebookId);
     formData.append("linkedinId", updatedUserData.linkedinId);
@@ -131,7 +136,6 @@ export const updateUser = async (updatedUserData) => {
 // update a user by id. for admin users.
 export const updateUserById = async (updatedUserData) => {
   try {
-    console.log(updatedUserData);
     const { userId, values } = updatedUserData;
     const { userData } = store.getState();
     const { token } = userData.user;
@@ -142,10 +146,12 @@ export const updateUserById = async (updatedUserData) => {
       },
     };
     const formData = new FormData();
+    const [imageFileName, imageURL] = await fileStorage(values.image);
     formData.append("name", values.name);
     formData.append("email", values.email);
     formData.append("password", values.password);
-    formData.append("image", values.image);
+    formData.append("imageURL", imageURL);
+    formData.append("imageFileName", imageFileName);
     formData.append("bio", values.bio);
     formData.append("facebookId", values.facebookId);
     formData.append("linkedinId", values.linkedinId);

@@ -12,7 +12,7 @@ const UserSummaryCardDeck = memo(({ users }) => {
       spacing={2}
     >
       {users.map((user) => (
-        <Grid item xs={4}>
+        <Grid item xs={12} sm={4}>
           <UserSummaryCard
             userProfileImageURL={user.imageURL}
             name={user.name}

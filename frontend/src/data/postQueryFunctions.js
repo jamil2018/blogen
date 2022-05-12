@@ -162,14 +162,16 @@ export const updatePostById = async (updatedPostData) => {
       },
     };
     const formData = new FormData();
-    const [imageFileName, imageURL] = await fileStorage(postData.image);
+    if (postData.image?.name) {
+      const [imageFileName, imageURL] = await fileStorage(postData.image);
+      formData.append("imageURL", imageURL);
+      formData.append("imageFileName", imageFileName);
+    }
     formData.append("title", postData.title);
     formData.append("description", postData.description);
     formData.append("summary", postData.summary);
     formData.append("category", postData.category);
     formData.append("tags", postData.tags);
-    formData.append("imageURL", imageURL);
-    formData.append("imageFileName", imageFileName);
     const { data } = await axios.put(`/api/posts/${postId}`, formData, config);
     return data;
   } catch (err) {

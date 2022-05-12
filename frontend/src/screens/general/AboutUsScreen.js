@@ -96,7 +96,7 @@ const AboutUsScreen = () => {
       </Typography>
       <Divider />
       <Grid container justifyContent="space-between" alignItems="center">
-        <Grid item xs={6}>
+        <Grid item xs={12} sm={6}>
           <Typography
             className={classes.headerText}
             variant="body2"
@@ -120,7 +120,7 @@ const AboutUsScreen = () => {
             and the people who think about them.
           </Typography>
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={12} sm={6}>
           <Grid container justifyContent="center">
             <img className={classes.logo} src={BlogenLogo} alt="logo" />
           </Grid>
@@ -132,7 +132,7 @@ const AboutUsScreen = () => {
           A Hive of Curious Minds
         </Typography>
         <Grid container justifyContent="center">
-          <Grid item xs={6}>
+          <Grid item xs={12} sm={6}>
             <Typography
               className={classes.sectionText}
               variant="body1"
@@ -171,7 +171,7 @@ const AboutUsScreen = () => {
           Make Blogen the place for your thoughts to take off
         </Typography>
         <Grid container justifyContent="center">
-          <Grid item xs={6}>
+          <Grid item xs={12} sm={6}>
             <Typography className={classes.sectionText} variant="body1">
               An empty page is also the starting point of a great idea. Blogen
               is the place where you can walk through it. Here it is very easy
