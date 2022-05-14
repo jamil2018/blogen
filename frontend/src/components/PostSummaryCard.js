@@ -7,7 +7,6 @@ import {
   getAuthorNameInitials,
 } from "../utils/dataFormat";
 import { getPostFormattedDate } from "../utils/dateUtils";
-import { getBase64ImageURL } from "../utils/imageConvertion";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -19,15 +18,17 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(1),
   },
   authorInfoContainer: {
-    marginBottom: theme.spacing(1),
+    marginLeft: theme.spacing(0.5),
   },
   postTitle: {
     textDecoration: "none",
+    fontWeight: theme.typography.fontWeightBold,
     display: "block",
     color: theme.palette.text.primary,
     [theme.breakpoints.down("sm")]: {
       fontSize: theme.typography.subtitle1.fontSize,
     },
+    marginTop: theme.spacing(1.5),
   },
   authorName: {
     textDecoration: "none",
@@ -47,45 +48,51 @@ const PostSummaryCard = ({
   const classes = useStyles();
   return (
     <Card className={classes.container} variant="outlined" elevation={0}>
-      <CardContent>
-        <Grid
-          container
-          alignItems="center"
-          className={classes.authorInfoContainer}
-        >
-          {authorImageURL ? (
-            <Avatar
-              className={classes.avatar}
-              src={authorImageURL}
-              alt={authorName}
-            />
-          ) : (
-            <Avatar className={classes.avatar}>
-              {getAuthorNameInitials(authorName)}
-            </Avatar>
-          )}
-          <Typography
-            className={classes.authorName}
-            variant="caption"
-            component={Link}
-            to={`/authors/${authorId}`}
+      <CardContent className={classes.cardContent}>
+        <Grid container direction="column" spacing={2}>
+          <Grid
+            container
+            alignItems="center"
+            className={classes.authorInfoContainer}
           >
-            {authorName}
-          </Typography>
+            {authorImageURL ? (
+              <Avatar
+                className={classes.avatar}
+                src={authorImageURL}
+                alt={authorName}
+              />
+            ) : (
+              <Avatar className={classes.avatar}>
+                {getAuthorNameInitials(authorName)}
+              </Avatar>
+            )}
+            <Typography
+              className={classes.authorName}
+              variant="caption"
+              component={Link}
+              to={`/authors/${authorId}`}
+            >
+              {authorName}
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Typography
+              className={classes.postTitle}
+              variant="body1"
+              gutterBottom
+              component={Link}
+              to={`/posts/${postId}`}
+            >
+              {postTitle}
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Typography variant="caption" style={{ justifySelf: "flex-end" }}>
+              {getPostFormattedDate(publishDate)} ·{" "}
+              {calculateReadingTime(convertToText(description))} min read
+            </Typography>
+          </Grid>
         </Grid>
-        <Typography
-          className={classes.postTitle}
-          variant="h6"
-          gutterBottom
-          component={Link}
-          to={`/posts/${postId}`}
-        >
-          {postTitle}
-        </Typography>
-        <Typography variant="caption">
-          {getPostFormattedDate(publishDate)} ·{" "}
-          {calculateReadingTime(convertToText(description))} min read
-        </Typography>
       </CardContent>
     </Card>
   );
