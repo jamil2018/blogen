@@ -57,29 +57,50 @@ export const getLatestUsers = async () => {
 };
 export const createUser = async (userData) => {
   try {
-    const formData = new FormData();
-    if (userData.image?.file) {
+    // const formData = new FormData();
+    // if (userData.image) {
+    //   const [imageFileName, imageURL] = await fileStorage(userData.image);
+    //   formData.append("imageURL", imageURL);
+    //   formData.append("imageFileName", imageFileName);
+    //   imageData.imageURL = imageURL;
+    //   imageData.imageFileName = imageFileName;
+    // }
+    // formData.append("name", userData.name);
+    // formData.append("email", userData.email);
+    // formData.append("password", userData.password);
+    // formData.append("bio", userData.bio);
+    // formData.append("facebookId", userData.facebookId);
+    // formData.append("linkedinId", userData.linkedinId);
+    // formData.append("twitterId", userData.twitterId);
+    // formData.append("isAdmin", userData.isAdmin);
+    const imageData = {
+      imageURL: "",
+      imageFileName: "",
+    };
+    if (userData.image) {
       const [imageFileName, imageURL] = await fileStorage(userData.image);
-      formData.append("imageURL", imageURL);
-      formData.append("imageFileName", imageFileName);
-      console.log("imageFileName", imageFileName);
-      console.log("imageURL", imageURL);
-      console.log("user image", userData.image);
+      imageData.imageURL = imageURL;
+      imageData.imageFileName = imageFileName;
     }
-    formData.append("name", userData.name);
-    formData.append("email", userData.email);
-    formData.append("password", userData.password);
-    formData.append("bio", userData.bio);
-    formData.append("facebookId", userData.facebookId);
-    formData.append("linkedinId", userData.linkedinId);
-    formData.append("twitterId", userData.twitterId);
-    formData.append("isAdmin", userData.isAdmin);
+    const userDataToSend = {
+      name: userData.name,
+      email: userData.email,
+      password: userData.password,
+      bio: userData.bio,
+      facebookId: userData.facebookId,
+      linkedinId: userData.linkedinId,
+      twitterId: userData.twitterId,
+      isAdmin: userData.isAdmin,
+      imageURL: imageData.imageURL,
+      imageFileName: imageData.imageFileName,
+    };
+    console.log(userDataToSend);
     const config = {
       headers: {
-        "Content-Type": "multipart/form-data",
+        "Content-Type": "application/json",
       },
     };
-    const { data } = await axios.post("/api/users", formData, config);
+    const { data } = await axios.post("/api/users", userDataToSend, config);
     return data;
   } catch (err) {
     const error = new Error(

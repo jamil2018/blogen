@@ -1,8 +1,5 @@
 import axios from "axios";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { getStorageController } from "../config/firebaseConfig";
 import { store } from "../redux/store";
-import { v4 } from "uuid";
 import fileStorage from "../utils/fileStorage";
 
 if (process.env.REACT_APP_NODE_ENV === "PRODUCTION") {

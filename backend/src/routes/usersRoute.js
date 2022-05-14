@@ -18,7 +18,7 @@ const router = Router();
 
 router
   .route("/")
-  .post(uploads.single("image"), registerUser)
+  .post(registerUser)
   .get(getAllUsers)
   .delete(protect, checkAdmin, deleteUsersById);
 

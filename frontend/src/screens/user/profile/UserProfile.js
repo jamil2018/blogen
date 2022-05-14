@@ -27,7 +27,10 @@ const UserProfile = () => {
   const { user } = useSelector((state) => state.userData);
   const { isLoading, isFetching, isError, data } = useQuery(
     [SINGLE_USER_DATA, user._id],
-    ({ queryKey }) => getUserById(queryKey[1])
+    ({ queryKey }) => getUserById(queryKey[1]),
+    {
+      refetchOnWindowFocus: false,
+    }
   );
   const history = useHistory();
   const classes = userProfileStyles();
