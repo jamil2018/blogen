@@ -28,6 +28,7 @@ import CategoryLoaderDeck from "../../components/CategoryLoaderDeck";
 import HomeAllPostsDeck from "../../components/HomeAllPostsDeck";
 import HomeLatestPostsDeck from "../../components/HomeLatestPostsDeck";
 import HomeCategoriesDeck from "../../components/HomeCategoriesDeck";
+import LibraryBooksIcon from "@material-ui/icons/LibraryBooks";
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -68,8 +69,8 @@ const useStyles = makeStyles((theme) => ({
       justifyContent: "center",
     },
   },
-  latestArticlesHeaderText: {
-    marginLeft: theme.spacing(0.3),
+  sectionHeaderText: {
+    marginLeft: theme.spacing(1),
   },
   latestArticlesContainer: {
     margin: theme.spacing(4, 0),
@@ -95,6 +96,14 @@ const useStyles = makeStyles((theme) => ({
   },
   paginationContainer: {
     marginTop: theme.spacing(8),
+  },
+  allPostsSectionHeaderContainer: {
+    marginBottom: "-2rem",
+    marginLeft: theme.spacing(0.8),
+    [theme.breakpoints.down("xs")]: {
+      marginBottom: theme.spacing(1.5),
+      marginLeft: theme.spacing(-0.1),
+    },
   },
 }));
 
@@ -221,7 +230,7 @@ const HomeScreen = () => {
         >
           <AutorenewIcon />
           <Typography
-            className={classes.latestArticlesHeaderText}
+            className={classes.sectionHeaderText}
             variant="subtitle2"
             component="h2"
             gutterBottom
@@ -246,7 +255,22 @@ const HomeScreen = () => {
       <Divider />
       <section className={classes.allPostsContainer} ref={allPostsContainerRef}>
         <Grid
-          spacing={10}
+          container
+          alignItems="center"
+          className={classes.allPostsSectionHeaderContainer}
+        >
+          <LibraryBooksIcon />
+          <Typography
+            className={classes.sectionHeaderText}
+            variant="subtitle2"
+            component="h2"
+            gutterBottom
+          >
+            ALL POSTS
+          </Typography>
+        </Grid>
+        <Grid
+          spacing={6}
           container
           justifyContent="center"
           alignItems="flex-start"
