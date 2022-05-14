@@ -57,22 +57,6 @@ export const getLatestUsers = async () => {
 };
 export const createUser = async (userData) => {
   try {
-    // const formData = new FormData();
-    // if (userData.image) {
-    //   const [imageFileName, imageURL] = await fileStorage(userData.image);
-    //   formData.append("imageURL", imageURL);
-    //   formData.append("imageFileName", imageFileName);
-    //   imageData.imageURL = imageURL;
-    //   imageData.imageFileName = imageFileName;
-    // }
-    // formData.append("name", userData.name);
-    // formData.append("email", userData.email);
-    // formData.append("password", userData.password);
-    // formData.append("bio", userData.bio);
-    // formData.append("facebookId", userData.facebookId);
-    // formData.append("linkedinId", userData.linkedinId);
-    // formData.append("twitterId", userData.twitterId);
-    // formData.append("isAdmin", userData.isAdmin);
     const imageData = {
       imageURL: "",
       imageFileName: "",
@@ -94,7 +78,6 @@ export const createUser = async (userData) => {
       imageURL: imageData.imageURL,
       imageFileName: imageData.imageFileName,
     };
-    console.log(userDataToSend);
     const config = {
       headers: {
         "Content-Type": "application/json",
@@ -132,27 +115,38 @@ export const updateUser = async (updatedUserData) => {
     const { token } = userData.user;
     const config = {
       headers: {
-        "Content-Type": "multipart/form-data",
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     };
-    const formData = new FormData();
-    if (updatedUserData.image?.name) {
+    const imageData = {
+      imageURL: "",
+      imageFileName: "",
+    };
+    if (updatedUserData.image) {
       const [imageFileName, imageURL] = await fileStorage(
         updatedUserData.image
       );
-      formData.append("imageURL", imageURL);
-      formData.append("imageFileName", imageFileName);
+      imageData.imageURL = imageURL;
+      imageData.imageFileName = imageFileName;
     }
-    formData.append("name", updatedUserData.name);
-    formData.append("email", updatedUserData.email);
-    formData.append("password", updatedUserData.password);
-    formData.append("bio", updatedUserData.bio);
-    formData.append("facebookId", updatedUserData.facebookId);
-    formData.append("linkedinId", updatedUserData.linkedinId);
-    formData.append("twitterId", updatedUserData.twitterId);
-    formData.append("isAdmin", updatedUserData.isAdmin);
-    const { data } = await axios.put(`/api/users/profile`, formData, config);
+    const updatedUserDataToSend = {
+      name: updatedUserData.name,
+      email: updatedUserData.email,
+      password: updatedUserData.password,
+      bio: updatedUserData.bio,
+      facebookId: updatedUserData.facebookId,
+      linkedinId: updatedUserData.linkedinId,
+      twitterId: updatedUserData.twitterId,
+      isAdmin: updatedUserData.isAdmin,
+      imageURL: imageData.imageURL,
+      imageFileName: imageData.imageFileName,
+    };
+    const { data } = await axios.put(
+      `/api/users/profile`,
+      updatedUserDataToSend,
+      config
+    );
     return data;
   } catch (err) {
     const error = new Error(
@@ -171,25 +165,34 @@ export const updateUserById = async (updatedUserData) => {
     const { token } = userData.user;
     const config = {
       headers: {
-        "Content-Type": "multipart/form-data",
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     };
-    const formData = new FormData();
-    const [imageFileName, imageURL] = await fileStorage(values.image);
-    formData.append("name", values.name);
-    formData.append("email", values.email);
-    formData.append("password", values.password);
-    formData.append("imageURL", imageURL);
-    formData.append("imageFileName", imageFileName);
-    formData.append("bio", values.bio);
-    formData.append("facebookId", values.facebookId);
-    formData.append("linkedinId", values.linkedinId);
-    formData.append("twitterId", values.twitterId);
-    formData.append("isAdmin", values.isAdmin);
+    const imageData = {
+      imageURL: "",
+      imageFileName: "",
+    };
+    if (values.image) {
+      const [imageFileName, imageURL] = await fileStorage(values.image);
+      imageData.imageURL = imageURL;
+      imageData.imageFileName = imageFileName;
+    }
+    const updatedUserDataToSend = {
+      name: values.name,
+      email: values.email,
+      password: values.password,
+      bio: values.bio,
+      facebookId: values.facebookId,
+      linkedinId: values.linkedinId,
+      twitterId: values.twitterId,
+      isAdmin: values.isAdmin,
+      imageURL: imageData.imageURL,
+      imageFileName: imageData.imageFileName,
+    };
     const { data } = await axios.put(
       `/api/users/profile/${userId}`,
-      formData,
+      updatedUserDataToSend,
       config
     );
     return data;

@@ -186,7 +186,6 @@ const updateUserProfile = asyncHandler(async (req, res) => {
  */
 const updateUserProfileById = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
-  console.log(req.body);
   if (req.body.imageURL || req.body.imageFileName) {
     const storage = getStorageController(
       process.env.FIREBASE_API_KEY,
