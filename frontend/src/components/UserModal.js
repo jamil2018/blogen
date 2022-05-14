@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     alignItems: "center",
     overflowY: "auto",
-    maxHeight: "100vh",
+    maxHeight: "95vh",
   },
   modalContent: {
     width: "50vw",

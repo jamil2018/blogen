@@ -64,7 +64,7 @@ const useStyles = makeStyles((theme) => ({
   postImage: {
     width: "100%",
     height: theme.spacing(25),
-    objectFit: "cover",
+    objectFit: "contain",
   },
 }));
 
