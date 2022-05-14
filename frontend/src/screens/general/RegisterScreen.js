@@ -42,6 +42,9 @@ const useStyles = makeStyles((theme) => ({
     paddingRight: theme.spacing(2),
     paddingBottom: theme.spacing(2),
     paddingTop: theme.spacing(2),
+    [theme.breakpoints.down("xs")]: {
+      padding: theme.spacing(1, 0),
+    },
   },
   input: {
     display: "none",
