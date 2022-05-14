@@ -64,7 +64,7 @@ const AuthorSummaryCard = ({ authorData }) => {
   return (
     <Card variant="outlined" className={classes.container}>
       <CardContent className={classes.cardContent}>
-        <Grid container justifyContent="space-between">
+        <Grid container justifyContent="space-between" spacing={2}>
           <Grid item xs={12} sm={2} className={classes.imageContainer}>
             <img
               className={classes.authorImage}

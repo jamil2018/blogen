@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   categoryChip: {
-    marginRight: theme.spacing(2),
+    marginLeft: theme.spacing(2),
     margin: theme.spacing(1, 0),
     "&:hover": {
       cursor: "pointer",

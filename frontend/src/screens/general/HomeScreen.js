@@ -90,6 +90,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   categoriesContainer: {
+    justifyContent: "flex-end",
     [theme.breakpoints.down("xs")]: {
       justifyContent: "center",
     },
@@ -98,7 +99,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(8),
   },
   allPostsSectionHeaderContainer: {
-    marginBottom: "-2rem",
+    marginBottom: theme.spacing(-2.5),
     marginLeft: theme.spacing(0.8),
     [theme.breakpoints.down("xs")]: {
       marginBottom: theme.spacing(1.5),
@@ -254,20 +255,34 @@ const HomeScreen = () => {
       </section>
       <Divider />
       <section className={classes.allPostsContainer} ref={allPostsContainerRef}>
-        <Grid
-          container
-          alignItems="center"
-          className={classes.allPostsSectionHeaderContainer}
-        >
-          <LibraryBooksIcon />
-          <Typography
-            className={classes.sectionHeaderText}
-            variant="subtitle2"
-            component="h2"
-            gutterBottom
+        <Grid container justifyContent="space-between">
+          <Grid
+            sm={6}
+            xs={12}
+            container
+            alignItems="center"
+            className={classes.allPostsSectionHeaderContainer}
           >
-            ALL POSTS
-          </Typography>
+            <LibraryBooksIcon />
+            <Typography
+              className={classes.sectionHeaderText}
+              variant="subtitle2"
+              component="h2"
+              gutterBottom
+            >
+              ALL POSTS
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Typography
+              className={classes.categorySectionTitle}
+              variant="h6"
+              component="h4"
+              gutterBottom
+            >
+              DISCOVER MORE OF WHAT MATTERS TO YOU
+            </Typography>
+          </Grid>
         </Grid>
         <Grid
           spacing={6}
@@ -304,14 +319,6 @@ const HomeScreen = () => {
             )}
           </Grid>
           <Grid item xs={12} sm={4}>
-            <Typography
-              className={classes.categorySectionTitle}
-              variant="h6"
-              component="h4"
-              gutterBottom
-            >
-              DISCOVER MORE OF WHAT MATTERS TO YOU
-            </Typography>
             {allCategoryDataLoading || allCategoryDataFectching ? (
               <CategoryLoaderDeck count={8} />
             ) : allCategoryDataError ? (
