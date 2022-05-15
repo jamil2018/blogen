@@ -4,10 +4,11 @@ import { memo } from "react";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    marginRight: theme.spacing(3),
+    marginLeft: theme.spacing(3),
     marginBottom: theme.spacing(2),
   },
   container: {
+    justifyContent: "flex-end",
     [theme.breakpoints.down("xs")]: {
       justifyContent: "center",
     },

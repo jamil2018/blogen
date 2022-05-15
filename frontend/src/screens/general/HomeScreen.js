@@ -337,6 +337,7 @@ const HomeScreen = () => {
           </Grid>
         </Grid>
       </section>
+
       {/* Modals */}
       <UserModal open={openLoginModal} onClose={handleLoginModalClose}>
         <LoginScreen
