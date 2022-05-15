@@ -34,7 +34,7 @@ const CategoryListScreen = () => {
       <Divider />
       <Box className={classes.categoriesContainer}>
         {allCategoryDataLoading || allCategoryDataFectching ? (
-          <CategoryLoaderDeck count={8} />
+          <CategoryLoaderDeck count={8} position="center" />
         ) : allCategoryDataError ? (
           <Grid container alignItems="center" justifyContent="center">
             <Typography variant="h6" component="h4" gutterBottom>
@@ -42,7 +42,7 @@ const CategoryListScreen = () => {
             </Typography>
           </Grid>
         ) : (
-          <Grid container>
+          <Grid container justifyContent="center">
             <HomeCategoriesDeck categories={allCategoryData} />
           </Grid>
         )}

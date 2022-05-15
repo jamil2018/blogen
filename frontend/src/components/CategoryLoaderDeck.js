@@ -15,10 +15,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CategoryLoaderDeck = memo(({ count }) => {
+const CategoryLoaderDeck = memo(({ count, position = "flex-end" }) => {
   const classes = useStyles();
   return (
-    <Grid container className={classes.container}>
+    <Grid
+      container
+      className={classes.container}
+      style={{ justifyContent: position }}
+    >
       {Array.from(Array(count).keys()).map((i) => (
         <Skeleton
           key={i}
