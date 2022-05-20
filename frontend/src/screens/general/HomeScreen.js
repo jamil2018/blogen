@@ -88,6 +88,18 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("xs")]: {
       textAlign: "center",
     },
+    [theme.breakpoints.down("xs")]: {
+      display: "none",
+    },
+  },
+  categorySectionTitleMobile: {
+    marginTop: theme.spacing(3),
+    fontSize: theme.typography.pxToRem(16),
+    textAlign: "center",
+    display: "none",
+    [theme.breakpoints.down("xs")]: {
+      display: "block",
+    },
   },
   categoriesContainer: {
     justifyContent: "flex-end",
@@ -319,6 +331,14 @@ const HomeScreen = () => {
             )}
           </Grid>
           <Grid item xs={12} sm={4}>
+            <Typography
+              className={classes.categorySectionTitleMobile}
+              variant="h6"
+              component="h4"
+              gutterBottom
+            >
+              DISCOVER MORE OF WHAT MATTERS TO YOU
+            </Typography>
             {allCategoryDataLoading || allCategoryDataFectching ? (
               <CategoryLoaderDeck count={8} />
             ) : allCategoryDataError ? (
