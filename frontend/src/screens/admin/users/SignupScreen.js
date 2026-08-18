@@ -1,11 +1,12 @@
-import { Box, Button, Grid, makeStyles, TextField } from "@material-ui/core";
-import { useMutation, useQueryClient } from "react-query";
+import { Box, Button, Grid, TextField } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import FacebookIcon from "@material-ui/icons/Facebook";
-import LinkedInIcon from "@material-ui/icons/LinkedIn";
-import TwitterIcon from "@material-ui/icons/Twitter";
-import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
-import AddBoxIcon from "@material-ui/icons/AddBox";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import TwitterIcon from "@mui/icons-material/Twitter";
+import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
+import AddBoxIcon from "@mui/icons-material/AddBox";
 import * as yup from "yup";
 import { createUser } from "../../../data/userQueryFunctions";
 import { USER_DATA } from "../../../definitions/reactQueryConstants/queryConstants";
@@ -75,9 +76,10 @@ const SignupScreen = ({ showSuccessAlertHandler, handleModalClose }) => {
 
   const classes = useStyles();
   const queryClient = useQueryClient();
-  const mutation = useMutation(createUser, {
+  const mutation = useMutation({
+    mutationFn: createUser,
     onSuccess: () => {
-      queryClient.invalidateQueries(USER_DATA);
+      queryClient.invalidateQueries({ queryKey: [USER_DATA] });
       showSuccessAlertHandler();
     },
     onError: (error) => {
@@ -85,7 +87,7 @@ const SignupScreen = ({ showSuccessAlertHandler, handleModalClose }) => {
         setErrorMessage("User with this email already exists");
         setShowErrorAlert(true);
       }
-    },
+    }
   });
   const formik = useFormik({
     initialValues: {

@@ -1,4 +1,5 @@
-import { Box, makeStyles, Grid } from "@material-ui/core";
+import { Box, Grid } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import { memo } from "react";
 import AuthorSummaryCard from "./AuthorSummaryCard";
 

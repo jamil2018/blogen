@@ -1,7 +1,7 @@
-import { Box, Button, TextField } from "@material-ui/core";
+import { Box, Button, TextField } from "@mui/material";
 import { useFormik } from "formik";
-import { useMutation, useQueryClient } from "react-query";
-import AddBoxIcon from "@material-ui/icons/AddBox";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import AddBoxIcon from "@mui/icons-material/AddBox";
 import * as yup from "yup";
 import { createCategory } from "../../../data/categoryQueryFunctions";
 import { CATEGORY_DATA } from "../../../definitions/reactQueryConstants/queryConstants";
@@ -17,11 +17,12 @@ const CreateCategoryScreen = ({
 }) => {
   const classes = adminCategoryCreateStyles();
   const queryClient = useQueryClient();
-  const mutation = useMutation(createCategory, {
+  const mutation = useMutation({
+    mutationFn: createCategory,
     onSuccess: () => {
-      queryClient.invalidateQueries(CATEGORY_DATA);
+      queryClient.invalidateQueries({ queryKey: [CATEGORY_DATA] });
       showSuccessAlertHandler();
-    },
+    }
   });
   const formik = useFormik({
     initialValues: {

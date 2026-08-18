@@ -1,5 +1,6 @@
-import { Grid, makeStyles } from "@material-ui/core";
-import { Skeleton } from "@material-ui/lab";
+import { Grid } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import { Skeleton } from '@mui/material';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -7,13 +8,13 @@ const useStyles = makeStyles((theme) => ({
   },
   authorInfoContainer: {
     marginBottom: theme.spacing(2),
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('sm')]: {
       display: "none",
     },
   },
   authorInfoContainerMobile: {
     display: "none",
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('sm')]: {
       display: "flex",
     },
   },
@@ -33,13 +34,13 @@ const useStyles = makeStyles((theme) => ({
   },
   imageLoader: {
     display: "block",
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('sm')]: {
       display: "none",
     },
   },
   imageLoaderMobile: {
     display: "none",
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('sm')]: {
       display: "block",
     },
   },
@@ -54,7 +55,7 @@ const ExpandedPostSummaryLoader = () => {
         container
         alignItems="center"
       >
-        <Skeleton variant="circle" className={classes.avatar} />
+        <Skeleton variant="circular" className={classes.avatar} />
         <Skeleton variant="text" width={50} />
       </Grid>
       <Grid
@@ -65,7 +66,7 @@ const ExpandedPostSummaryLoader = () => {
         className={classes.container}
       >
         <Grid item xs={12} sm={4} className={classes.imageLoaderMobile}>
-          <Skeleton variant="rect" width={"100%"} height={160} />
+          <Skeleton variant="rectangular" width={"100%"} height={160} />
         </Grid>
         <Grid item xs={12} sm={8}>
           <Grid
@@ -73,7 +74,7 @@ const ExpandedPostSummaryLoader = () => {
             container
             alignItems="center"
           >
-            <Skeleton variant="circle" className={classes.avatar} />
+            <Skeleton variant="circular" className={classes.avatar} />
             <Skeleton variant="text" width={50} />
           </Grid>
           <Skeleton className={classes.title} variant="text" width={100} />
@@ -86,7 +87,7 @@ const ExpandedPostSummaryLoader = () => {
           </Grid>
         </Grid>
         <Grid item xs={12} sm={4} className={classes.imageLoader}>
-          <Skeleton variant="rect" width={"100%"} height={160} />
+          <Skeleton variant="rectangular" width={"100%"} height={160} />
         </Grid>
       </Grid>
     </>

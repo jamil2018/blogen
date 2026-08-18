@@ -1,38 +1,48 @@
+"use client";
+
 import {
   Grid,
   Typography,
   IconButton,
   ButtonGroup,
   Box,
-} from "@material-ui/core";
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link, useHistory, useLocation } from "react-router-dom";
+import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import dynamic from "next/dynamic";
 import ScreenTitle from "../../../components/ScreenTitle";
-import CreateIcon from "@material-ui/icons/Add";
-import EditIcon from "@material-ui/icons/Edit";
-import DeleteIcon from "@material-ui/icons/Delete";
-import { useQuery } from "react-query";
+import CreateIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { useQuery } from "@tanstack/react-query";
 import columns from "../../../definitions/gridColDef/postGrids";
 import { POST_DATA } from "../../../definitions/reactQueryConstants/queryConstants";
 import { getAllPostsByAuthorId } from "../../../data/postQueryFunctions";
-import { DataGrid, GridToolbar } from "@material-ui/data-grid";
+import { GridToolbar } from "@mui/x-data-grid";
 import AdminModal from "../../../components/AdminModal";
-import ErrorIcon from "@material-ui/icons/Error";
+import ErrorIcon from "@mui/icons-material/Error";
 import AlertNotification from "../../../components/AlertNotification";
 import { adminPostHomeStyles } from "../../../styles/adminPostStyles";
 import DeleteUserPostScreen from "./DeleteUserPostScreen";
 
+const DataGrid = dynamic(
+  () => import("@mui/x-data-grid").then((mod) => mod.DataGrid),
+  { ssr: false }
+);
+
 const UserPosts = () => {
   let rows = [];
-  const location = useLocation();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const classes = adminPostHomeStyles();
-  const history = useHistory();
-  const { user } = useSelector((state) => state.userData);
-  const { data, isLoading, isFetching, isError, error } = useQuery(
-    [POST_DATA, user._id],
-    ({ queryKey }) => getAllPostsByAuthorId(queryKey[1])
-  );
+  const router = useRouter();
+  const { user, isRehydrated } = useSelector((state) => state.userData);
+  const { data, isLoading, isFetching, isError, error } = useQuery({
+    queryKey: [POST_DATA, user._id],
+    queryFn: ({ queryKey }) => getAllPostsByAuthorId(queryKey[1])
+  });
   // states
   const [selectedRows, setSelectedRows] = useState([]);
   const [editDisabled, setEditDisabled] = useState(true);
@@ -44,20 +54,26 @@ const UserPosts = () => {
 
   // effects
   useEffect(() => {
-    if (location.state) {
-      if (location.state.showCreateSuccessAlert) {
-        setShowCreateSuccessAlert(true);
-      }
-      if (location.state.showEditSuccessAlert) {
-        setShowEditSuccessAlert(true);
-      }
+    const created = searchParams.get("created") === "1";
+    const edited = searchParams.get("edited") === "1";
+    if (created) {
+      setShowCreateSuccessAlert(true);
     }
-  }, [location]);
+    if (edited) {
+      setShowEditSuccessAlert(true);
+    }
+    if (created || edited) {
+      router.replace(pathname);
+    }
+  }, [pathname, router, searchParams]);
   useEffect(() => {
-    if (user.isAdmin || !user._id) {
-      history.push("/");
+    if (!isRehydrated) {
+      return;
     }
-  }, [history, user]);
+    if (user.isAdmin || !user._id) {
+      router.push("/");
+    }
+  }, [isRehydrated, router, user]);
   useEffect(() => {
     if (selectedRows.length > 0) {
       setEditDisabled(false);
@@ -140,26 +156,22 @@ const UserPosts = () => {
           variant="outlined"
           aria-label="general user action button group"
         >
-          <IconButton
-            aria-label="create"
-            component={Link}
-            to="/user/posts/create"
-          >
+          <IconButton aria-label="create" component={Link} href="/user/posts/create" size="large">
             <CreateIcon fontSize="small" />
           </IconButton>
           <IconButton
             disabled={editDisabled}
             aria-label="edit"
             component={Link}
-            to={`/user/posts/edit/${selectedRows[0]}`}
-          >
+            href={`/user/posts/edit/${selectedRows[0]}`}
+            size="large">
             <EditIcon fontSize="small" />
           </IconButton>
           <IconButton
             aria-label="delete"
             disabled={deleteDisabled}
             onClick={() => handleModalOpen("DELETE")}
-          >
+            size="large">
             <DeleteIcon fontSize="small" />
           </IconButton>
         </ButtonGroup>
@@ -170,10 +182,11 @@ const UserPosts = () => {
           checkboxSelection
           columns={columns}
           rows={rows}
-          pageSize={12}
-          onSelectionModelChange={(e) => setSelectedRows(e.selectionModel)}
-          components={{
-            Toolbar: GridToolbar,
+          initialState={{ pagination: { paginationModel: { pageSize: 12 } } }}
+          pageSizeOptions={[12]}
+          onRowSelectionModelChange={(ids) => setSelectedRows(ids)}
+          slots={{
+            toolbar: GridToolbar,
           }}
           error={error}
         />

@@ -1,7 +1,9 @@
-import { Box, Divider, Grid, Typography } from "@material-ui/core";
-import { Alert } from "@material-ui/lab";
-import { makeStyles } from "@material-ui/styles";
-import { useQuery } from "react-query";
+"use client";
+
+import { Box, Divider, Grid, Typography } from "@mui/material";
+import { Alert } from '@mui/material';
+import { makeStyles } from "@mui/styles";
+import { useQuery } from "@tanstack/react-query";
 import CategoryLoaderDeck from "../../components/CategoryLoaderDeck";
 import HomeCategoriesDeck from "../../components/HomeCategoriesDeck";
 import { getAllCategories } from "../../data/categoryQueryFunctions";
@@ -13,18 +15,33 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CategoryListScreen = () => {
+const CategoryListScreen = (props) => {
+  const { categories } = props || {};
   const classes = useStyles();
 
+  const hasCategories = categories !== undefined;
   const {
-    data: allCategoryData,
-    isLoading: allCategoryDataLoading,
-    isFetching: allCategoryDataFectching,
-    isError: allCategoryDataError,
-  } = useQuery(CATEGORY_DATA, getAllCategories, {
+    data: queriedAllCategoryData,
+    isLoading: queriedAllCategoryDataLoading,
+    isFetching: queriedAllCategoryDataFectching,
+    isError: queriedAllCategoryDataError,
+  } = useQuery({
+    queryKey: [CATEGORY_DATA],
+    queryFn: getAllCategories,
+    enabled: !hasCategories,
     refetchOnWindowFocus: false,
-    refetchInterval: 10 * 60 * 1000,
+    refetchInterval: 10 * 60 * 1000
   });
+  const allCategoryData = hasCategories ? categories : queriedAllCategoryData;
+  const allCategoryDataLoading = hasCategories
+    ? false
+    : queriedAllCategoryDataLoading;
+  const allCategoryDataFectching = hasCategories
+    ? false
+    : queriedAllCategoryDataFectching;
+  const allCategoryDataError = hasCategories
+    ? false
+    : queriedAllCategoryDataError;
 
   return (
     <>

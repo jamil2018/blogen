@@ -1,9 +1,5 @@
-import axios from "axios";
+import { api } from "../lib/api";
 import { store } from "../redux/store";
-
-if (process.env.REACT_APP_NODE_ENV === "PRODUCTION") {
-  axios.defaults.baseURL = process.env.REACT_APP_PRODUCTION_API;
-}
 
 export const getAllCategories = async () => {
   try {
@@ -15,7 +11,7 @@ export const getAllCategories = async () => {
         Authorization: `Bearer ${user.token}`,
       },
     };
-    const { data } = await axios.get("/api/categories", config);
+    const { data } = await api.get("/api/categories", config);
     return data;
   } catch (err) {
     throw new Error(`Error while fecthing data. Error Message: ${err.message}`);
@@ -31,7 +27,7 @@ export const getCategoryById = async (catId) => {
         Authorization: `Bearer ${user.token}`,
       },
     };
-    const { data } = await axios.get(`/api/categories/${catId}`, config);
+    const { data } = await api.get(`/api/categories/${catId}`, config);
     return data;
   } catch (err) {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
@@ -48,7 +44,7 @@ export const createCategory = async (categoryData) => {
         Authorization: `Bearer ${user.token}`,
       },
     };
-    const { data } = await axios.post("/api/categories", categoryData, config);
+    const { data } = await api.post("/api/categories", categoryData, config);
     return data;
   } catch (err) {
     throw new Error(`Error while fecthing data. Error Message: ${err.message}`);
@@ -66,7 +62,7 @@ export const updateCategoryById = async (updatedCategoryData) => {
         Authorization: `Bearer ${user.token}`,
       },
     };
-    const { data } = await axios.put(
+    const { data } = await api.put(
       `/api/categories/${categoryId}`,
       values,
       config
@@ -88,7 +84,7 @@ export const deleteMultipleCategoriesById = async (categoryId) => {
         Authorization: `Bearer ${token}`,
       },
     };
-    const { data } = await axios.delete("/api/categories", config);
+    const { data } = await api.delete("/api/categories", config);
     return data;
   } catch (err) {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
@@ -105,7 +101,7 @@ export const getCuratedCategoryList = async () => {
         Authorization: `Bearer ${user.token}`,
       },
     };
-    const { data } = await axios.get("/api/categories/curated", config);
+    const { data } = await api.get("/api/categories/curated", config);
     return data;
   } catch (err) {
     throw new Error(`Error while fecthing data. Error Message: ${err.message}`);

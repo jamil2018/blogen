@@ -1,17 +1,12 @@
-import {
-  Avatar,
-  Card,
-  CardContent,
-  Grid,
-  IconButton,
-  makeStyles,
-  Typography,
-} from "@material-ui/core";
-import { grey } from "@material-ui/core/colors";
-import DeleteIcon from "@material-ui/icons/Delete";
-import EditIcon from "@material-ui/icons/Edit";
+"use client";
+
+import { Avatar, Card, CardContent, Grid, IconButton, Typography } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import { grey } from "@mui/material/colors";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import { memo } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { getAuthorNameInitials } from "../utils/dataFormat";
 import { getBase64ImageURL } from "../utils/imageConvertion";
 
@@ -71,7 +66,7 @@ const PostComment = memo(
                 )}
                 <Typography
                   component={Link}
-                  to={`/authors/${authorId}`}
+                  href={`/authors/${authorId}`}
                   variant="subtitle2"
                   className={classes.authorText}
                 >

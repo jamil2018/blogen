@@ -1,14 +1,16 @@
+"use client";
+
 import {
   Card,
   CardContent,
   CircularProgress,
   Grid,
   Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import { useEffect, useState } from "react";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import AlertNotification from "../../../components/AlertNotification";
 import ScreenTitle from "../../../components/ScreenTitle";
 import { getCuratedPostListByAuthor } from "../../../data/postQueryFunctions";
@@ -24,12 +26,12 @@ import {
   Legend,
   Bar,
 } from "recharts";
-import { useTheme } from "@material-ui/styles";
+import { useTheme } from "@mui/styles";
 
 const UserDashboard = () => {
   const classes = adminHomeStyles();
-  const history = useHistory();
-  const { user } = useSelector((state) => state.userData);
+  const router = useRouter();
+  const { user, isRehydrated } = useSelector((state) => state.userData);
   const theme = useTheme();
 
   const [showErrorNotification, setShowErrorNotification] = useState(false);
@@ -40,17 +42,23 @@ const UserDashboard = () => {
     isError: isPostDataError,
     isFetching: isPostDataFetching,
     data: postData,
-  } = useQuery(POST_DATA, getCuratedPostListByAuthor);
+  } = useQuery({
+    queryKey: [POST_DATA],
+    queryFn: getCuratedPostListByAuthor
+  });
   useEffect(() => {
     if (!isPostDataLoading && !isPostDataFetching) {
       setCuratedPostData(formatData(postData, "createdAt"));
     }
   }, [isPostDataLoading, postData, isPostDataFetching]);
   useEffect(() => {
-    if (user.isAdmin || !user._id) {
-      history.push("/");
+    if (!isRehydrated) {
+      return;
     }
-  }, [history, user]);
+    if (user.isAdmin || !user._id) {
+      router.push("/");
+    }
+  }, [isRehydrated, router, user]);
   return (
     <>
       <ScreenTitle text="Dashboard" className={classes.root} />
@@ -75,7 +83,7 @@ const UserDashboard = () => {
                   Posts
                 </Typography>
                 {isPostDataLoading || isPostDataFetching ? (
-                  <Grid container justify="center">
+                  <Grid container justifyContent="center">
                     <CircularProgress size={25} color="primary" />
                   </Grid>
                 ) : (

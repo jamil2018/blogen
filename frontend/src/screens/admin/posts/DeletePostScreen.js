@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import AdminDeleteConfirmation from "../../../components/AdminDeleteConfirmation";
 import { deleteMultiplePostsById } from "../../../data/postQueryFunctions";
 
@@ -8,12 +8,13 @@ const DeletePostScreen = ({
   handleModalClose,
 }) => {
   const queryClient = useQueryClient();
-  const mutation = useMutation(deleteMultiplePostsById, {
+  const mutation = useMutation({
+    mutationFn: deleteMultiplePostsById,
     onSuccess: () => {
-      queryClient.invalidateQueries("posts");
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
       showSuccessAlertHandler();
       handleModalClose();
-    },
+    }
   });
   const handleUserDelete = () => {
     mutation.mutate(postId);

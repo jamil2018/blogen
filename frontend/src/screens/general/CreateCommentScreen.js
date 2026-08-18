@@ -1,10 +1,11 @@
 import { useFormik } from "formik";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createCommentByPostId } from "../../data/commentQueryFunctions";
 import { COMMENT_DATA } from "../../definitions/reactQueryConstants/queryConstants";
 import * as yup from "yup";
-import { Box, Button, makeStyles, TextField } from "@material-ui/core";
-import Alert from "@material-ui/lab/Alert";
+import { Box, Button, TextField } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import Alert from '@mui/material/Alert';
 import { useSelector } from "react-redux";
 
 const validationSchema = yup.object({
@@ -24,11 +25,12 @@ const useStyles = makeStyles((theme) => ({
 const CreateCommentScreen = ({ postId, showSuccessAlertHandler }) => {
   const queryClient = useQueryClient();
   const { user } = useSelector((state) => state.userData);
-  const { isLoading, mutate } = useMutation(createCommentByPostId, {
+  const { isLoading, mutate } = useMutation({
+    mutationFn: createCommentByPostId,
     onSuccess: () => {
-      queryClient.invalidateQueries(COMMENT_DATA);
+      queryClient.invalidateQueries({ queryKey: [COMMENT_DATA] });
       formik.values.text = "";
-    },
+    }
   });
   const classes = useStyles();
   const formik = useFormik({

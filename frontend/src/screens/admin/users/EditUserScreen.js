@@ -1,19 +1,13 @@
-import {
-  Box,
-  Button,
-  makeStyles,
-  TextField,
-  CircularProgress,
-  Grid,
-} from "@material-ui/core";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { Box, Button, TextField, CircularProgress, Grid } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import CreateIcon from "@material-ui/icons/Create";
+import CreateIcon from "@mui/icons-material/Create";
 import * as yup from "yup";
-import FacebookIcon from "@material-ui/icons/Facebook";
-import LinkedInIcon from "@material-ui/icons/LinkedIn";
-import TwitterIcon from "@material-ui/icons/Twitter";
-import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import TwitterIcon from "@mui/icons-material/Twitter";
+import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 
 import { getUserById, updateUserById } from "../../../data/userQueryFunctions";
 import { SINGLE_USER_DATA } from "../../../definitions/reactQueryConstants/queryConstants";
@@ -75,10 +69,10 @@ const EditUserScreen = ({
 }) => {
   const classes = useStyles();
   const queryClient = useQueryClient();
-  const { isLoading, isError, data } = useQuery(
-    [SINGLE_USER_DATA, userId],
-    ({ queryKey }) => getUserById(queryKey[1])
-  );
+  const { isLoading, isError, data } = useQuery({
+    queryKey: [SINGLE_USER_DATA, userId],
+    queryFn: ({ queryKey }) => getUserById(queryKey[1])
+  });
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -118,11 +112,12 @@ const EditUserScreen = ({
     formik.initialValues.linkedinId = data.linkedinId;
     formik.initialValues.twitterId = data.twitterId;
   }
-  const mutation = useMutation(updateUserById, {
+  const mutation = useMutation({
+    mutationFn: updateUserById,
     onSuccess: () => {
-      queryClient.invalidateQueries("users");
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       showSuccessAlertHandler();
-    },
+    }
   });
   return (
     <Box>

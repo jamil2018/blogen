@@ -4,9 +4,9 @@ import { getStorageController } from "../config/firebaseConfig";
 
 const fileStorage = async (file) => {
   const storage = getStorageController(
-    process.env.REACT_APP_FIREBASE_API_KEY,
-    process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-    process.env.REACT_APP_FIREBASE_STORAGE_BUCKET
+    process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
   );
   const fileName = `${v4()}.${file.name.split(".")[1]}`;
   const storageRef = ref(storage, fileName);

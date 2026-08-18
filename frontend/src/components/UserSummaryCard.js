@@ -1,11 +1,8 @@
-import {
-  Card,
-  CardContent,
-  Grid,
-  makeStyles,
-  Typography,
-} from "@material-ui/core";
-import { Link } from "react-router-dom";
+"use client";
+
+import { Card, CardContent, Grid, Typography } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import Link from "next/link";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -44,7 +41,7 @@ const UserSummaryCard = ({ userProfileImageURL, name, bio, authorId }) => {
             <Typography
               className={classes.authorName}
               component={Link}
-              to={`/authors/${authorId}`}
+              href={`/authors/${authorId}`}
               variant="h6"
               gutterBottom
             >

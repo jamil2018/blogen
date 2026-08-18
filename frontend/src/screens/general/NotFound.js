@@ -1,6 +1,8 @@
-import { Button, Grid, Typography } from "@material-ui/core";
-import { Link } from "react-router-dom";
-import { makeStyles } from "@material-ui/styles";
+"use client";
+
+import { Button, Grid, Typography } from "@mui/material";
+import Link from "next/link";
+import { makeStyles } from "@mui/styles";
 import NotFoundImg from "../../assets/404.svg";
 
 const useStyles = makeStyles((theme) => ({
@@ -38,7 +40,7 @@ const NotFound = () => {
           variant="text"
           color="primary"
           component={Link}
-          to="/"
+          href="/"
         >
           go back to Home Page
         </Button>

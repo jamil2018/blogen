@@ -1,14 +1,16 @@
-import Box from "@material-ui/core/Box";
-import Button from "@material-ui/core/Button";
-import Grid from "@material-ui/core/Grid";
-import TextField from "@material-ui/core/TextField";
-import Typography from "@material-ui/core/Typography";
-import Link from "@material-ui/core/Link";
-import { makeStyles } from "@material-ui/core/styles";
-import { useHistory } from "react-router-dom";
+"use client";
+
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import Link from "@mui/material/Link";
+import makeStyles from '@mui/styles/makeStyles';
+import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import { useState } from "react";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
 import * as yup from "yup";
 import LoginImg from "../../assets/login.svg";
@@ -24,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     height: "35vh",
     padding: theme.spacing(1),
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('sm')]: {
       display: "none",
     },
   },
@@ -54,14 +56,15 @@ const validationSchema = yup.object({
 const LoginScreen = ({ handleModalClose, openRegistrationModal }) => {
   const [showInvalidCredentialsAlert, setShowInvalidCredentialsAlert] =
     useState(false);
-  const history = useHistory();
+  const router = useRouter();
   const classes = useStyles();
   const dispatch = useDispatch();
-  const mutation = useMutation(signInUser, {
+  const mutation = useMutation({
+    mutationFn: signInUser,
     onSuccess: (data) => {
       dispatch(storeUserData(data));
       if (data.isAdmin) {
-        history.push("/admin");
+        router.push("/admin");
       }
       handleModalClose();
     },
@@ -69,7 +72,7 @@ const LoginScreen = ({ handleModalClose, openRegistrationModal }) => {
       if (error.status === 401) {
         setShowInvalidCredentialsAlert(true);
       }
-    },
+    }
   });
   const formik = useFormik({
     initialValues: {

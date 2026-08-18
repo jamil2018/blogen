@@ -1,5 +1,6 @@
-import { Grid, makeStyles } from "@material-ui/core";
-import { Skeleton } from "@material-ui/lab";
+import { Grid } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import { Skeleton } from '@mui/material';
 
 const useStyles = makeStyles((theme) => ({
   avatar: {
@@ -21,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(2),
   },
   socialLinks: {
-    [theme.breakpoints.down("sm")]: {
+    [theme.breakpoints.down('md')]: {
       display: "none",
     },
   },
@@ -40,7 +41,7 @@ const IndividualPostLoader = () => {
             <Grid item>
               <Skeleton
                 className={classes.avatar}
-                variant="circle"
+                variant="circular"
                 width={40}
                 height={40}
               />
@@ -56,16 +57,16 @@ const IndividualPostLoader = () => {
         </Grid>
         <Grid item className={classes.socialLinks}>
           <Grid container>
-            <Skeleton className={classes.meta} variant="rect" width={25} />
-            <Skeleton className={classes.meta} variant="rect" width={25} />
-            <Skeleton className={classes.meta} variant="rect" width={25} />
-            <Skeleton variant="rect" width={25} />
+            <Skeleton className={classes.meta} variant="rectangular" width={25} />
+            <Skeleton className={classes.meta} variant="rectangular" width={25} />
+            <Skeleton className={classes.meta} variant="rectangular" width={25} />
+            <Skeleton variant="rectangular" width={25} />
           </Grid>
         </Grid>
       </Grid>
       <Skeleton
         className={classes.image}
-        variant="rect"
+        variant="rectangular"
         width={"100%"}
         height={400}
       />
@@ -87,9 +88,9 @@ const IndividualPostLoader = () => {
         justifyContent="flex-start"
         alignItems="center"
       >
-        <Skeleton className={classes.tag} variant="rect" width={50} />
-        <Skeleton className={classes.tag} variant="rect" width={50} />
-        <Skeleton className={classes.tag} variant="rect" width={50} />
+        <Skeleton className={classes.tag} variant="rectangular" width={50} />
+        <Skeleton className={classes.tag} variant="rectangular" width={50} />
+        <Skeleton className={classes.tag} variant="rectangular" width={50} />
       </Grid>
     </>
   );

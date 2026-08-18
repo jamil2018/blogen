@@ -1,19 +1,21 @@
-// make Box, Button, Grid, Link, makeStyles, TextField, Typography imports from '@material-ui/core' to individual imports
+"use client";
 
-import Box from "@material-ui/core/Box";
-import Button from "@material-ui/core/Button";
-import Grid from "@material-ui/core/Grid";
-import Link from "@material-ui/core/Link";
-import Typography from "@material-ui/core/Typography";
-import TextField from "@material-ui/core/TextField";
-import { makeStyles } from "@material-ui/core/styles";
-import FacebookIcon from "@material-ui/icons/Facebook";
-import LinkedInIcon from "@material-ui/icons/LinkedIn";
-import TwitterIcon from "@material-ui/icons/Twitter";
-import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
+// make Box, Button, Grid, Link, makeStyles, TextField, Typography imports from '@mui/material' to individual imports
+
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import Link from "@mui/material/Link";
+import Typography from "@mui/material/Typography";
+import TextField from "@mui/material/TextField";
+import makeStyles from '@mui/styles/makeStyles';
+import FacebookIcon from "@mui/icons-material/Facebook";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import TwitterIcon from "@mui/icons-material/Twitter";
+import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import * as yup from "yup";
 import { useFormik } from "formik";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import RegisterImg from "../../assets/register.svg";
 import { createUser } from "../../data/userQueryFunctions";
 import { USER_DATA } from "../../definitions/reactQueryConstants/queryConstants";
@@ -31,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     height: "40vh",
     padding: theme.spacing(1),
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('sm')]: {
       display: "none",
     },
   },
@@ -42,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
     paddingRight: theme.spacing(2),
     paddingBottom: theme.spacing(2),
     paddingTop: theme.spacing(2),
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('sm')]: {
       padding: theme.spacing(1, 0),
     },
   },
@@ -102,9 +104,10 @@ const RegisterScreen = ({ handleModalClose, openLoginModal }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
-  const mutation = useMutation(createUser, {
+  const mutation = useMutation({
+    mutationFn: createUser,
     onSuccess: (data) => {
-      queryClient.invalidateQueries(USER_DATA);
+      queryClient.invalidateQueries({ queryKey: [USER_DATA] });
       dispatch(storeUserData(data));
       handleModalClose();
     },
@@ -113,7 +116,7 @@ const RegisterScreen = ({ handleModalClose, openLoginModal }) => {
         setErrorMessage("User with this email already exists");
         setShowErrorAlert(true);
       }
-    },
+    }
   });
   const formik = useFormik({
     initialValues: {

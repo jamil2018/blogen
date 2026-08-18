@@ -1,6 +1,9 @@
-import { Divider, makeStyles, Typography } from "@material-ui/core";
-import { Alert } from "@material-ui/lab";
-import { useQuery } from "react-query";
+"use client";
+
+import { Divider, Typography } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import { Alert } from '@mui/material';
+import { useQuery } from "@tanstack/react-query";
 import AuthorSummaryCardDeck from "../../components/AuthorSummaryCardDeck";
 import AuthorSummaryCardLoader from "../../components/AuthorSummaryCardLoader";
 import AuthorSummaryCardLoaderDeck from "../../components/AuthorSummaryCardLoaderDeck";
@@ -13,9 +16,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const AuthorListScreen = () => {
+const AuthorListScreen = (props) => {
+  const { authors } = props || {};
   const classes = useStyles();
-  const { data, isLoading, isError } = useQuery(USER_DATA, getAllUsers);
+  const hasAuthors = authors !== undefined;
+  const { data: queriedAuthors, isLoading: queriedIsLoading, isError: queriedIsError } = useQuery({
+    queryKey: [USER_DATA],
+    queryFn: getAllUsers,
+    enabled: !hasAuthors,
+  });
+  const data = hasAuthors ? authors : queriedAuthors;
+  const isLoading = hasAuthors ? false : queriedIsLoading;
+  const isError = hasAuthors ? false : queriedIsError;
 
   return (
     <>

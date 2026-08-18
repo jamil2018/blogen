@@ -1,10 +1,10 @@
-import { makeStyles } from "@material-ui/core";
-import Typography from "@material-ui/core/Typography";
-import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
-import Fade from "@material-ui/core/Fade";
-import Backdrop from "@material-ui/core/Backdrop";
-import Modal from "@material-ui/core/Modal";
+import makeStyles from '@mui/styles/makeStyles';
+import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Grid";
+import Paper from "@mui/material/Paper";
+import Fade from "@mui/material/Fade";
+import Backdrop from "@mui/material/Backdrop";
+import Modal from "@mui/material/Modal";
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -51,7 +51,7 @@ const AdminModal = ({
         <Paper className={classes.modalContent}>
           <Grid
             container
-            justify="center"
+            justifyContent="center"
             alignItems="center"
             className={classes.modalHeader}
           >

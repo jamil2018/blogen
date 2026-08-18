@@ -1,10 +1,6 @@
-import axios from "axios";
+import { api } from "../lib/api";
 import { store } from "../redux/store";
 import fileStorage from "../utils/fileStorage";
-
-if (process.env.REACT_APP_NODE_ENV === "PRODUCTION") {
-  axios.defaults.baseURL = process.env.REACT_APP_PRODUCTION_API;
-}
 
 export const getAllPosts = async () => {
   try {
@@ -13,7 +9,7 @@ export const getAllPosts = async () => {
         "Content-Type": "application/json",
       },
     };
-    const { data } = await axios.get("/api/posts", config);
+    const { data } = await api.get("/api/posts", config);
     return data;
   } catch (err) {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
@@ -27,7 +23,7 @@ export const getPaginatedPosts = async ({ page, limit }) => {
         "Content-Type": "application/json",
       },
     };
-    const { data } = await axios.get(
+    const { data } = await api.get(
       `/api/posts/paginated?page=${page}&limit=${limit}`,
       config
     );
@@ -44,7 +40,7 @@ export const getLatestPosts = async () => {
         "Content-Type": "application/json",
       },
     };
-    const { data } = await axios.get("/api/posts/latest", config);
+    const { data } = await api.get("/api/posts/latest", config);
     return data;
   } catch (err) {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
@@ -61,7 +57,7 @@ export const getAllPostsByAuthorId = async (authorId) => {
         Authorization: `Bearer ${user.token}`,
       },
     };
-    const { data } = await axios.get(`/api/posts/author/${authorId}`, config);
+    const { data } = await api.get(`/api/posts/author/${authorId}`, config);
     return data;
   } catch (err) {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
@@ -78,7 +74,7 @@ export const getPostById = async (postId) => {
         Authorization: `Bearer ${user.token}`,
       },
     };
-    const { data } = await axios.get(`/api/posts/${postId}`, config);
+    const { data } = await api.get(`/api/posts/${postId}`, config);
     return data;
   } catch (err) {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
@@ -96,7 +92,7 @@ export const getPostByCategoryName = async ({ categoryName }) => {
       },
       params: reqBody,
     };
-    const { data } = await axios.get(`/api/posts/find`, config);
+    const { data } = await api.get(`/api/posts/find`, config);
     return data;
   } catch (err) {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
@@ -114,7 +110,7 @@ export const getPostByTagName = async ({ tagName }) => {
       },
       params: reqBody,
     };
-    const { data } = await axios.get(`/api/posts/find`, config);
+    const { data } = await api.get(`/api/posts/find`, config);
     return data;
   } catch (err) {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
@@ -140,7 +136,7 @@ export const createPost = async (postData) => {
         Authorization: `Bearer ${user.token}`,
       },
     };
-    const { data } = await axios.post("/api/posts", formData, config);
+    const { data } = await api.post("/api/posts", formData, config);
     return data;
   } catch (err) {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
@@ -169,7 +165,7 @@ export const updatePostById = async (updatedPostData) => {
     formData.append("summary", postData.summary);
     formData.append("category", postData.category);
     formData.append("tags", postData.tags);
-    const { data } = await axios.put(`/api/posts/${postId}`, formData, config);
+    const { data } = await api.put(`/api/posts/${postId}`, formData, config);
     return data;
   } catch (err) {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
@@ -187,7 +183,7 @@ export const deleteMultiplePostsById = async (postId) => {
         Authorization: `Bearer ${token}`,
       },
     };
-    const { data } = await axios.delete("/api/posts", config);
+    const { data } = await api.delete("/api/posts", config);
     return data;
   } catch (err) {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
@@ -201,7 +197,7 @@ export const getCuratedPostList = async () => {
         "Content-Type": "application/json",
       },
     };
-    const { data } = await axios.get("/api/posts/curated", config);
+    const { data } = await api.get("/api/posts/curated", config);
     return data;
   } catch (err) {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
@@ -218,7 +214,7 @@ export const getCuratedPostListByAuthor = async () => {
         Authorization: `Bearer ${token}`,
       },
     };
-    const { data } = await axios.get("/api/posts/curated/author", config);
+    const { data } = await api.get("/api/posts/curated/author", config);
     return data;
   } catch (err) {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
@@ -228,7 +224,7 @@ export const getCuratedPostListByAuthor = async () => {
 export const searchPosts = async (searchQuery) => {
   try {
     if (searchQuery.length > 1) {
-      const { data } = await axios.get(
+      const { data } = await api.get(
         `/api/posts/search?query=${searchQuery}`
       );
       return data;
@@ -242,7 +238,7 @@ export const searchPosts = async (searchQuery) => {
 
 export const searchPostResults = async (searchQuery) => {
   try {
-    const { data } = await axios.get(
+    const { data } = await api.get(
       `/api/posts/searchresult?query=${searchQuery}`
     );
     return data;

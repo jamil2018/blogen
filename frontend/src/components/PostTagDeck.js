@@ -1,5 +1,6 @@
-import { Box, makeStyles } from "@material-ui/core";
-import { orange } from "@material-ui/core/colors";
+import { Box } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import { orange } from "@mui/material/colors";
 import PostTag from "./PostTag";
 
 const useStyles = makeStyles((theme) => ({

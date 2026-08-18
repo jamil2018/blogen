@@ -1,16 +1,18 @@
-import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
-import Divider from "@material-ui/core/Divider";
-import Grid from "@material-ui/core/Grid";
-import makeStyles from "@material-ui/styles/makeStyles";
+"use client";
+
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import Grid from "@mui/material/Grid";
+import makeStyles from "@mui/styles/makeStyles";
 import homeBg from "../../assets/homeBg.svg";
-import AutorenewIcon from "@material-ui/icons/Autorenew";
+import AutorenewIcon from "@mui/icons-material/Autorenew";
 import UserModal from "../../components/UserModal";
 import LoginScreen from "./LoginScreen";
 import RegisterScreen from "./RegisterScreen";
 import { useCallback, useRef, useState } from "react";
-import { useQuery } from "react-query";
-import { Pagination } from "@material-ui/lab";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { Pagination } from '@mui/material';
 import {
   CATEGORY_DATA,
   LATEST_POST_DATA,
@@ -20,7 +22,7 @@ import {
   getLatestPosts,
   getPaginatedPosts,
 } from "../../data/postQueryFunctions";
-import Alert from "@material-ui/lab/Alert";
+import Alert from '@mui/material/Alert';
 import { getAllCategories } from "../../data/categoryQueryFunctions";
 import ExpandedPostSummaryLoaderDeck from "../../components/ExpandedPostSummaryLoaderDeck";
 import PostSummaryCardLoaderDeck from "../../components/PostSummaryCardLoaderDeck";
@@ -28,18 +30,18 @@ import CategoryLoaderDeck from "../../components/CategoryLoaderDeck";
 import HomeAllPostsDeck from "../../components/HomeAllPostsDeck";
 import HomeLatestPostsDeck from "../../components/HomeLatestPostsDeck";
 import HomeCategoriesDeck from "../../components/HomeCategoriesDeck";
-import LibraryBooksIcon from "@material-ui/icons/LibraryBooks";
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 
 const useStyles = makeStyles((theme) => ({
   header: {
     margin: theme.spacing(4, 0),
   },
   headerTitle: {
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('sm')]: {
       fontSize: theme.typography.h4.fontSize,
       textAlign: "center",
     },
-    [theme.breakpoints.down("sm")]: {
+    [theme.breakpoints.down('md')]: {
       fontSize: theme.typography.h3.fontSize,
     },
   },
@@ -47,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(6),
   },
   headerContentContainer: {
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('sm')]: {
       flexDirection: "column-reverse",
     },
   },
@@ -57,15 +59,15 @@ const useStyles = makeStyles((theme) => ({
   },
   subHeader: {
     fontWeight: theme.typography.fontWeightLight,
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('sm')]: {
       textAlign: "center",
     },
-    [theme.breakpoints.down("sm")]: {
+    [theme.breakpoints.down('md')]: {
       fontSize: theme.typography.subtitle1.fontSize,
     },
   },
   headerCallContainer: {
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('sm')]: {
       justifyContent: "center",
     },
   },
@@ -85,10 +87,10 @@ const useStyles = makeStyles((theme) => ({
   categorySectionTitle: {
     marginTop: theme.spacing(3),
     fontSize: theme.typography.pxToRem(16),
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('sm')]: {
       textAlign: "center",
     },
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('sm')]: {
       display: "none",
     },
   },
@@ -97,13 +99,13 @@ const useStyles = makeStyles((theme) => ({
     fontSize: theme.typography.pxToRem(16),
     textAlign: "center",
     display: "none",
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('sm')]: {
       display: "block",
     },
   },
   categoriesContainer: {
     justifyContent: "flex-end",
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('sm')]: {
       justifyContent: "center",
     },
   },
@@ -113,14 +115,15 @@ const useStyles = makeStyles((theme) => ({
   allPostsSectionHeaderContainer: {
     marginBottom: theme.spacing(-2.5),
     marginLeft: theme.spacing(0.8),
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('sm')]: {
       marginBottom: theme.spacing(1.5),
       marginLeft: theme.spacing(-0.1),
     },
   },
 }));
 
-const HomeScreen = () => {
+const HomeScreen = (props) => {
+  const { latestPosts, paginatedPosts, categories } = props || {};
   //#region states
   const [openLoginModal, setOpenLoginModal] = useState(false);
   const [openRegistrationModal, setOpenRegistrationModal] = useState(false);
@@ -134,38 +137,79 @@ const HomeScreen = () => {
   const classes = useStyles();
 
   //#region data queries
+  const hasLatestPosts = latestPosts !== undefined;
   const {
-    data: latestPostData,
-    isLoading: latestPostDataLoading,
-    isFetching: latestPostDataFetching,
-    isError: latestPostDataError,
-  } = useQuery(LATEST_POST_DATA, getLatestPosts, {
+    data: queriedLatestPostData,
+    isLoading: queriedLatestPostDataLoading,
+    isFetching: queriedLatestPostDataFetching,
+    isError: queriedLatestPostDataError,
+  } = useQuery({
+    queryKey: [LATEST_POST_DATA],
+    queryFn: getLatestPosts,
+    enabled: !hasLatestPosts,
+    refetchOnWindowFocus: false,
+    refetchInterval: 10 * 60 * 1000
+  });
+  const latestPostData = hasLatestPosts ? latestPosts : queriedLatestPostData;
+  const latestPostDataLoading = hasLatestPosts
+    ? false
+    : queriedLatestPostDataLoading;
+  const latestPostDataFetching = hasLatestPosts
+    ? false
+    : queriedLatestPostDataFetching;
+  const latestPostDataError = hasLatestPosts
+    ? false
+    : queriedLatestPostDataError;
+
+  const usePrefetchedPage =
+    paginatedPosts !== undefined && currentPage === 1;
+  const {
+    data: queriedAllPostData,
+    isLoading: queriedAllPostDataLoading,
+    isFetching: queriedAllPostDataFetching,
+    isError: queriedAllPostDataError,
+  } = useQuery({
+    queryKey: [PAGINATED_POST_DATA, { page: currentPage, limit: 5 }],
+    queryFn: ({ queryKey }) => getPaginatedPosts(queryKey[1]),
+    enabled: !usePrefetchedPage,
     refetchOnWindowFocus: false,
     refetchInterval: 10 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
+  const allPostData = usePrefetchedPage ? paginatedPosts : queriedAllPostData;
+  const allPostDataLoading = usePrefetchedPage
+    ? false
+    : queriedAllPostDataLoading;
+  const allPostDataFetching = usePrefetchedPage
+    ? false
+    : queriedAllPostDataFetching;
+  const allPostDataError = usePrefetchedPage
+    ? false
+    : queriedAllPostDataError;
+
+  const hasCategories = categories !== undefined;
   const {
-    data: allPostData,
-    isLoading: allPostDataLoading,
-    isFetching: allPostDataFetching,
-    isError: allPostDataError,
-  } = useQuery(
-    [PAGINATED_POST_DATA, { page: currentPage, limit: 5 }],
-    ({ queryKey }) => getPaginatedPosts(queryKey[1]),
-    {
-      refetchOnWindowFocus: false,
-      refetchInterval: 10 * 60 * 1000,
-      keepPreviousData: true,
-    }
-  );
-  const {
-    data: allCategoryData,
-    isLoading: allCategoryDataLoading,
-    isFetching: allCategoryDataFectching,
-    isError: allCategoryDataError,
-  } = useQuery(CATEGORY_DATA, getAllCategories, {
+    data: queriedAllCategoryData,
+    isLoading: queriedAllCategoryDataLoading,
+    isFetching: queriedAllCategoryDataFectching,
+    isError: queriedAllCategoryDataError,
+  } = useQuery({
+    queryKey: [CATEGORY_DATA],
+    queryFn: getAllCategories,
+    enabled: !hasCategories,
     refetchOnWindowFocus: false,
-    refetchInterval: 10 * 60 * 1000,
+    refetchInterval: 10 * 60 * 1000
   });
+  const allCategoryData = hasCategories ? categories : queriedAllCategoryData;
+  const allCategoryDataLoading = hasCategories
+    ? false
+    : queriedAllCategoryDataLoading;
+  const allCategoryDataFectching = hasCategories
+    ? false
+    : queriedAllCategoryDataFectching;
+  const allCategoryDataError = hasCategories
+    ? false
+    : queriedAllCategoryDataError;
   //#endregion
 
   //#region action handlers
@@ -184,7 +228,9 @@ const HomeScreen = () => {
 
   const handlePageChange = useCallback((_, page) => {
     setCurrentPage(page);
-    window.scrollTo(0, allPostsContainerRef.current.offsetTop);
+    if (typeof window !== "undefined" && allPostsContainerRef.current) {
+      window.scrollTo(0, allPostsContainerRef.current.offsetTop);
+    }
   }, []);
   //#endregion
 

@@ -1,30 +1,25 @@
-import { useQuery } from "react-query";
-import { Link, useParams } from "react-router-dom";
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
 import { getAllPostsByAuthorId } from "../../data/postQueryFunctions";
 import { getUserById } from "../../data/userQueryFunctions";
 import {
   POST_DATA,
   SINGLE_AUTHOR_DATA,
 } from "../../definitions/reactQueryConstants/queryConstants";
-import {
-  Avatar,
-  Grid,
-  IconButton,
-  makeStyles,
-  Typography,
-  Divider,
-  Box,
-} from "@material-ui/core";
-import MailIcon from "@material-ui/icons/Mail";
-import LinkedInIcon from "@material-ui/icons/LinkedIn";
-import FacebookIcon from "@material-ui/icons/Facebook";
-import TwitterIcon from "@material-ui/icons/Twitter";
-import { Alert, Skeleton } from "@material-ui/lab";
+import { Avatar, Grid, IconButton, Typography, Divider, Box } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import MailIcon from "@mui/icons-material/Mail";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import TwitterIcon from "@mui/icons-material/Twitter";
+import { Alert, Skeleton } from '@mui/material';
 import { getBase64ImageURL } from "../../utils/imageConvertion";
 import { getAuthorNameInitials } from "../../utils/dataFormat";
 import HomeAllPostsDeck from "../../components/HomeAllPostsDeck";
 import ExpandedPostSummaryLoaderDeck from "../../components/ExpandedPostSummaryLoaderDeck";
-import { grey } from "@material-ui/core/colors";
+import { grey } from "@mui/material/colors";
 import { useEffect } from "react";
 
 const useStyles = makeStyles((theme) => ({
@@ -78,8 +73,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const AuthorProfileScreen = () => {
-  const { authorId } = useParams();
+const AuthorProfileScreen = (props) => {
+  const { authorId: authorIdProp, author, posts } = props || {};
+  const params = useParams();
+  const authorId = authorIdProp ?? params?.authorId;
   const classes = useStyles();
 
   // effects
@@ -88,21 +85,39 @@ const AuthorProfileScreen = () => {
   }, []);
 
   // data queries
+  const hasAuthor = author !== undefined;
   const {
-    data: authorData,
-    isLoading: isAuthorDataLoading,
-    isError: isAuthorDataError,
-  } = useQuery([SINGLE_AUTHOR_DATA, authorId], ({ queryKey }) =>
-    getUserById(queryKey[1])
-  );
+    data: queriedAuthorData,
+    isLoading: queriedAuthorDataLoading,
+    isError: queriedAuthorDataError,
+  } = useQuery({
+    queryKey: [SINGLE_AUTHOR_DATA, authorId],
 
+    queryFn: ({ queryKey }) =>
+      getUserById(queryKey[1]),
+    enabled: !hasAuthor && Boolean(authorId),
+  });
+  const authorData = hasAuthor ? author : queriedAuthorData;
+  const isAuthorDataLoading = hasAuthor ? false : queriedAuthorDataLoading;
+  const isAuthorDataError = hasAuthor ? false : queriedAuthorDataError;
+
+  const hasPosts = posts !== undefined;
   const {
-    data: authorPostData,
-    isLoading: isAuthorPostDataLoading,
-    isError: isAuthorPostDataError,
-  } = useQuery([POST_DATA, authorId], ({ queryKey }) =>
-    getAllPostsByAuthorId(queryKey[1])
-  );
+    data: queriedAuthorPostData,
+    isLoading: queriedAuthorPostDataLoading,
+    isError: queriedAuthorPostDataError,
+  } = useQuery({
+    queryKey: [POST_DATA, authorId],
+
+    queryFn: ({ queryKey }) =>
+      getAllPostsByAuthorId(queryKey[1]),
+    enabled: !hasPosts && Boolean(authorId),
+  });
+  const authorPostData = hasPosts ? posts : queriedAuthorPostData;
+  const isAuthorPostDataLoading = hasPosts
+    ? false
+    : queriedAuthorPostDataLoading;
+  const isAuthorPostDataError = hasPosts ? false : queriedAuthorPostDataError;
 
   return (
     <Grid
@@ -149,7 +164,7 @@ const AuthorProfileScreen = () => {
       <Grid className={classes.rightContainer} item xs={3}>
         {isAuthorDataLoading ? (
           <>
-            <Skeleton variant="circle" height={90} width={90} />
+            <Skeleton variant="circular" height={90} width={90} />
             <Skeleton
               className={classes.authorNameLoader}
               variant="text"
@@ -165,25 +180,25 @@ const AuthorProfileScreen = () => {
             >
               <Skeleton
                 className={classes.socialLinkLoader}
-                variant="rect"
+                variant="rectangular"
                 height={15}
                 width={25}
               />
               <Skeleton
                 className={classes.socialLinkLoader}
-                variant="rect"
+                variant="rectangular"
                 height={15}
                 width={25}
               />
               <Skeleton
                 className={classes.socialLinkLoader}
-                variant="rect"
+                variant="rectangular"
                 height={15}
                 width={25}
               />
               <Skeleton
                 className={classes.socialLinkLoader}
-                variant="rect"
+                variant="rectangular"
                 height={15}
                 width={25}
               />
@@ -222,15 +237,13 @@ const AuthorProfileScreen = () => {
             >
               <IconButton
                 aria-label="email author"
-                to="#"
                 onClick={(e) => {
                   e.preventDefault();
                   window.open(`mailto:${authorData.email}`);
                 }}
-                component={Link}
                 color="primary"
                 edge="start"
-              >
+                size="large">
                 <MailIcon />
               </IconButton>
               <IconButton
@@ -239,7 +252,7 @@ const AuthorProfileScreen = () => {
                 component="a"
                 target="_blank"
                 color="primary"
-              >
+                size="large">
                 <FacebookIcon />
               </IconButton>
               <IconButton
@@ -248,7 +261,7 @@ const AuthorProfileScreen = () => {
                 component="a"
                 target="_blank"
                 color="primary"
-              >
+                size="large">
                 <TwitterIcon />
               </IconButton>
               <IconButton
@@ -257,7 +270,7 @@ const AuthorProfileScreen = () => {
                 component="a"
                 target="_blank"
                 color="primary"
-              >
+                size="large">
                 <LinkedInIcon />
               </IconButton>
             </Grid>

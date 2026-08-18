@@ -1,8 +1,11 @@
-import { CircularProgress, Divider, Grid, makeStyles } from "@material-ui/core";
-import Typography from "@material-ui/core/Typography";
-import { Alert } from "@material-ui/lab";
-import { useQuery } from "react-query";
-import { useParams } from "react-router-dom";
+"use client";
+
+import { CircularProgress, Divider, Grid } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import Typography from "@mui/material/Typography";
+import { Alert } from '@mui/material';
+import { useQuery } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
 import ExpandedPostSummaryCard from "../../components/ExpandedPostSummaryCard";
 import { getPostByTagName } from "../../data/postQueryFunctions";
 import { POST_DATA } from "../../definitions/reactQueryConstants/queryConstants";
@@ -33,17 +36,23 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const PostsByTagScreen = () => {
+const PostsByTagScreen = (props) => {
+  const { tagName: tagNameProp, posts } = props || {};
   const classes = useStyles();
-  const { tagName } = useParams();
-  const { data, isLoading, isFetching, isError } = useQuery(
-    [POST_DATA, { tagName }],
-    ({ queryKey }) => getPostByTagName(queryKey[1]),
-    {
-      refetchOnWindowFocus: false,
-      refetchInterval: 10 * 60 * 1000,
-    }
-  );
+  const params = useParams();
+  const tagName = tagNameProp ?? params?.tagName;
+  const hasPosts = posts !== undefined;
+  const { data: queriedPosts, isLoading: queriedIsLoading, isFetching: queriedIsFetching, isError: queriedIsError } = useQuery({
+    queryKey: [POST_DATA, { tagName }],
+    queryFn: ({ queryKey }) => getPostByTagName(queryKey[1]),
+    enabled: !hasPosts && Boolean(tagName),
+    refetchOnWindowFocus: false,
+    refetchInterval: 10 * 60 * 1000,
+  });
+  const data = hasPosts ? posts : queriedPosts;
+  const isLoading = hasPosts ? false : queriedIsLoading;
+  const isFetching = hasPosts ? false : queriedIsFetching;
+  const isError = hasPosts ? false : queriedIsError;
 
   // effects
   useEffect(() => {
