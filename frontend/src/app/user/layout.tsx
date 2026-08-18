@@ -1,9 +1,11 @@
-import UserLayout from "../../layout/UserLayout";
+"use client";
 
-export default function UserSectionLayout({
+import AppSidebar from "../../components/layout/AppSidebar";
+
+export default function UserLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <UserLayout>{children}</UserLayout>;
+  return <AppSidebar variant="user">{children}</AppSidebar>;
 }

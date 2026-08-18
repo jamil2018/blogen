@@ -1,5 +1,5 @@
-import AdminUsers from "../../../screens/admin/users/AdminUsers";
+import AdminUsersView from "../../../components/studio/AdminUsersView";
 
 export default function AdminUsersPage() {
-  return <AdminUsers />;
+  return <AdminUsersView />;
 }

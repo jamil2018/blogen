@@ -1,5 +1,5 @@
-import AdminProfile from "../../../screens/admin/profile/AdminProfile";
+import ProfileView from "../../../components/studio/ProfileView";
 
 export default function AdminProfilePage() {
-  return <AdminProfile />;
+  return <ProfileView admin />;
 }
