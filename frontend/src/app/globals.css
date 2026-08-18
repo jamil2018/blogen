@@ -1,0 +1,52 @@
+@import "tailwindcss";
+@import "@heroui/styles";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --color-paper: oklch(0.985 0.002 286);
+  --color-ink: oklch(0.21 0.006 286);
+  --color-muted: oklch(0.55 0.016 286);
+  --color-border: oklch(0.92 0.004 286);
+  --color-accent: oklch(0.508 0.118 175);
+  --color-accent-foreground: oklch(0.985 0.002 286);
+
+  --radius-input: 8px;
+  --radius-card: 12px;
+}
+
+.dark {
+  --color-paper: oklch(0.17 0.006 286);
+  --color-ink: oklch(0.96 0.002 286);
+  --color-muted: oklch(0.65 0.016 286);
+  --color-border: oklch(0.28 0.006 286);
+  --color-accent: oklch(0.777 0.152 175);
+  --color-accent-foreground: oklch(0.17 0.006 286);
+}
+
+@layer base {
+  html {
+    @apply antialiased;
+  }
+
+  body {
+    @apply bg-paper text-ink font-sans;
+  }
+
+  ::selection {
+    @apply bg-teal-200 dark:bg-teal-800;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
