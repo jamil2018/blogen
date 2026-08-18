@@ -1,4 +1,4 @@
-import SearchResultScreen from "../../../../screens/general/SearchResultScreen";
+import SearchResultsView from "../../../../components/pages/SearchResultsView";
 import { fetchSearchPostResults } from "../../../../lib/api";
 
 type SearchPageProps = {
@@ -8,8 +8,7 @@ type SearchPageProps = {
 export default async function SearchPage({ params }: SearchPageProps) {
   const { searchQuery } = await params;
   const results = await fetchSearchPostResults(searchQuery);
-
   return (
-    <SearchResultScreen searchQuery={searchQuery} results={results} />
+    <SearchResultsView searchQuery={searchQuery} results={results} />
   );
 }

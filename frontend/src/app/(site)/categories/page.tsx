@@ -1,8 +1,7 @@
-import CategoryListScreen from "../../../screens/general/CategoryListScreen";
+import CategoryListView from "../../../components/pages/CategoryListView";
 import { fetchAllCategories } from "../../../lib/api";
 
 export default async function CategoriesPage() {
   const categories = await fetchAllCategories();
-
-  return <CategoryListScreen categories={categories} />;
+  return <CategoryListView categories={categories} />;
 }

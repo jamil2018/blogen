@@ -1,11 +1,14 @@
-import AuthorProfileScreen from "../../../../screens/general/AuthorProfileScreen";
-import { fetchPostsByAuthorId, fetchUserById } from "../../../../lib/api";
+import AuthorProfileView from "../../../../components/pages/AuthorProfileView";
+import {
+  fetchPostsByAuthorId,
+  fetchUserById,
+} from "../../../../lib/api";
 
 type AuthorPageProps = {
   params: Promise<{ authorId: string }>;
 };
 
-export default async function AuthorPage({ params }: AuthorPageProps) {
+export default async function AuthorProfilePage({ params }: AuthorPageProps) {
   const { authorId } = await params;
   const [author, posts] = await Promise.all([
     fetchUserById(authorId),
@@ -13,6 +16,6 @@ export default async function AuthorPage({ params }: AuthorPageProps) {
   ]);
 
   return (
-    <AuthorProfileScreen authorId={authorId} author={author} posts={posts} />
+    <AuthorProfileView authorId={authorId} author={author} posts={posts} />
   );
 }

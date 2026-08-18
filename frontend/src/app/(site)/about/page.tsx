@@ -1,8 +1,7 @@
-import AboutUsScreen from "../../../screens/general/AboutUsScreen";
+import AboutPageView from "../../../components/pages/AboutPageView";
 import { fetchLatestUsers } from "../../../lib/api";
 
 export default async function AboutPage() {
   const users = await fetchLatestUsers();
-
-  return <AboutUsScreen users={users} />;
+  return <AboutPageView users={users} />;
 }

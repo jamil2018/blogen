@@ -1,4 +1,4 @@
-import PostsByTagScreen from "../../../../../../screens/general/PostByTagScreen";
+import PostsByTagView from "../../../../../../components/pages/PostsByTagView";
 import { fetchPostsByTagName } from "../../../../../../lib/api";
 
 type TagPostsPageProps = {
@@ -7,7 +7,7 @@ type TagPostsPageProps = {
 
 export default async function TagPostsPage({ params }: TagPostsPageProps) {
   const { tagName } = await params;
-  const posts = await fetchPostsByTagName(tagName);
-
-  return <PostsByTagScreen tagName={tagName} posts={posts} />;
+  const decoded = decodeURIComponent(tagName);
+  const posts = await fetchPostsByTagName(decoded);
+  return <PostsByTagView tagName={decoded} posts={posts} />;
 }

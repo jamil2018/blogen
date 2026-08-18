@@ -1,4 +1,4 @@
-import PostsByCategoryScreen from "../../../../../../screens/general/PostsByCategoryScreen";
+import PostsByCategoryView from "../../../../../../components/pages/PostsByCategoryView";
 import { fetchPostsByCategoryName } from "../../../../../../lib/api";
 
 type CategoryPostsPageProps = {
@@ -9,9 +9,13 @@ export default async function CategoryPostsPage({
   params,
 }: CategoryPostsPageProps) {
   const { categoryName } = await params;
-  const posts = await fetchPostsByCategoryName(categoryName);
-
+  const posts = await fetchPostsByCategoryName(
+    decodeURIComponent(categoryName)
+  );
   return (
-    <PostsByCategoryScreen categoryName={categoryName} posts={posts} />
+    <PostsByCategoryView
+      categoryName={decodeURIComponent(categoryName)}
+      posts={posts}
+    />
   );
 }
