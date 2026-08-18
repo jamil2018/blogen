@@ -9,6 +9,7 @@ import {
   StyledEngineProvider,
   ThemeProvider,
 } from "@mui/material";
+import { Toast } from "@heroui/react";
 import { store } from "./redux/store";
 import {
   hydrateUserData,
@@ -43,6 +44,7 @@ export default function Providers({ children }: { children: ReactNode }) {
             <CssBaseline />
             <AuthHydrator />
             {children}
+            <Toast.Provider placement="bottom end" />
           </ThemeProvider>
         </StyledEngineProvider>
         <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-right" />
