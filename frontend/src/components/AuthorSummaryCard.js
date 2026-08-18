@@ -1,17 +1,12 @@
-import {
-  Box,
-  Card,
-  CardContent,
-  Grid,
-  IconButton,
-  makeStyles,
-  Typography,
-} from "@material-ui/core";
-import { Link } from "react-router-dom";
-import MailIcon from "@material-ui/icons/Mail";
-import LinkedInIcon from "@material-ui/icons/LinkedIn";
-import FacebookIcon from "@material-ui/icons/Facebook";
-import TwitterIcon from "@material-ui/icons/Twitter";
+"use client";
+
+import { Box, Card, CardContent, Grid, IconButton, Typography } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import Link from "next/link";
+import MailIcon from "@mui/icons-material/Mail";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import TwitterIcon from "@mui/icons-material/Twitter";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -27,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.text.primary,
   },
   imageContainer: {
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('sm')]: {
       display: "flex",
       justifyContent: "center",
     },
@@ -36,13 +31,13 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     height: "100%",
     objectFit: "cover",
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('sm')]: {
       width: "70%",
       height: "auto",
     },
   },
   authorMeta: {
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('sm')]: {
       display: "flex",
       alignItems: "center",
       flexDirection: "column",
@@ -50,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
   },
   socialLinks: {
     marginTop: theme.spacing(2),
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('sm')]: {
       justifyContent: "center",
     },
   },
@@ -84,7 +79,7 @@ const AuthorSummaryCard = ({ authorData }) => {
                 variant="h5"
                 component={Link}
                 gutterBottom
-                to={`/authors/${authorData._id}`}
+                href={`/authors/${authorData._id}`}
                 className={classes.authorName}
               >
                 {authorData.name}
@@ -102,15 +97,13 @@ const AuthorSummaryCard = ({ authorData }) => {
               <IconButton
                 className={classes.socialLink}
                 aria-label="email author"
-                to="#"
                 onClick={(e) => {
                   e.preventDefault();
                   window.open(`mailto:${authorData.email}`);
                 }}
-                component={Link}
                 color="primary"
                 edge="start"
-              >
+                size="large">
                 <MailIcon />
               </IconButton>
               <IconButton
@@ -120,7 +113,7 @@ const AuthorSummaryCard = ({ authorData }) => {
                 component="a"
                 target="_blank"
                 color="primary"
-              >
+                size="large">
                 <FacebookIcon />
               </IconButton>
               <IconButton
@@ -130,7 +123,7 @@ const AuthorSummaryCard = ({ authorData }) => {
                 component="a"
                 target="_blank"
                 color="primary"
-              >
+                size="large">
                 <TwitterIcon />
               </IconButton>
               <IconButton
@@ -141,7 +134,7 @@ const AuthorSummaryCard = ({ authorData }) => {
                 target="_blank"
                 color="primary"
                 edge="end"
-              >
+                size="large">
                 <LinkedInIcon />
               </IconButton>
             </Grid>

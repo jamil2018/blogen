@@ -1,14 +1,16 @@
+"use client";
+
 import {
   Card,
   CardContent,
   CircularProgress,
   Grid,
   Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import { useEffect, useState } from "react";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import AlertNotification from "../../../components/AlertNotification";
 import ScreenTitle from "../../../components/ScreenTitle";
 import { getCuratedCategoryList } from "../../../data/categoryQueryFunctions";
@@ -30,12 +32,12 @@ import {
   Legend,
   Bar,
 } from "recharts";
-import { useTheme } from "@material-ui/styles";
+import { useTheme } from "@mui/styles";
 
 const AdminHomeScreen = () => {
   const classes = adminHomeStyles();
-  const history = useHistory();
-  const { user } = useSelector((state) => state.userData);
+  const router = useRouter();
+  const { user, isRehydrated } = useSelector((state) => state.userData);
   const theme = useTheme();
 
   const [showErrorNotification, setShowErrorNotification] = useState(false);
@@ -47,21 +49,30 @@ const AdminHomeScreen = () => {
     isError: isUserDataError,
     isFetching: isUserDataFetching,
     data: userData,
-  } = useQuery(USER_DATA, getCuratedUserList);
+  } = useQuery({
+    queryKey: [USER_DATA],
+    queryFn: getCuratedUserList
+  });
 
   const {
     isLoading: isCategoryDataLoading,
     isError: isCategoryDataError,
     isFetching: isCategoryDataFetching,
     data: categoryData,
-  } = useQuery(CATEGORY_DATA, getCuratedCategoryList);
+  } = useQuery({
+    queryKey: [CATEGORY_DATA],
+    queryFn: getCuratedCategoryList
+  });
 
   const {
     isLoading: isPostDataLoading,
     isError: isPostDataError,
     isFetching: isPostDataFetching,
     data: postData,
-  } = useQuery(POST_DATA, getCuratedPostList);
+  } = useQuery({
+    queryKey: [POST_DATA],
+    queryFn: getCuratedPostList
+  });
   useEffect(() => {
     if (!isUserDataLoading && !isUserDataFetching) {
       setCuratedUserData(formatData(userData, "createdAt"));
@@ -81,10 +92,13 @@ const AdminHomeScreen = () => {
     isPostDataFetching,
   ]);
   useEffect(() => {
-    if (!user.isAdmin) {
-      history.push("/");
+    if (!isRehydrated) {
+      return;
     }
-  }, [history, user]);
+    if (!user.isAdmin) {
+      router.push("/");
+    }
+  }, [isRehydrated, router, user]);
   return (
     <>
       <ScreenTitle text="Dashboard" className={classes.root} />
@@ -110,7 +124,7 @@ const AdminHomeScreen = () => {
                     Posts
                   </Typography>
                   {isPostDataLoading || isPostDataFetching ? (
-                    <Grid container justify="center">
+                    <Grid container justifyContent="center">
                       <CircularProgress size={25} color="primary" />
                     </Grid>
                   ) : (
@@ -138,7 +152,7 @@ const AdminHomeScreen = () => {
                     Users
                   </Typography>
                   {isUserDataLoading || isUserDataFetching ? (
-                    <Grid container justify="center">
+                    <Grid container justifyContent="center">
                       <CircularProgress size={25} color="primary" />
                     </Grid>
                   ) : (
@@ -166,7 +180,7 @@ const AdminHomeScreen = () => {
                     Categories
                   </Typography>
                   {isCategoryDataLoading || isCategoryDataFetching ? (
-                    <Grid container justify="center">
+                    <Grid container justifyContent="center">
                       <CircularProgress size={25} color="primary" />
                     </Grid>
                   ) : (

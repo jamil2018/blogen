@@ -1,41 +1,49 @@
-import CreateIcon from "@material-ui/icons/Add";
-import EditIcon from "@material-ui/icons/Edit";
-import DeleteIcon from "@material-ui/icons/Delete";
+"use client";
+
+import CreateIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
   Box,
   ButtonGroup,
   Grid,
   IconButton,
   Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
+import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import ScreenTitle from "../../../components/ScreenTitle";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { CATEGORY_DATA } from "../../../definitions/reactQueryConstants/queryConstants";
 import { getAllCategories } from "../../../data/categoryQueryFunctions";
-import { DataGrid, GridToolbar } from "@material-ui/data-grid";
+import { GridToolbar } from "@mui/x-data-grid";
 import columns from "../../../definitions/gridColDef/categoryGrids";
 import AdminModal from "../../../components/AdminModal";
-import CategoryIcon from "@material-ui/icons/Category";
-import ErrorIcon from "@material-ui/icons/Error";
+import CategoryIcon from "@mui/icons-material/Category";
+import ErrorIcon from "@mui/icons-material/Error";
 import CreateCategoryScreen from "./CreateCategoryScreen";
 import AlertNotification from "../../../components/AlertNotification";
 import EditCategoryScreen from "./EditCategoryScreen";
 import DeleteCategoryScreen from "./DeleteCategoryScreen";
 import { adminCategoryHomeStyles } from "../../../styles/adminCategoryStyles";
 
+const DataGrid = dynamic(
+  () => import("@mui/x-data-grid").then((mod) => mod.DataGrid),
+  { ssr: false }
+);
+
 const AdminCategories = () => {
   let rows = [];
-  const { user } = useSelector((state) => state.userData);
+  const { user, isRehydrated } = useSelector((state) => state.userData);
   const classes = adminCategoryHomeStyles();
-  const history = useHistory();
-  const { data, isLoading, isError, error, isFetching } = useQuery(
-    CATEGORY_DATA,
-    getAllCategories,
-    { refetchOnWindowFocus: false, refetchInterval: 10 * 60 * 1000 }
-  );
+  const router = useRouter();
+  const { data, isLoading, isError, error, isFetching } = useQuery({
+    queryKey: [CATEGORY_DATA],
+    queryFn: getAllCategories,
+    refetchOnWindowFocus: false, refetchInterval: 10 * 60 * 1000
+  });
 
   // states
   const [selectedRows, setSelectedRows] = useState([]);
@@ -49,10 +57,13 @@ const AdminCategories = () => {
   const [showDeleteSuccessAlert, setShowDeleteSuccessAlert] = useState(false);
   // effects
   useEffect(() => {
-    if (!user.isAdmin) {
-      history.push("/");
+    if (!isRehydrated) {
+      return;
     }
-  }, [history, user]);
+    if (!user.isAdmin) {
+      router.push("/");
+    }
+  }, [isRehydrated, router, user]);
   useEffect(() => {
     if (selectedRows.length > 0) {
       setEditDisabled(false);
@@ -150,21 +161,21 @@ const AdminCategories = () => {
           <IconButton
             aria-label="create"
             onClick={() => handleModalOpen("CREATE")}
-          >
+            size="large">
             <CreateIcon fontSize="small" />
           </IconButton>
           <IconButton
             aria-label="edit"
             disabled={editDisabled}
             onClick={() => handleModalOpen("EDIT")}
-          >
+            size="large">
             <EditIcon fontSize="small" />
           </IconButton>
           <IconButton
             aria-label="delete"
             disabled={deleteDisabled}
             onClick={() => handleModalOpen("DELETE")}
-          >
+            size="large">
             <DeleteIcon fontSize="small" />
           </IconButton>
         </ButtonGroup>
@@ -175,10 +186,11 @@ const AdminCategories = () => {
           checkboxSelection
           columns={columns}
           rows={rows}
-          pageSize={12}
-          onSelectionModelChange={(e) => setSelectedRows(e.selectionModel)}
-          components={{
-            Toolbar: GridToolbar,
+          initialState={{ pagination: { paginationModel: { pageSize: 12 } } }}
+          pageSizeOptions={[12]}
+          onRowSelectionModelChange={(ids) => setSelectedRows(ids)}
+          slots={{
+            toolbar: GridToolbar,
           }}
           error={error}
         />

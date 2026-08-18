@@ -1,25 +1,39 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const userData = localStorage.getItem("user")
-  ? JSON.parse(localStorage.getItem("user"))
-  : {};
+export const USER_STORAGE_KEY = "user";
 
 const initialState = {
-  user: userData,
+  user: {},
+  isRehydrated: false,
 };
 
 export const userDataSlice = createSlice({
   name: "userData",
   initialState,
   reducers: {
-    storeUserData: (state, action) => {
-      state.user = action.payload;
+    hydrateUserData: (state, action) => {
+      state.user = action.payload ?? {};
+      state.isRehydrated = true;
     },
-    clearUserData: (state, action) => {
+    storeUserData: (state, action) => {
+      state.user = action.payload ?? {};
+      state.isRehydrated = true;
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(
+          USER_STORAGE_KEY,
+          JSON.stringify(state.user)
+        );
+      }
+    },
+    clearUserData: (state) => {
       state.user = {};
+      if (typeof window !== "undefined") {
+        window.localStorage.removeItem(USER_STORAGE_KEY);
+      }
     },
   },
 });
 
-export const { storeUserData, clearUserData } = userDataSlice.actions;
+export const { hydrateUserData, storeUserData, clearUserData } =
+  userDataSlice.actions;
 export default userDataSlice.reducer;

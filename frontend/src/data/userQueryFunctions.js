@@ -1,10 +1,6 @@
-import axios from "axios";
+import { api } from "../lib/api";
 import { store } from "../redux/store";
 import fileStorage from "../utils/fileStorage";
-
-if (process.env.REACT_APP_NODE_ENV === "PRODUCTION") {
-  axios.defaults.baseURL = process.env.REACT_APP_PRODUCTION_API;
-}
 
 export const signInUser = async ({ email, password }) => {
   try {
@@ -13,7 +9,7 @@ export const signInUser = async ({ email, password }) => {
         "Content-Type": "application/json",
       },
     };
-    const { data } = await axios.post(
+    const { data } = await api.post(
       "/api/users/login",
       { email, password },
       config
@@ -35,7 +31,7 @@ export const getAllUsers = async () => {
         "Content-Type": "application/json",
       },
     };
-    const { data } = await axios.get("/api/users/", config);
+    const { data } = await api.get("/api/users/", config);
     return data;
   } catch (err) {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
@@ -49,7 +45,7 @@ export const getLatestUsers = async () => {
         "Content-Type": "application/json",
       },
     };
-    const { data } = await axios.get("/api/users/latest", config);
+    const { data } = await api.get("/api/users/latest", config);
     return data;
   } catch (err) {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
@@ -83,7 +79,7 @@ export const createUser = async (userData) => {
         "Content-Type": "application/json",
       },
     };
-    const { data } = await axios.post("/api/users", userDataToSend, config);
+    const { data } = await api.post("/api/users", userDataToSend, config);
     return data;
   } catch (err) {
     const error = new Error(
@@ -102,7 +98,7 @@ export const getUserById = async (userId) => {
         "Content-Type": "application/json",
       },
     };
-    const { data } = await axios.get(`/api/users/${userId}`, config);
+    const { data } = await api.get(`/api/users/${userId}`, config);
     return data;
   } catch (err) {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
@@ -142,7 +138,7 @@ export const updateUser = async (updatedUserData) => {
       imageURL: imageData.imageURL,
       imageFileName: imageData.imageFileName,
     };
-    const { data } = await axios.put(
+    const { data } = await api.put(
       `/api/users/profile`,
       updatedUserDataToSend,
       config
@@ -190,7 +186,7 @@ export const updateUserById = async (updatedUserData) => {
       imageURL: imageData.imageURL,
       imageFileName: imageData.imageFileName,
     };
-    const { data } = await axios.put(
+    const { data } = await api.put(
       `/api/users/profile/${userId}`,
       updatedUserDataToSend,
       config
@@ -212,7 +208,7 @@ export const deleteMultipleUsersById = async (userId) => {
         Authorization: `Bearer ${token}`,
       },
     };
-    const { data } = await axios.delete("/api/users", config);
+    const { data } = await api.delete("/api/users", config);
     return data;
   } catch (err) {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
@@ -226,7 +222,7 @@ export const getCuratedUserList = async () => {
         "Content-Type": "application/json",
       },
     };
-    const { data } = await axios.get("/api/users/curated", config);
+    const { data } = await api.get("/api/users/curated", config);
     return data;
   } catch (err) {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);

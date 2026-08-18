@@ -1,9 +1,11 @@
 import hljs from "highlight.js";
 import "highlight.js/styles/night-owl.css";
 
-hljs.configure({
-  languages: ["javascript", "ruby", "python", "rust"],
-});
+if (typeof window !== "undefined") {
+  hljs.configure({
+    languages: ["javascript", "ruby", "python", "rust"],
+  });
+}
 
 export const modules = {
   syntax: {

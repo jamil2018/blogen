@@ -1,5 +1,5 @@
-import { Skeleton } from "@material-ui/lab";
-import { makeStyles } from "@material-ui/styles";
+import { Skeleton } from '@mui/material';
+import { makeStyles } from "@mui/styles";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -17,25 +17,25 @@ const PostCommentLoader = () => {
     <div className={classes.container}>
       <Skeleton
         className={classes.comment}
-        variant="rect"
+        variant="rectangular"
         height={100}
         width={"100%"}
       />
       <Skeleton
         className={classes.comment}
-        variant="rect"
+        variant="rectangular"
         height={100}
         width={"100%"}
       />
       <Skeleton
         className={classes.comment}
-        variant="rect"
+        variant="rectangular"
         height={100}
         width={"100%"}
       />
       <Skeleton
         className={classes.comment}
-        variant="rect"
+        variant="rectangular"
         height={100}
         width={"100%"}
       />

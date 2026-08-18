@@ -1,14 +1,15 @@
-import { Box, Button, Grid, makeStyles, TextField } from "@material-ui/core";
+import { Box, Button, Grid, TextField } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import { useFormik } from "formik";
-import { useMutation, useQueryClient } from "react-query";
-import CreateIcon from "@material-ui/icons/Create";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import CreateIcon from "@mui/icons-material/Create";
 import * as yup from "yup";
 import { updateUser } from "../../../data/userQueryFunctions";
 import { sanitizeSocialURL } from "../../../utils/dataFormat";
-import FacebookIcon from "@material-ui/icons/Facebook";
-import LinkedInIcon from "@material-ui/icons/LinkedIn";
-import TwitterIcon from "@material-ui/icons/Twitter";
-import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import TwitterIcon from "@mui/icons-material/Twitter";
+import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import { SINGLE_USER_DATA } from "../../../definitions/reactQueryConstants/queryConstants";
 
 const validationSchema = yup.object({
@@ -94,12 +95,13 @@ const EditProfileScreen = ({
       handleModalClose();
     },
   });
-  const mutation = useMutation(updateUser, {
+  const mutation = useMutation({
+    mutationFn: updateUser,
     onSuccess: (data) => {
-      queryClient.invalidateQueries(SINGLE_USER_DATA);
+      queryClient.invalidateQueries({ queryKey: [SINGLE_USER_DATA] });
       showSuccessAlertHandler();
       dispatcher(data);
-    },
+    }
   });
   return (
     <Box>

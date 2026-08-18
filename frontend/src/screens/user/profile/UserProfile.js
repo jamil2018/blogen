@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Avatar,
   Box,
@@ -5,34 +7,32 @@ import {
   CircularProgress,
   Grid,
   Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import AdminModal from "../../../components/AdminModal";
 import AdminProfileDataRow from "../../../components/AdminProfileDataRow";
 import ScreenTitle from "../../../components/ScreenTitle";
 import { userProfileStyles } from "../../../styles/userProfileStyles";
-import AccountCircleIcon from "@material-ui/icons/AccountCircle";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import EditUserProfileScreen from "./EditUserProfileScreen";
 import { useDispatch, useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { storeUserData } from "../../../redux/slices/userDataSlice";
 import AlertNotification from "../../../components/AlertNotification";
-import CreateIcon from "@material-ui/icons/Create";
-import { useQuery } from "react-query";
+import CreateIcon from "@mui/icons-material/Create";
+import { useQuery } from "@tanstack/react-query";
 import { SINGLE_USER_DATA } from "../../../definitions/reactQueryConstants/queryConstants";
 import { getUserById } from "../../../data/userQueryFunctions";
 import { getBase64ImageURL } from "../../../utils/imageConvertion";
 
 const UserProfile = () => {
-  const { user } = useSelector((state) => state.userData);
-  const { isLoading, isFetching, isError, data } = useQuery(
-    [SINGLE_USER_DATA, user._id],
-    ({ queryKey }) => getUserById(queryKey[1]),
-    {
-      refetchOnWindowFocus: false,
-    }
-  );
-  const history = useHistory();
+  const { user, isRehydrated } = useSelector((state) => state.userData);
+  const { isLoading, isFetching, isError, data } = useQuery({
+    queryKey: [SINGLE_USER_DATA, user._id],
+    queryFn: ({ queryKey }) => getUserById(queryKey[1]),
+    refetchOnWindowFocus: false,
+  });
+  const router = useRouter();
   const classes = userProfileStyles();
   const dispatch = useDispatch();
 
@@ -56,10 +56,13 @@ const UserProfile = () => {
 
   // effects
   useEffect(() => {
-    if (user.isAdmin || !user._id) {
-      history.push("/");
+    if (!isRehydrated) {
+      return;
     }
-  }, [history, user]);
+    if (user.isAdmin || !user._id) {
+      router.push("/");
+    }
+  }, [isRehydrated, router, user]);
 
   return (
     <>

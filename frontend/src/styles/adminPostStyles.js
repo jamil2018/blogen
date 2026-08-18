@@ -1,4 +1,4 @@
-import { makeStyles } from "@material-ui/core";
+import makeStyles from '@mui/styles/makeStyles';
 
 const adminPostHomeStyles = makeStyles((theme) => ({
   root: {
@@ -19,7 +19,7 @@ const adminPostCreateStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(2.5),
   },
   formContent: {
-    padding: `${theme.spacing(4)}px 0px`,
+    padding: `${theme.spacing(4)} 0px`,
     paddingRight: theme.spacing(4),
   },
   editor: {
@@ -70,7 +70,7 @@ const adminPostEditStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(2.5),
   },
   formContent: {
-    padding: `${theme.spacing(4)}px 0px`,
+    padding: `${theme.spacing(4)} 0px`,
     paddingRight: theme.spacing(4),
   },
   editor: {

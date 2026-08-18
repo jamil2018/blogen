@@ -1,4 +1,4 @@
-import { Grid } from "@material-ui/core";
+import { Grid } from "@mui/material";
 import AuthorSummaryCardLoader from "./AuthorSummaryCardLoader";
 
 const AuthorSummaryCardLoaderDeck = ({ count }) => {

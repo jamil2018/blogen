@@ -1,5 +1,6 @@
-import { Grid, makeStyles } from "@material-ui/core";
-import { Skeleton } from "@material-ui/lab";
+import { Grid } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import { Skeleton } from '@mui/material';
 import { memo } from "react";
 
 const useStyles = makeStyles((theme) => ({
@@ -9,7 +10,7 @@ const useStyles = makeStyles((theme) => ({
   },
   container: {
     justifyContent: "flex-end",
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('sm')]: {
       justifyContent: "center",
     },
   },
@@ -26,7 +27,7 @@ const CategoryLoaderDeck = memo(({ count, position = "flex-end" }) => {
       {Array.from(Array(count).keys()).map((i) => (
         <Skeleton
           key={i}
-          variant="rect"
+          variant="rectangular"
           width={60}
           height={20}
           className={classes.root}

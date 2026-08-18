@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import AdminDeleteConfirmation from "../../../components/AdminDeleteConfirmation";
 import { deleteMultipleUsersById } from "../../../data/userQueryFunctions";
 
@@ -8,12 +8,13 @@ const AdminUserDeleteScreen = ({
   handleModalClose,
 }) => {
   const queryClient = useQueryClient();
-  const mutation = useMutation(deleteMultipleUsersById, {
+  const mutation = useMutation({
+    mutationFn: deleteMultipleUsersById,
     onSuccess: () => {
-      queryClient.invalidateQueries("users");
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       showSuccessAlertHandler();
       handleModalClose();
-    },
+    }
   });
   const handleUserDelete = () => {
     mutation.mutate(userId);

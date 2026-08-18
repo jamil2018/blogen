@@ -1,5 +1,5 @@
 import { useFormik } from "formik";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   getCommentByPostIdCommentId,
   updateCommentByPostIdCommentId,
@@ -9,7 +9,8 @@ import {
   COMMENT_DATA,
   SINGLE_COMMENT_DATA,
 } from "../../definitions/reactQueryConstants/queryConstants";
-import { Button, makeStyles, TextField } from "@material-ui/core";
+import { Button, TextField } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import { memo } from "react";
 
 const validationSchema = yup.object({
@@ -27,16 +28,17 @@ const useStyles = makeStyles((theme) => ({
 const EditCommentScreen = memo(({ postId, commentId, modalCloseHandler }) => {
   const classes = useStyles();
   const queryClient = useQueryClient();
-  const { isLoading, isError, data } = useQuery(
-    [SINGLE_COMMENT_DATA, { postId, commentId }],
-    ({ queryKey }) => getCommentByPostIdCommentId(queryKey[1])
-  );
+  const { isLoading, isError, data } = useQuery({
+    queryKey: [SINGLE_COMMENT_DATA, { postId, commentId }],
+    queryFn: ({ queryKey }) => getCommentByPostIdCommentId(queryKey[1])
+  });
 
-  const mutation = useMutation(updateCommentByPostIdCommentId, {
+  const mutation = useMutation({
+    mutationFn: updateCommentByPostIdCommentId,
     onSuccess: () => {
-      queryClient.invalidateQueries(COMMENT_DATA);
+      queryClient.invalidateQueries({ queryKey: [COMMENT_DATA] });
       modalCloseHandler();
-    },
+    }
   });
   const formik = useFormik({
     initialValues: {

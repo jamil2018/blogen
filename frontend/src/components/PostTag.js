@@ -1,11 +1,13 @@
-import { Chip } from "@material-ui/core";
-import { Link } from "react-router-dom";
+"use client";
+
+import { Chip } from "@mui/material";
+import Link from "next/link";
 
 const PostTag = ({ text, ...props }) => {
   return (
     <Chip
       component={Link}
-      to={`/posts/search/tags/${text}`}
+      href={`/posts/search/tags/${text}`}
       variant="outlined"
       {...props}
       label={text}

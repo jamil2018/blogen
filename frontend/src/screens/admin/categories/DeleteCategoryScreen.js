@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import AdminDeleteConfirmation from "../../../components/AdminDeleteConfirmation";
 import { deleteMultipleCategoriesById } from "../../../data/categoryQueryFunctions";
 
@@ -8,12 +8,13 @@ const DeleteCategoryScreen = ({
   handleModalClose,
 }) => {
   const queryClient = useQueryClient();
-  const mutation = useMutation(deleteMultipleCategoriesById, {
+  const mutation = useMutation({
+    mutationFn: deleteMultipleCategoriesById,
     onSuccess: () => {
-      queryClient.invalidateQueries("categories");
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
       showSuccessAlertHandler();
       handleModalClose();
-    },
+    }
   });
   const handleUserDelete = () => {
     mutation.mutate(categoryId);

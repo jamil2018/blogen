@@ -1,6 +1,7 @@
-import { Box, Button, Grid, makeStyles, Typography } from "@material-ui/core";
-import DeleteIcon from "@material-ui/icons/Delete";
-import CancelIcon from "@material-ui/icons/Cancel";
+import { Box, Button, Grid, Typography } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import DeleteIcon from "@mui/icons-material/Delete";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 const useStyles = makeStyles((theme) => ({
   root: {

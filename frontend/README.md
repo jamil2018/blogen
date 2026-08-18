@@ -1,70 +1,61 @@
-# Getting Started with Create React App
+# Blogen frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Next.js **16** App Router (React 19, TypeScript). This package replaced Create React App. Prefer running the full stack from the [repo root](../README.md) (`npm run dev`).
 
-## Available Scripts
+## Requirements
 
-In the project directory, you can run:
+- Node.js >= 20.9
 
-### `npm start`
+## Quick start
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+1. Install dependencies:
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+   ```bash
+   npm install
+   ```
 
-### `npm test`
+2. Copy [`.env.example`](.env.example) to `.env` and fill in values. Do not invent or commit secrets. Backend API variables are documented in [`backend/README.md`](../backend/README.md).
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+3. Start the Next.js dev server (Express must be running for `/api` and RSC fetches):
 
-### `npm run build`
+   ```bash
+   npm run dev
+   ```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+   Open [http://localhost:3000](http://localhost:3000).
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Scripts
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Next.js development server |
+| `npm run build` | Production build |
+| `npm run start` | Serve the production build |
+| `npm run lint` | ESLint (`eslint-config-next`) |
 
-### `npm run eject`
+## Environment
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+See [`.env.example`](.env.example):
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+| Variable | Where | Purpose |
+|----------|--------|---------|
+| `API_INTERNAL_URL` | server only | RSC fetch base URL (e.g. `http://localhost:8000`) |
+| `NEXT_PUBLIC_API_URL` | optional, public | Production API origin; empty in development (relative `/api` + rewrite) |
+| `NEXT_PUBLIC_FIREBASE_*` | client | Firebase Storage uploads |
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+`next.config.ts` rewrites `/api/:path*` to Express. There are **no** Next.js Route Handlers under `app/api`.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## App structure
 
-## Learn More
+```
+src/app/          App Router pages and layouts
+src/components/   Existing MUI UI (kept)
+src/screens/      Existing screens; pages render these
+src/layout/       Site / user / admin chrome
+src/lib/api.ts    Typed client + server fetch helpers
+src/providers.tsx Redux, TanStack Query, MUI theme
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Public `page.tsx` files are Server Components that prefetch data and pass it into client screens. User and admin routes are client-only (JWT in Redux / `localStorage`).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Architecture decisions: [ADR-001](../docs/decisions/ADR-001-nextjs-app-router.md).

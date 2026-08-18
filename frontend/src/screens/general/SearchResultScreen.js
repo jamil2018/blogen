@@ -1,5 +1,8 @@
-import { Divider, Grid, makeStyles, Typography } from "@material-ui/core";
-import { useQuery } from "react-query";
+"use client";
+
+import { Divider, Grid, Typography } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import ExpandedPostSummaryCard from "../../components/ExpandedPostSummaryCard";
 import { searchPostResults, searchPosts } from "../../data/postQueryFunctions";
@@ -11,8 +14,8 @@ import { calculateReadingTime } from "../../utils/dataFormat";
 import { getPostFormattedDate } from "../../utils/dateUtils";
 import notFoundImage from "../../assets/notFound.svg";
 import ExpandedPostSummaryLoaderDeck from "../../components/ExpandedPostSummaryLoaderDeck";
-import { Alert } from "@material-ui/lab";
-import { useParams } from "react-router-dom";
+import { Alert } from '@mui/material';
+import { useParams } from "next/navigation";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -34,18 +37,24 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SearchResultScreen = () => {
-  const { searchQuery } = useParams();
+const SearchResultScreen = (props) => {
+  const { searchQuery: searchQueryProp, results } = props || {};
+  const params = useParams();
+  const searchQuery = searchQueryProp ?? params?.searchQuery;
   console.log(searchQuery);
   const classes = useStyles();
 
-  const { isLoading, isFetching, isError, data } = useQuery(
-    [SEARCH_POST_DATA_RESULTS, searchQuery],
-    ({ queryKey }) => searchPostResults(queryKey[1]),
-    {
-      refetchOnWindowFocus: false,
-    }
-  );
+  const hasResults = results !== undefined;
+  const { isLoading: queriedIsLoading, isFetching: queriedIsFetching, isError: queriedIsError, data: queriedData } = useQuery({
+    queryKey: [SEARCH_POST_DATA_RESULTS, searchQuery],
+    queryFn: ({ queryKey }) => searchPostResults(queryKey[1]),
+    enabled: !hasResults && Boolean(searchQuery),
+    refetchOnWindowFocus: false,
+  });
+  const isLoading = hasResults ? false : queriedIsLoading;
+  const isFetching = hasResults ? false : queriedIsFetching;
+  const isError = hasResults ? false : queriedIsError;
+  const data = hasResults ? results : queriedData;
 
   return (
     <>

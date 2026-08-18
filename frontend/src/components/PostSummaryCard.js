@@ -1,6 +1,8 @@
-import { Avatar, Card, CardContent, Grid, Typography } from "@material-ui/core";
-import { makeStyles } from "@material-ui/styles";
-import { Link } from "react-router-dom";
+"use client";
+
+import { Avatar, Card, CardContent, Grid, Typography } from "@mui/material";
+import { makeStyles } from "@mui/styles";
+import Link from "next/link";
 import {
   calculateReadingTime,
   convertToText,
@@ -25,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: theme.typography.fontWeightBold,
     display: "block",
     color: theme.palette.text.primary,
-    [theme.breakpoints.down("sm")]: {
+    [theme.breakpoints.down('md')]: {
       fontSize: theme.typography.subtitle1.fontSize,
     },
     marginTop: theme.spacing(1.5),
@@ -70,7 +72,7 @@ const PostSummaryCard = ({
               className={classes.authorName}
               variant="caption"
               component={Link}
-              to={`/authors/${authorId}`}
+              href={`/authors/${authorId}`}
             >
               {authorName}
             </Typography>
@@ -81,7 +83,7 @@ const PostSummaryCard = ({
               variant="body1"
               gutterBottom
               component={Link}
-              to={`/posts/${postId}`}
+              href={`/posts/${postId}`}
             >
               {postTitle}
             </Typography>

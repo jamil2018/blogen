@@ -1,19 +1,14 @@
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Divider,
-  Grid,
-  makeStyles,
-  Typography,
-} from "@material-ui/core";
+"use client";
+
+import { Box, Button, CircularProgress, Divider, Grid, Typography } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import BlogenLogo from "../../assets/appIcon.svg";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { getLatestUsers } from "../../data/userQueryFunctions";
 import { DETAILED_USER_DATA } from "../../definitions/reactQueryConstants/queryConstants";
 import UserSummaryCardDeck from "../../components/UserSummaryCardDeck";
-import { Alert } from "@material-ui/lab";
-import { grey } from "@material-ui/core/colors";
+import { Alert } from '@mui/material';
+import { grey } from "@mui/material/colors";
 import UserModal from "../../components/UserModal";
 import LoginScreen from "./LoginScreen";
 import RegisterScreen from "./RegisterScreen";
@@ -54,7 +49,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const AboutUsScreen = () => {
+const AboutUsScreen = (props) => {
+  const { users } = props || {};
   const classes = useStyles();
 
   // states
@@ -62,14 +58,17 @@ const AboutUsScreen = () => {
   const [openRegistrationModal, setOpenRegistrationModal] = useState(false);
 
   // data queries
-  const { data, isLoading, isError } = useQuery(
-    DETAILED_USER_DATA,
-    getLatestUsers,
-    {
-      refetchOnWindowFocus: false,
-      refetchInterval: 10 * 60 * 1000,
-    }
-  );
+  const hasUsers = users !== undefined;
+  const { data: queriedUsers, isLoading: queriedIsLoading, isError: queriedIsError } = useQuery({
+    queryKey: [DETAILED_USER_DATA],
+    queryFn: getLatestUsers,
+    enabled: !hasUsers,
+    refetchOnWindowFocus: false,
+      refetchInterval: 10 * 60 * 1000
+  });
+  const data = hasUsers ? users : queriedUsers;
+  const isLoading = hasUsers ? false : queriedIsLoading;
+  const isError = hasUsers ? false : queriedIsError;
 
   // handlers
   const handleLoginModalOpen = useCallback(() => {

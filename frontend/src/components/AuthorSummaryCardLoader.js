@@ -1,7 +1,7 @@
-import { Skeleton } from "@material-ui/lab";
+import { Skeleton } from '@mui/material';
 
 const AuthorSummaryCardLoader = () => {
-  return <Skeleton variant="rect" width={"100%"} height={150} />;
+  return <Skeleton variant="rectangular" width={"100%"} height={150} />;
 };
 
 export default AuthorSummaryCardLoader;

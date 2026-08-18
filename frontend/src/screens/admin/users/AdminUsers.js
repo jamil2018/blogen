@@ -1,29 +1,38 @@
-import { ButtonGroup, makeStyles } from "@material-ui/core";
-import Box from "@material-ui/core/Box";
-import Typography from "@material-ui/core/Typography";
-import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
-import AccountCircleIcon from "@material-ui/icons/AccountCircle";
+"use client";
+
+import { ButtonGroup } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import {
   Delete as DeleteIcon,
   Edit as EditIcon,
   Add as CreateIcon,
-} from "@material-ui/icons";
-import ErrorIcon from "@material-ui/icons/Error";
-import { DataGrid, GridToolbar } from "@material-ui/data-grid";
+} from "@mui/icons-material";
+import ErrorIcon from "@mui/icons-material/Error";
+import { GridToolbar } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import ScreenTitle from "../../../components/ScreenTitle";
 import columns from "../../../definitions/gridColDef/userGrids";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { getAllUsers } from "../../../data/userQueryFunctions";
 import SignupScreen from "./SignupScreen";
 import { USER_DATA } from "../../../definitions/reactQueryConstants/queryConstants";
 import AdminModal from "../../../components/AdminModal";
 import AlertNotification from "../../../components/AlertNotification";
 import EditUserScreen from "./EditUserScreen";
-import { useHistory } from "react-router-dom";
+import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { useSelector } from "react-redux";
 import AdminUserDeleteScreen from "./AdminUserDeleteScreen";
+
+const DataGrid = dynamic(
+  () => import("@mui/x-data-grid").then((mod) => mod.DataGrid),
+  { ssr: false }
+);
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -39,14 +48,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const AdminUsers = (props) => {
-  const history = useHistory();
-  const { user } = useSelector((state) => state.userData);
+  const router = useRouter();
+  const { user, isRehydrated } = useSelector((state) => state.userData);
   const classes = useStyles();
-  const { isLoading, isError, data, error, isFetching } = useQuery(
-    USER_DATA,
-    getAllUsers,
-    { refetchOnWindowFocus: false, refetchInterval: 10 * 60 * 1000 }
-  );
+  const { isLoading, isError, data, error, isFetching } = useQuery({
+    queryKey: [USER_DATA],
+    queryFn: getAllUsers,
+    refetchOnWindowFocus: false, refetchInterval: 10 * 60 * 1000
+  });
   let rows = [];
 
   // states
@@ -62,10 +71,13 @@ const AdminUsers = (props) => {
 
   // effects
   useEffect(() => {
-    if (!user.isAdmin) {
-      history.push("/");
+    if (!isRehydrated) {
+      return;
     }
-  }, [history, user]);
+    if (!user.isAdmin) {
+      router.push("/");
+    }
+  }, [isRehydrated, router, user]);
 
   useEffect(() => {
     if (selectedRows.length > 0) {
@@ -174,21 +186,21 @@ const AdminUsers = (props) => {
           <IconButton
             aria-label="create"
             onClick={() => handleModalOpen("CREATE")}
-          >
+            size="large">
             <CreateIcon fontSize="small" />
           </IconButton>
           <IconButton
             aria-label="edit"
             disabled={editDisabled}
             onClick={() => handleModalOpen("EDIT")}
-          >
+            size="large">
             <EditIcon fontSize="small" />
           </IconButton>
           <IconButton
             aria-label="delete"
             disabled={deleteDisabled}
             onClick={() => handleModalOpen("DELETE")}
-          >
+            size="large">
             <DeleteIcon fontSize="small" />
           </IconButton>
         </ButtonGroup>
@@ -199,10 +211,11 @@ const AdminUsers = (props) => {
           checkboxSelection
           columns={columns}
           rows={rows}
-          pageSize={12}
-          onSelectionModelChange={(e) => setSelectedRows(e.selectionModel)}
-          components={{
-            Toolbar: GridToolbar,
+          initialState={{ pagination: { paginationModel: { pageSize: 12 } } }}
+          pageSizeOptions={[12]}
+          onRowSelectionModelChange={(ids) => setSelectedRows(ids)}
+          slots={{
+            toolbar: GridToolbar,
           }}
           error={error}
           {...props}

@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Box,
   Button,
@@ -8,21 +10,21 @@ import {
   MenuItem,
   Select,
   TextField,
-} from "@material-ui/core";
-import { useHistory, useParams } from "react-router-dom";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+} from "@mui/material";
+import { useParams, useRouter } from "next/navigation";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getPostById, updatePostById } from "../../../data/postQueryFunctions";
 import { useFormik } from "formik";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { Link as RouterLink } from "react-router-dom";
+import Link from "next/link";
 import * as yup from "yup";
-import ArrowBackIcon from "@material-ui/icons/ArrowBack";
-import ReactQuill from "react-quill";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import dynamic from "next/dynamic";
 import ScreenTitle from "../../../components/ScreenTitle";
-import "react-quill/dist/quill.bubble.css";
-import CreateIcon from "@material-ui/icons/Create";
-import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
+import "react-quill-new/dist/quill.bubble.css";
+import CreateIcon from "@mui/icons-material/Create";
+import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import { getAllCategories } from "../../../data/categoryQueryFunctions";
 import {
   CATEGORY_DATA,
@@ -31,6 +33,8 @@ import {
 } from "../../../definitions/reactQueryConstants/queryConstants";
 import { adminPostEditStyles } from "../../../styles/adminPostStyles";
 import { modules } from "../../../definitions/editorModules";
+
+const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
 const validationSchema = yup.object({
   title: yup.string("Enter post title").required("This field is required"),
@@ -50,39 +54,40 @@ const validationSchema = yup.object({
 
 const EditUserPostScreen = () => {
   const classes = adminPostEditStyles();
-  const history = useHistory();
+  const router = useRouter();
   const queryClient = useQueryClient();
-  const { user } = useSelector((state) => state.userData);
+  const { user, isRehydrated } = useSelector((state) => state.userData);
   const { editPostId } = useParams();
   useEffect(() => {
-    if (user.isAdmin) {
-      history.push("/");
+    if (!isRehydrated) {
+      return;
     }
-  }, [history, user]);
+    if (user.isAdmin) {
+      router.push("/");
+    }
+  }, [isRehydrated, router, user]);
   const {
     isLoading: isUserDataLoading,
     isError: isUserDataError,
     data: userData,
-  } = useQuery([SINGLE_POST_DATA, editPostId], ({ queryKey }) =>
-    getPostById(queryKey[1])
-  );
-  const mutation = useMutation(updatePostById, {
-    onSuccess: () => {
-      queryClient.invalidateQueries(POST_DATA);
-      queryClient.invalidateQueries(SINGLE_POST_DATA);
-      history.push({
-        pathname: "/user/posts/",
-        state: {
-          showCreateSuccessAlert: false,
-          showEditSuccessAlert: true,
-        },
-      });
-    },
+  } = useQuery({
+    queryKey: [SINGLE_POST_DATA, editPostId],
+
+    queryFn: ({ queryKey }) =>
+      getPostById(queryKey[1])
   });
-  const { data, isLoading, isError } = useQuery(
-    CATEGORY_DATA,
-    getAllCategories
-  );
+  const mutation = useMutation({
+    mutationFn: updatePostById,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [POST_DATA] });
+      queryClient.invalidateQueries({ queryKey: [SINGLE_POST_DATA] });
+      router.push("/user/posts?edited=1");
+    }
+  });
+  const { data, isLoading, isError } = useQuery({
+    queryKey: [CATEGORY_DATA],
+    queryFn: getAllCategories
+  });
   const formik = useFormik({
     initialValues: {
       title: "",
@@ -126,8 +131,8 @@ const EditUserPostScreen = () => {
         <Button
           variant="text"
           className={classes.returnLink}
-          component={RouterLink}
-          to="/user/posts"
+          component={Link}
+          href="/user/posts"
           color="primary"
           size="small"
           startIcon={<ArrowBackIcon />}

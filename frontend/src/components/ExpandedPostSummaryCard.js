@@ -1,17 +1,19 @@
-import makeStyles from "@material-ui/styles/makeStyles";
-import Box from "@material-ui/core/Box";
-import Chip from "@material-ui/core/Chip";
-import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
-import Avatar from "@material-ui/core/Avatar";
-import grey from "@material-ui/core/colors/grey";
-import { Link } from "react-router-dom";
+"use client";
+
+import makeStyles from "@mui/styles/makeStyles";
+import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import Avatar from "@mui/material/Avatar";
+import Link from "next/link";
 import { getPostFormattedDate } from "../utils/dateUtils";
+import { grey } from '@mui/material/colors';
 
 const useStyles = makeStyles((theme) => ({
   container: {
     margin: theme.spacing(4, 0),
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('sm')]: {
       flexDirection: "column-reverse",
       marginBottom: theme.spacing(4),
       marginTop: theme.spacing(1),
@@ -24,13 +26,13 @@ const useStyles = makeStyles((theme) => ({
   },
   authorInfoContainer: {
     marginBottom: theme.spacing(2),
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('sm')]: {
       display: "none",
     },
   },
   authorInfoContainerMobile: {
     display: "none",
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('sm')]: {
       display: "flex",
       margin: theme.spacing(1, 0),
     },
@@ -96,7 +98,7 @@ const ExpandedPostSummaryCard = ({
         />
         <Typography
           component={Link}
-          to={`/authors/${authorId}`}
+          href={`/authors/${authorId}`}
           className={classes.authorName}
           variant="body2"
         >
@@ -123,7 +125,7 @@ const ExpandedPostSummaryCard = ({
             />
             <Typography
               component={Link}
-              to={`/authors/${authorId}`}
+              href={`/authors/${authorId}`}
               className={classes.authorName}
               variant="body2"
             >
@@ -133,7 +135,7 @@ const ExpandedPostSummaryCard = ({
           <Box
             className={classes.postTitle}
             component={Link}
-            to={`/posts/${postId}`}
+            href={`/posts/${postId}`}
           >
             <Typography variant="h5" component="h4" gutterBottom>
               {postTitle}
@@ -159,7 +161,7 @@ const ExpandedPostSummaryCard = ({
               <Chip
                 key={index}
                 component={Link}
-                to={`/posts/search/tags/${tag}`}
+                href={`/posts/search/tags/${tag}`}
                 className={classes.tagsChip}
                 size="small"
                 label={tag.toLowerCase()}

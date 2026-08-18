@@ -1,9 +1,5 @@
-import axios from "axios";
+import { api } from "../lib/api";
 import { store } from "../redux/store";
-
-if (process.env.REACT_APP_NODE_ENV === "PRODUCTION") {
-  axios.defaults.baseURL = process.env.REACT_APP_PRODUCTION_API;
-}
 
 export const getCommentsByPostId = async (postId) => {
   try {
@@ -12,7 +8,7 @@ export const getCommentsByPostId = async (postId) => {
         "content-type": "application/json",
       },
     };
-    const { data } = await axios.get(`/api/posts/${postId}/comments`, config);
+    const { data } = await api.get(`/api/posts/${postId}/comments`, config);
     return data;
   } catch (err) {
     throw new Error(`Error while fetching data. Error Message: ${err.message}`);
@@ -26,7 +22,7 @@ export const getCommentByPostIdCommentId = async ({ postId, commentId }) => {
         "content-type": "application/json",
       },
     };
-    const { data } = await axios.get(
+    const { data } = await api.get(
       `/api/posts/${postId}/comments/${commentId}`,
       config
     );
@@ -50,7 +46,7 @@ export const updateCommentByPostIdCommentId = async ({
         Authorization: `Bearer ${user.token}`,
       },
     };
-    const { data } = await axios.put(
+    const { data } = await api.put(
       `/api/posts/${postId}/comments/${commentId}`,
       {
         ...values,
@@ -74,7 +70,7 @@ export const createCommentByPostId = async ({ postId, values }) => {
         Authorization: `Bearer ${user.token}`,
       },
     };
-    const { data } = await axios.post(
+    const { data } = await api.post(
       `/api/posts/${postId}/comments/`,
       {
         ...values,
@@ -97,7 +93,7 @@ export const deleteCommentById = async ({ postId, commentId }) => {
         Authorization: `Bearer ${user.token}`,
       },
     };
-    const { data } = await axios.delete(
+    const { data } = await api.delete(
       `/api/posts/${postId}/comments/${commentId}`,
       config
     );

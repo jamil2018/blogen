@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Box,
   Button,
@@ -8,21 +10,21 @@ import {
   MenuItem,
   Select,
   TextField,
-} from "@material-ui/core";
-import { useHistory } from "react-router-dom";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+} from "@mui/material";
+import { useRouter } from "next/navigation";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createPost } from "../../../data/postQueryFunctions";
 import { useFormik } from "formik";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { Link as RouterLink } from "react-router-dom";
-import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
-import AddBoxIcon from "@material-ui/icons/AddBox";
+import Link from "next/link";
+import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
+import AddBoxIcon from "@mui/icons-material/AddBox";
 import * as yup from "yup";
-import ArrowBackIcon from "@material-ui/icons/ArrowBack";
-import ReactQuill from "react-quill";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import dynamic from "next/dynamic";
 import ScreenTitle from "../../../components/ScreenTitle";
-import "react-quill/dist/quill.bubble.css";
+import "react-quill-new/dist/quill.bubble.css";
 import { getAllCategories } from "../../../data/categoryQueryFunctions";
 import {
   CATEGORY_DATA,
@@ -30,6 +32,8 @@ import {
 } from "../../../definitions/reactQueryConstants/queryConstants";
 import { adminPostCreateStyles } from "../../../styles/adminPostStyles";
 import { modules } from "../../../definitions/editorModules";
+
+const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
 const validationSchema = yup.object({
   title: yup.string("Enter post title").required("This field is required"),
@@ -49,30 +53,28 @@ const validationSchema = yup.object({
 
 const UserCreatePostScreen = () => {
   const classes = adminPostCreateStyles();
-  const history = useHistory();
+  const router = useRouter();
   const queryClient = useQueryClient();
-  const { user } = useSelector((state) => state.userData);
+  const { user, isRehydrated } = useSelector((state) => state.userData);
   useEffect(() => {
-    if (user.isAdmin) {
-      history.push("/");
+    if (!isRehydrated) {
+      return;
     }
-  }, [history, user]);
-  const mutation = useMutation(createPost, {
+    if (user.isAdmin) {
+      router.push("/");
+    }
+  }, [isRehydrated, router, user]);
+  const mutation = useMutation({
+    mutationFn: createPost,
     onSuccess: () => {
-      queryClient.invalidateQueries(POST_DATA);
-      history.push({
-        pathname: "/user/posts/",
-        state: {
-          showCreateSuccessAlert: true,
-          showEditSuccessAlert: false,
-        },
-      });
-    },
+      queryClient.invalidateQueries({ queryKey: [POST_DATA] });
+      router.push("/user/posts?created=1");
+    }
   });
-  const { data, isLoading, isError } = useQuery(
-    CATEGORY_DATA,
-    getAllCategories
-  );
+  const { data, isLoading, isError } = useQuery({
+    queryKey: [CATEGORY_DATA],
+    queryFn: getAllCategories
+  });
   const formik = useFormik({
     initialValues: {
       title: "",
@@ -104,8 +106,8 @@ const UserCreatePostScreen = () => {
         <Button
           variant="text"
           className={classes.returnLink}
-          component={RouterLink}
-          to="/user/posts"
+          component={Link}
+          href="/user/posts"
           color="primary"
           size="small"
           startIcon={<ArrowBackIcon />}

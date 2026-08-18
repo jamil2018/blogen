@@ -4,11 +4,11 @@ import {
   CircularProgress,
   Grid,
   TextField,
-} from "@material-ui/core";
+} from "@mui/material";
 import { useFormik } from "formik";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as yup from "yup";
-import CreateIcon from "@material-ui/icons/Create";
+import CreateIcon from "@mui/icons-material/Create";
 import {
   getCategoryById,
   updateCategoryById,
@@ -30,16 +30,17 @@ const EditCategoryScreen = ({
 }) => {
   const classes = adminCategoryEditStyles();
   const queryClient = useQueryClient();
-  const { isLoading, isError, data } = useQuery(
-    [SINGLE_CATEGORY_DATA, categoryId],
-    ({ queryKey }) => getCategoryById(queryKey[1])
-  );
+  const { isLoading, isError, data } = useQuery({
+    queryKey: [SINGLE_CATEGORY_DATA, categoryId],
+    queryFn: ({ queryKey }) => getCategoryById(queryKey[1])
+  });
 
-  const mutation = useMutation(updateCategoryById, {
+  const mutation = useMutation({
+    mutationFn: updateCategoryById,
     onSuccess: () => {
-      queryClient.invalidateQueries(CATEGORY_DATA);
+      queryClient.invalidateQueries({ queryKey: [CATEGORY_DATA] });
       showSuccessAlertHandler();
-    },
+    }
   });
   const formik = useFormik({
     initialValues: {

@@ -1,39 +1,49 @@
+"use client";
+
 import {
   Grid,
   Typography,
   IconButton,
   ButtonGroup,
   Box,
-} from "@material-ui/core";
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link, useHistory, useLocation } from "react-router-dom";
+import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import dynamic from "next/dynamic";
 import ScreenTitle from "../../../components/ScreenTitle";
-import CreateIcon from "@material-ui/icons/Add";
-import EditIcon from "@material-ui/icons/Edit";
-import DeleteIcon from "@material-ui/icons/Delete";
-import { useQuery } from "react-query";
+import CreateIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { useQuery } from "@tanstack/react-query";
 import columns from "../../../definitions/gridColDef/postGrids";
 import { POST_DATA } from "../../../definitions/reactQueryConstants/queryConstants";
 import { getAllPosts } from "../../../data/postQueryFunctions";
-import { DataGrid, GridToolbar } from "@material-ui/data-grid";
+import { GridToolbar } from "@mui/x-data-grid";
 import DeletePostScreen from "./DeletePostScreen";
 import AdminModal from "../../../components/AdminModal";
-import ErrorIcon from "@material-ui/icons/Error";
+import ErrorIcon from "@mui/icons-material/Error";
 import AlertNotification from "../../../components/AlertNotification";
 import { adminPostHomeStyles } from "../../../styles/adminPostStyles";
 
+const DataGrid = dynamic(
+  () => import("@mui/x-data-grid").then((mod) => mod.DataGrid),
+  { ssr: false }
+);
+
 const AdminPosts = () => {
   let rows = [];
-  const location = useLocation();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const classes = adminPostHomeStyles();
-  const history = useHistory();
-  const { user } = useSelector((state) => state.userData);
-  const { data, isLoading, isFetching, isError, error } = useQuery(
-    POST_DATA,
-    getAllPosts,
-    { refetchOnWindowFocus: false, refetchInterval: 10 * 60 * 1000 }
-  );
+  const router = useRouter();
+  const { user, isRehydrated } = useSelector((state) => state.userData);
+  const { data, isLoading, isFetching, isError, error } = useQuery({
+    queryKey: [POST_DATA],
+    queryFn: getAllPosts,
+    refetchOnWindowFocus: false, refetchInterval: 10 * 60 * 1000
+  });
   // states
   const [selectedRows, setSelectedRows] = useState([]);
   const [editDisabled, setEditDisabled] = useState(true);
@@ -45,20 +55,26 @@ const AdminPosts = () => {
 
   // effects
   useEffect(() => {
-    if (location.state) {
-      if (location.state.showCreateSuccessAlert) {
-        setShowCreateSuccessAlert(true);
-      }
-      if (location.state.showEditSuccessAlert) {
-        setShowEditSuccessAlert(true);
-      }
+    const created = searchParams.get("created") === "1";
+    const edited = searchParams.get("edited") === "1";
+    if (created) {
+      setShowCreateSuccessAlert(true);
     }
-  }, [location]);
+    if (edited) {
+      setShowEditSuccessAlert(true);
+    }
+    if (created || edited) {
+      router.replace(pathname);
+    }
+  }, [pathname, router, searchParams]);
   useEffect(() => {
-    if (!user.isAdmin) {
-      history.push("/");
+    if (!isRehydrated) {
+      return;
     }
-  }, [history, user]);
+    if (!user.isAdmin) {
+      router.push("/");
+    }
+  }, [isRehydrated, router, user]);
   useEffect(() => {
     if (selectedRows.length > 0) {
       setEditDisabled(false);
@@ -144,23 +160,23 @@ const AdminPosts = () => {
           <IconButton
             aria-label="create"
             component={Link}
-            to="/admin/posts/create"
-          >
+            href="/admin/posts/create"
+            size="large">
             <CreateIcon fontSize="small" />
           </IconButton>
           <IconButton
             disabled={editDisabled}
             aria-label="edit"
             component={Link}
-            to={`/admin/posts/edit/${selectedRows[0]}`}
-          >
+            href={`/admin/posts/edit/${selectedRows[0]}`}
+            size="large">
             <EditIcon fontSize="small" />
           </IconButton>
           <IconButton
             aria-label="delete"
             disabled={deleteDisabled}
             onClick={() => handleModalOpen("DELETE")}
-          >
+            size="large">
             <DeleteIcon fontSize="small" />
           </IconButton>
         </ButtonGroup>
@@ -171,10 +187,11 @@ const AdminPosts = () => {
           checkboxSelection
           columns={columns}
           rows={rows}
-          pageSize={12}
-          onSelectionModelChange={(e) => setSelectedRows(e.selectionModel)}
-          components={{
-            Toolbar: GridToolbar,
+          initialState={{ pagination: { paginationModel: { pageSize: 12 } } }}
+          pageSizeOptions={[12]}
+          onRowSelectionModelChange={(ids) => setSelectedRows(ids)}
+          slots={{
+            toolbar: GridToolbar,
           }}
           error={error}
         />

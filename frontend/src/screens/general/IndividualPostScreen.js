@@ -1,16 +1,13 @@
-import {
-  Avatar,
-  Container,
-  Divider,
-  Grid,
-  IconButton,
-  makeStyles,
-  Typography,
-} from "@material-ui/core";
-import { grey } from "@material-ui/core/colors";
+"use client";
+
+import { Avatar, Container, Divider, Grid, IconButton, Typography } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import { grey } from "@mui/material/colors";
 import { useEffect, useState } from "react";
-import { useQuery } from "react-query";
-import { Link, useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import dynamic from "next/dynamic";
 import PostCommentDeck from "../../components/PostCommentDeck";
 import PostTagDeck from "../../components/PostTagDeck";
 import { getPostById } from "../../data/postQueryFunctions";
@@ -27,28 +24,28 @@ import {
 } from "../../utils/dataFormat";
 import { getPostFormattedDate } from "../../utils/dateUtils";
 import { getBase64ImageURL } from "../../utils/imageConvertion";
-import ReactQuill from "react-quill";
-import CreateIcon from "@material-ui/icons/Create";
+import CreateIcon from "@mui/icons-material/Create";
 import DeleteCommentScreen from "./DeleteCommentScreen";
 import AdminModal from "../../components/AdminModal";
-import ErrorIcon from "@material-ui/icons/Error";
+import ErrorIcon from "@mui/icons-material/Error";
 import EditCommentScreen from "./EditCommentScreen";
-import MailIcon from "@material-ui/icons/Mail";
-import LinkedInIcon from "@material-ui/icons/LinkedIn";
-import FacebookIcon from "@material-ui/icons/Facebook";
-import TwitterIcon from "@material-ui/icons/Twitter";
+import MailIcon from "@mui/icons-material/Mail";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import TwitterIcon from "@mui/icons-material/Twitter";
 import { getUserById } from "../../data/userQueryFunctions";
 import IndividualPostLoader from "../../components/IndividualPostLoader";
 import PostCommentLoader from "../../components/PostCommentLoader";
 import { getCommentsByPostId } from "../../data/commentQueryFunctions";
-import { modules } from "../../definitions/editorModules";
+
+const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
 const useStyles = makeStyles((theme) => ({
   container: {
     marginTop: theme.spacing(8),
   },
   postTitle: {
-    [theme.breakpoints.down("sm")]: {
+    [theme.breakpoints.down('md')]: {
       fontSize: theme.typography.h3.fontSize,
     },
   },
@@ -79,7 +76,7 @@ const useStyles = makeStyles((theme) => ({
   },
   socialLinks: {
     marginTop: theme.spacing(2),
-    [theme.breakpoints.down("sm")]: {
+    [theme.breakpoints.down('md')]: {
       display: "none",
     },
   },
@@ -107,41 +104,60 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const IndividualPostScreen = () => {
+const IndividualPostScreen = (props) => {
+  const { postId: postIdProp, post, author } = props || {};
   const [showDeleteCommentModal, setShowDeleteCommentModal] = useState(false);
   const [showEditCommentModal, setShowEditCommentModal] = useState(false);
   const [modificationCommentId, setModificationCommentId] = useState(null);
+  const [modules, setModules] = useState(null);
 
-  const { postId } = useParams();
+  const params = useParams();
+  const postId = postIdProp ?? params?.postId;
   const classes = useStyles();
-  const { isLoading, data } = useQuery(
-    [SINGLE_POST_DATA, postId],
-    ({ queryKey }) => getPostById(queryKey[1]),
-    {
-      refetchOnWindowFocus: false,
-    }
-  );
+  const hasPost = post !== undefined;
+  const { isLoading: queriedIsLoading, data: queriedPost } = useQuery({
+    queryKey: [SINGLE_POST_DATA, postId],
+    queryFn: ({ queryKey }) => getPostById(queryKey[1]),
+    enabled: !hasPost && Boolean(postId),
+    refetchOnWindowFocus: false,
+  });
+  const data = hasPost ? post : queriedPost;
+  const isLoading = hasPost ? false : queriedIsLoading;
   const {
     isLoading: isPostCommentLoading,
     data: postCommentData,
     isFetching: isPostCommentFetching,
-  } = useQuery(
-    [COMMENT_DATA, postId],
-    ({ queryKey }) => getCommentsByPostId(queryKey[1]),
-    {
-      refetchOnWindowFocus: false,
-      refetchInterval: 5 * 60 * 1000,
-    }
-  );
+  } = useQuery({
+    queryKey: [COMMENT_DATA, postId],
+    queryFn: ({ queryKey }) => getCommentsByPostId(queryKey[1]),
+    enabled: Boolean(postId),
+    refetchOnWindowFocus: false,
+    refetchInterval: 5 * 60 * 1000,
+  });
+  const hasAuthor = author !== undefined;
   const authorId = data?.author._id;
-  const { isLoading: isAuthorDataLoading, data: authorData } = useQuery(
-    [SINGLE_AUTHOR_DATA, authorId],
-    ({ queryKey }) => getUserById(queryKey[1]),
-    { enabled: !!authorId, refetchOnWindowFocus: false }
-  );
+  const { isLoading: queriedAuthorDataLoading, data: queriedAuthorData } = useQuery({
+    queryKey: [SINGLE_AUTHOR_DATA, authorId],
+    queryFn: ({ queryKey }) => getUserById(queryKey[1]),
+    enabled: !hasAuthor && !!authorId,
+    refetchOnWindowFocus: false,
+  });
+  const authorData = hasAuthor ? author : queriedAuthorData;
+  const isAuthorDataLoading = hasAuthor ? false : queriedAuthorDataLoading;
   // effects
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, []);
+  useEffect(() => {
+    let cancelled = false;
+    import("../../definitions/editorModules").then((mod) => {
+      if (!cancelled) {
+        setModules(mod.modules);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // action handlers
@@ -197,7 +213,7 @@ const IndividualPostScreen = () => {
                     variant="subtitle2"
                     className={classes.authorName}
                     component={Link}
-                    to={`/authors/${data.author._id}`}
+                    href={`/authors/${data.author._id}`}
                   >
                     {data.author.name}
                   </Typography>
@@ -218,14 +234,12 @@ const IndividualPostScreen = () => {
               >
                 <IconButton
                   aria-label="email author"
-                  to="#"
                   onClick={(e) => {
                     e.preventDefault();
                     window.open(`mailto:${authorData.email}`);
                   }}
-                  component={Link}
                   color="primary"
-                >
+                  size="large">
                   <MailIcon />
                 </IconButton>
                 <IconButton
@@ -234,7 +248,7 @@ const IndividualPostScreen = () => {
                   component="a"
                   target="_blank"
                   color="primary"
-                >
+                  size="large">
                   <FacebookIcon />
                 </IconButton>
                 <IconButton
@@ -243,7 +257,7 @@ const IndividualPostScreen = () => {
                   component="a"
                   target="_blank"
                   color="primary"
-                >
+                  size="large">
                   <TwitterIcon />
                 </IconButton>
                 <IconButton
@@ -253,23 +267,30 @@ const IndividualPostScreen = () => {
                   target="_blank"
                   color="primary"
                   edge="end"
-                >
+                  size="large">
                   <LinkedInIcon />
                 </IconButton>
               </Grid>
             </Grid>
           </Grid>
           <img className={classes.postImg} src={data.imageURL} alt="post" />
-          <ReactQuill
-            theme="bubble"
-            value={data.description}
-            id="description"
-            placeholder="Description"
-            className={classes.postContent}
-            name="description"
-            modules={modules}
-            readOnly
-          />
+          {modules ? (
+            <ReactQuill
+              theme="bubble"
+              value={data.description}
+              id="description"
+              placeholder="Description"
+              className={classes.postContent}
+              name="description"
+              modules={modules}
+              readOnly
+            />
+          ) : (
+            <div
+              className={classes.postContent}
+              dangerouslySetInnerHTML={{ __html: data.description }}
+            />
+          )}
           <PostTagDeck tags={data.tags} />
           <Divider />
           <Typography
