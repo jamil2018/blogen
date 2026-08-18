@@ -1,9 +1,11 @@
-import AdminLayout from "../../layout/AdminLayout";
+"use client";
 
-export default function AdminSectionLayout({
+import AppSidebar from "../../components/layout/AppSidebar";
+
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <AdminLayout>{children}</AdminLayout>;
+  return <AppSidebar variant="admin">{children}</AppSidebar>;
 }

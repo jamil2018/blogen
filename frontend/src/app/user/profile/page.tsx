@@ -1,5 +1,5 @@
-import UserProfile from "../../../screens/user/profile/UserProfile";
+import ProfileView from "../../../components/studio/ProfileView";
 
 export default function UserProfilePage() {
-  return <UserProfile />;
+  return <ProfileView />;
 }

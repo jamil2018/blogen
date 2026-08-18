@@ -1,10 +1,22 @@
-import EditPostScreen from "../../../../../screens/admin/posts/EditPostScreen";
+"use client";
 
-type EditPostPageProps = {
+import { use } from "react";
+import { useRouter } from "next/navigation";
+import PostForm from "../../../../../components/studio/PostForm";
+
+type EditPageProps = {
   params: Promise<{ editPostId: string }>;
 };
 
-export default async function EditPostPage({ params }: EditPostPageProps) {
-  const { editPostId } = await params;
-  return <EditPostScreen key={editPostId} />;
+export default function AdminEditPostPage({ params }: EditPageProps) {
+  const { editPostId } = use(params);
+  const router = useRouter();
+  return (
+    <PostForm
+      mode="edit"
+      postId={editPostId}
+      redirectPath="/admin/posts"
+      onSuccess={() => router.push("/admin/posts?edited=1")}
+    />
+  );
 }

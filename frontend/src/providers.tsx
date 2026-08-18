@@ -4,18 +4,12 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Provider, useDispatch } from "react-redux";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import {
-  CssBaseline,
-  StyledEngineProvider,
-  ThemeProvider,
-} from "@mui/material";
 import { Toast } from "@heroui/react";
 import { store } from "./redux/store";
 import {
   hydrateUserData,
   USER_STORAGE_KEY,
 } from "./redux/slices/userDataSlice";
-import theme from "./theme/theme";
 
 function AuthHydrator() {
   const dispatch = useDispatch();
@@ -39,15 +33,13 @@ export default function Providers({ children }: { children: ReactNode }) {
   return (
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
-        <StyledEngineProvider injectFirst>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <AuthHydrator />
-            {children}
-            <Toast.Provider placement="bottom end" />
-          </ThemeProvider>
-        </StyledEngineProvider>
-        <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-right" />
+        <AuthHydrator />
+        {children}
+        <Toast.Provider placement="bottom end" />
+        <ReactQueryDevtools
+          initialIsOpen={false}
+          buttonPosition="bottom-right"
+        />
       </QueryClientProvider>
     </Provider>
   );

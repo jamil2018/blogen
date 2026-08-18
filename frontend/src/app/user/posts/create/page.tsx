@@ -1,5 +1,15 @@
-import UserCreatePostScreen from "../../../../screens/user/posts/UserCreatePostScreen";
+"use client";
+
+import { useRouter } from "next/navigation";
+import PostForm from "../../../../components/studio/PostForm";
 
 export default function UserCreatePostPage() {
-  return <UserCreatePostScreen />;
+  const router = useRouter();
+  return (
+    <PostForm
+      mode="create"
+      redirectPath="/user/posts"
+      onSuccess={() => router.push("/user/posts?created=1")}
+    />
+  );
 }
