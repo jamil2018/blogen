@@ -1,8 +1,7 @@
-import AuthorListScreen from "../../../screens/general/AuthorListScreen";
+import AuthorListView from "../../../components/pages/AuthorListView";
 import { fetchAllUsers } from "../../../lib/api";
 
 export default async function AuthorsPage() {
   const authors = await fetchAllUsers();
-
-  return <AuthorListScreen authors={authors} />;
+  return <AuthorListView authors={authors} />;
 }

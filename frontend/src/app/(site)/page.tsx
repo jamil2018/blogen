@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import HomeScreen from "../../screens/general/HomeScreen";
+import HomePageView from "../../components/pages/HomePageView";
 import {
   fetchAllCategories,
   fetchLatestPosts,
@@ -22,7 +22,7 @@ export default async function HomePage() {
   ]);
 
   return (
-    <HomeScreen
+    <HomePageView
       latestPosts={latestPosts}
       paginatedPosts={paginatedPosts}
       categories={categories}

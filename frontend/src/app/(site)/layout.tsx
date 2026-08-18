@@ -1,4 +1,4 @@
-import GeneralLayout from "../../layout/GeneralLayout";
+import SiteShell from "../../components/layout/SiteShell";
 
 export const dynamic = "force-dynamic";
 
@@ -7,5 +7,5 @@ export default function SiteLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <GeneralLayout>{children}</GeneralLayout>;
+  return <SiteShell>{children}</SiteShell>;
 }
