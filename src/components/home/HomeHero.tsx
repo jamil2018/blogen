@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@heroui/react";
@@ -24,6 +25,9 @@ function revealTransition(index: number) {
 
 export default function HomeHero({ post, className }: HomeHeroProps) {
   const prefersReducedMotion = useReducedMotion();
+  const [heroImageFailed, setHeroImageFailed] = useState(false);
+  const heroImageSrc = post?.imageURL;
+  const showHeroImage = Boolean(heroImageSrc) && !heroImageFailed;
 
   const categoryName = post
     ? typeof post.category === "string"
@@ -35,15 +39,16 @@ export default function HomeHero({ post, className }: HomeHeroProps) {
     <section
       className={cn("full-bleed relative min-h-[85dvh] overflow-hidden", className)}
     >
-      {post?.imageURL ? (
+      {showHeroImage ? (
         prefersReducedMotion ? (
           <Image
-            src={post.imageURL}
+            src={heroImageSrc!}
             alt=""
             fill
             priority
             sizes="100vw"
             className="object-cover"
+            onError={() => setHeroImageFailed(true)}
           />
         ) : (
           <motion.div
@@ -53,12 +58,13 @@ export default function HomeHero({ post, className }: HomeHeroProps) {
             transition={{ duration: 8, ease: revealEase }}
           >
             <Image
-              src={post.imageURL}
+              src={heroImageSrc!}
               alt=""
               fill
               priority
               sizes="100vw"
               className="object-cover"
+              onError={() => setHeroImageFailed(true)}
             />
           </motion.div>
         )

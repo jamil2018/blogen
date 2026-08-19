@@ -230,7 +230,7 @@ seed as (
         'Type-safe server actions without the ceremony',
         $html$<p>We did not add a separate API package. Mutations are Server Actions next to the pages that call them, with a thin <code>src/lib/db</code> layer so queries are not copy-pasted into every form.</p><h2>What we refused</h2><p>No extra RPC surface “for later.” No generated client that duplicates types we already have in <code>database.types.ts</code>. The form posts, the action checks the session, Postgres enforces the rest.</p><p>The ceremony that is worth it: mapping rows into the existing frontend types so cards and studio tables did not have to learn snake_case.</p>$html$,
         'Blogen’s mutations are Server Actions, not a second API. A small db helper, generated Database types, and a mapper back to the shapes the UI already expected.',
-        'https://images.unsplash.com/photo-1516116218424-4d5baa4b0b8f?auto=format&fit=crop&w=1600&q=80',
+        'https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=1600&q=80',
         'Technology',
         array['typescript', 'nextjs', 'server-actions'],
         now() - interval '1 day',
