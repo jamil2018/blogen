@@ -1,29 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import {
-  EnvelopeSimple,
-  FacebookLogo,
-  LinkedinLogo,
-  TwitterLogo,
-  PencilSimple,
-  Trash,
-} from "@phosphor-icons/react";
+import { Clock } from "@phosphor-icons/react";
 import {
   Avatar,
-  Button,
+  Chip,
   Modal,
   Separator,
 } from "@heroui/react";
 import PostProse from "../post/PostProse";
 import PostTags from "../post/PostTags";
 import CommentThread from "../post/CommentThread";
+import PostCard from "../post/PostCard";
+import AuthorBioCard from "../post/AuthorBioCard";
+import ReadingProgressBar from "../layout/ReadingProgressBar";
+import ShareBar from "../layout/ShareBar";
+import Reveal from "../motion/Reveal";
 import ErrorState from "../feedback/ErrorState";
 import { PostDetailSkeleton } from "../feedback/PageSkeleton";
-import { getPostById } from "../../data/postQueryFunctions";
+import { getPostById, getAllPostsByAuthorId } from "../../data/postQueryFunctions";
 import { getUserById } from "../../data/userQueryFunctions";
 import { getCommentsByPostId } from "../../data/commentQueryFunctions";
 import {
@@ -94,6 +92,21 @@ export default function PostDetailView({
     refetchInterval: 5 * 60 * 1000,
   });
 
+  const { data: authorPosts } = useQuery({
+    queryKey: ["author-posts", authorId],
+    queryFn: () => getAllPostsByAuthorId(authorId as string),
+    enabled: Boolean(authorId),
+    refetchOnWindowFocus: false,
+  });
+
+  const relatedPosts = useMemo(
+    () =>
+      authorPosts
+        ?.filter((p) => p.id !== postId)
+        .slice(0, 2) ?? [],
+    [authorPosts, postId]
+  );
+
   if (postLoading || authorLoading) {
     return <PostDetailSkeleton />;
   }
@@ -107,111 +120,124 @@ export default function PostDetailView({
   const initials = getAuthorNameInitials(authorObj.name ?? "")
     .filter(Boolean)
     .join("");
+  const categoryName =
+    typeof data.category === "string"
+      ? data.category
+      : data.category?.title;
+  const categoryHref = categoryName
+    ? `/posts/search/categories/${encodeURIComponent(categoryName)}`
+    : undefined;
+  const readingTime = calculateReadingTime(convertToText(data.description));
 
   return (
-    <article className="mx-auto max-w-3xl">
-      <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-        {data.title}
-      </h1>
-
-      <div className="mt-4 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <Avatar size="sm">
-            {authorData.imageURL ? (
-              <Avatar.Image src={authorData.imageURL} alt={authorData.name} />
-            ) : (
-              <Avatar.Fallback>{initials}</Avatar.Fallback>
-            )}
-          </Avatar>
-          <div>
-            <Link
-              href={`/authors/${authorObj.id}`}
-              className="text-sm font-medium text-teal-700 dark:text-teal-400"
-            >
-              {authorObj.name}
-            </Link>
-            <p className="text-xs text-muted">
-              {data.createdAt
-                ? getPostFormattedDate(data.createdAt)
-                : null}{" "}
-              · {calculateReadingTime(convertToText(data.description))} min read
-            </p>
-          </div>
-        </div>
-        <div className="hidden items-center gap-1 sm:flex">
-          <Button
-            isIconOnly
-            variant="ghost"
-            size="sm"
-            aria-label="Email author"
-            onPress={() => window.open(`mailto:${authorData.email}`)}
-          >
-            <EnvelopeSimple className="size-4" />
-          </Button>
-          {authorData.facebookId ? (
-            <a
-              href={`https://www.facebook.com/${authorData.facebookId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex"
-            >
-              <Button isIconOnly variant="ghost" size="sm" aria-label="Facebook">
-                <FacebookLogo className="size-4" />
-              </Button>
-            </a>
-          ) : null}
-          {authorData.twitterId ? (
-            <a
-              href={`https://twitter.com/${authorData.twitterId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex"
-            >
-              <Button isIconOnly variant="ghost" size="sm" aria-label="Twitter">
-                <TwitterLogo className="size-4" />
-              </Button>
-            </a>
-          ) : null}
-          {authorData.linkedinId ? (
-            <a
-              href={`https://www.linkedin.com/in/${authorData.linkedinId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex"
-            >
-              <Button isIconOnly variant="ghost" size="sm" aria-label="LinkedIn">
-                <LinkedinLogo className="size-4" />
-              </Button>
-            </a>
-          ) : null}
-        </div>
-      </div>
-
-      {data.imageURL ? (
-        <img
-          src={data.imageURL}
-          alt={data.title}
-          className="mt-8 w-full rounded-xl object-cover"
-        />
-      ) : null}
-
-      <PostProse html={data.description} className="mt-8" />
-
-      <PostTags tags={data.tags} className="mt-8" />
-
-      <Separator className="my-8" />
-
-      <h2 className="mb-4 text-lg font-medium">
-        See what others say about this post
-      </h2>
-
-      <CommentThread
+    <>
+      <ReadingProgressBar targetId="article-content" />
+      <ShareBar
+        key={postId}
         postId={postId}
-        comments={comments}
-        isLoading={commentsLoading || commentsFetching}
-        onDelete={(id) => setDeleteCommentId(id)}
-        onEdit={(id) => setEditCommentId(id)}
+        title={data.title}
+        commentCount={comments?.length ?? 0}
       />
+
+      <article className="relative mx-auto max-w-3xl">
+        <Reveal>
+          <header className="space-y-5">
+            {categoryName && categoryHref ? (
+              <Link href={categoryHref}>
+                <Chip
+                  variant="soft"
+                  className="rounded-full border border-border bg-zinc-100 capitalize dark:bg-zinc-800"
+                >
+                  {categoryName}
+                </Chip>
+              </Link>
+            ) : null}
+
+            <h1 className="text-3xl font-semibold tracking-tighter text-ink sm:text-4xl md:text-5xl">
+              {data.title}
+            </h1>
+
+            <div className="flex flex-wrap items-center gap-4">
+              <Link
+                href={`/authors/${authorObj.id}`}
+                className="flex items-center gap-3 transition-opacity hover:opacity-80"
+              >
+                <Avatar size="sm">
+                  {authorData.imageURL ? (
+                    <Avatar.Image src={authorData.imageURL} alt={authorData.name} />
+                  ) : (
+                    <Avatar.Fallback>{initials}</Avatar.Fallback>
+                  )}
+                </Avatar>
+                <span className="text-sm font-medium text-ink">{authorObj.name}</span>
+              </Link>
+              <span className="text-muted">·</span>
+              {data.createdAt ? (
+                <time className="text-sm text-muted" dateTime={data.createdAt}>
+                  {getPostFormattedDate(data.createdAt)}
+                </time>
+              ) : null}
+              <span className="inline-flex items-center gap-1 rounded-full border border-border px-2.5 py-0.5 text-xs text-muted">
+                <Clock className="size-3.5" aria-hidden />
+                {readingTime} min read
+              </span>
+            </div>
+          </header>
+        </Reveal>
+
+        {data.imageURL ? (
+          <Reveal delay={0.06}>
+            <div className="mt-8 overflow-hidden rounded-2xl">
+              <img
+                src={data.imageURL}
+                alt={data.title}
+                className="aspect-[16/9] w-full object-cover"
+              />
+            </div>
+          </Reveal>
+        ) : null}
+
+        <div id="article-content">
+          <PostProse html={data.description} className="mt-8" />
+        </div>
+
+        <PostTags tags={data.tags} className="mt-8" />
+
+        <Separator className="my-10" />
+
+        <Reveal>
+          <h2 className="mb-6 text-xl font-semibold tracking-tight text-ink">
+            Discussion
+          </h2>
+        </Reveal>
+
+        <CommentThread
+          postId={postId}
+          comments={comments}
+          isLoading={commentsLoading || commentsFetching}
+          onDelete={(id) => setDeleteCommentId(id)}
+          onEdit={(id) => setEditCommentId(id)}
+        />
+
+        <Separator className="my-10" />
+
+        <Reveal>
+          <AuthorBioCard author={authorData} />
+        </Reveal>
+
+        {relatedPosts.length > 0 ? (
+          <Reveal delay={0.06} className="mt-10">
+            <h2 className="mb-4 text-lg font-semibold tracking-tight text-ink">
+              More from {authorObj.name}
+            </h2>
+            <div className="grid gap-6 sm:grid-cols-2">
+              {relatedPosts.map((relatedPost) => (
+                <PostCard key={relatedPost.id} post={relatedPost} variant="featured" />
+              ))}
+            </div>
+          </Reveal>
+        ) : null}
+      </article>
 
       <Modal
         isOpen={Boolean(deleteCommentId)}
@@ -260,6 +286,6 @@ export default function PostDetailView({
           </Modal.Container>
         </Modal.Backdrop>
       </Modal>
-    </article>
+    </>
   );
 }
