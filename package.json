@@ -1,17 +1,75 @@
 {
-  "name": "blogen",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "start-backend": "npm run dev --prefix ./backend",
-    "start-frontend": "npm run dev --prefix ./frontend",
-    "dev": "concurrently \"npm run start-backend\" \"npm run start-frontend\""
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=20.9.0"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "dependencies": {
+    "@heroui/react": "^3.2.4",
+    "@heroui/styles": "^3.2.4",
+    "@phosphor-icons/react": "^2.1.10",
+    "@react-aria/ssr": "^3.10.1",
+    "@react-aria/utils": "^3.34.1",
+    "@reduxjs/toolkit": "^2.12.0",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@tailwindcss/typography": "^0.5.20",
+    "@tanstack/react-query": "^5.101.4",
+    "@tanstack/react-query-devtools": "^5.101.4",
+    "@tiptap/extension-highlight": "^3.30.1",
+    "@tiptap/extension-image": "^3.30.1",
+    "@tiptap/extension-link": "^3.30.1",
+    "@tiptap/extension-placeholder": "^3.30.1",
+    "@tiptap/extension-text-align": "^3.30.1",
+    "@tiptap/extension-underline": "^3.30.1",
+    "@tiptap/pm": "^3.30.1",
+    "@tiptap/react": "^3.30.1",
+    "@tiptap/starter-kit": "^3.30.1",
+    "axios": "^1.19.0",
+    "base-64": "^1.0.0",
+    "clsx": "^2.1.1",
+    "firebase": "^12.17.1",
+    "formik": "^2.2.9",
+    "geist": "^1.7.2",
+    "highlight.js": "^11.5.0",
+    "html2plaintext": "^2.1.4",
+    "lodash": "^4.17.21",
+    "next": "^16.3.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-redux": "^9.3.0",
+    "recharts": "^2.1.8",
+    "sanitize-html": "^2.17.7",
+    "tailwind-merge": "^3.6.0",
+    "tailwindcss": "^4.3.3",
+    "uuid": "^8.3.2",
+    "yup": "^0.32.9"
+  },
   "devDependencies": {
-    "concurrently": "^6.1.0"
+    "@types/node": "^20.17.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@types/sanitize-html": "^2.16.1",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^16.3.1",
+    "typescript": "^5.8.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint ."
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
