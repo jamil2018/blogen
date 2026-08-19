@@ -50,3 +50,64 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Auth page layout */
+.auth-panel-editorial {
+  background:
+    radial-gradient(
+      ellipse 80% 60% at 15% 15%,
+      oklch(0.95 0.03 175 / 0.45),
+      transparent 70%
+    ),
+    var(--color-paper);
+}
+
+.dark .auth-panel-editorial {
+  background:
+    radial-gradient(
+      ellipse 80% 60% at 15% 15%,
+      oklch(0.28 0.04 175 / 0.4),
+      transparent 70%
+    ),
+    var(--color-paper);
+}
+
+.auth-panel-texture {
+  opacity: 0.35;
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    oklch(0.55 0.016 286 / 0.14) 1px,
+    transparent 0
+  );
+  background-size: 22px 22px;
+}
+
+.dark .auth-panel-texture {
+  opacity: 0.2;
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    oklch(0.65 0.016 286 / 0.1) 1px,
+    transparent 0
+  );
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes auth-enter {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .auth-enter {
+    animation: auth-enter 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .auth-editorial-copy {
+    animation: auth-enter 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
