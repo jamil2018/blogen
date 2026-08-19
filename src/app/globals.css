@@ -91,6 +91,32 @@
   );
 }
 
+/* Full-bleed breakout from max-w shell */
+.full-bleed {
+  position: relative;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+}
+
+/* Hero scrims over photography */
+.hero-scrim-top {
+  background: linear-gradient(
+    to bottom,
+    oklch(0 0 0 / 0.45) 0%,
+    oklch(0 0 0 / 0) 100%
+  );
+}
+
+.hero-scrim-bottom {
+  background: linear-gradient(
+    to top,
+    oklch(0 0 0 / 0.8) 0%,
+    oklch(0 0 0 / 0.3) 55%,
+    oklch(0 0 0 / 0) 100%
+  );
+}
+
 @media (prefers-reduced-motion: no-preference) {
   @keyframes auth-enter {
     from {
