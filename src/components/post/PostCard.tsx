@@ -6,7 +6,7 @@ import { getPostFormattedDate } from "../../utils/dateUtils";
 
 type PostCardProps = {
   post: Post;
-  variant?: "compact" | "featured";
+  variant?: "compact" | "featured" | "lead";
   className?: string;
 };
 
@@ -20,6 +20,45 @@ export default function PostCard({
       ? post.category
       : post.category?.title;
 
+  if (variant === "lead") {
+    return (
+      <Link
+        href={`/posts/${post.id}`}
+        className={cn(
+          "group block lg:col-span-2 lg:row-span-2",
+          className
+        )}
+      >
+        <Card className="h-full overflow-hidden transition-shadow hover:shadow-md">
+          {post.imageURL ? (
+            <div className="aspect-[16/9] overflow-hidden">
+              <img
+                src={post.imageURL}
+                alt={post.title}
+                className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+              />
+            </div>
+          ) : (
+            <div className="aspect-[16/9] bg-zinc-100 dark:bg-zinc-800" />
+          )}
+          <Card.Header>
+            {categoryName ? (
+              <span className="text-xs font-medium uppercase tracking-wide text-teal-700 dark:text-teal-400">
+                {categoryName}
+              </span>
+            ) : null}
+            <Card.Title className="line-clamp-2 text-2xl transition-colors group-hover:text-accent">
+              {post.title}
+            </Card.Title>
+            <Card.Description className="line-clamp-3">
+              {post.summary}
+            </Card.Description>
+          </Card.Header>
+        </Card>
+      </Link>
+    );
+  }
+
   if (variant === "featured") {
     return (
       <Link href={`/posts/${post.id}`} className={cn("block group", className)}>
@@ -29,7 +68,7 @@ export default function PostCard({
               <img
                 src={post.imageURL}
                 alt={post.title}
-                className="size-full object-cover transition-transform group-hover:scale-[1.02]"
+                className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
               />
             </div>
           ) : (
@@ -41,7 +80,9 @@ export default function PostCard({
                 {categoryName}
               </span>
             ) : null}
-            <Card.Title className="line-clamp-2">{post.title}</Card.Title>
+            <Card.Title className="line-clamp-2 transition-colors group-hover:text-accent">
+              {post.title}
+            </Card.Title>
             <Card.Description className="line-clamp-2">
               {post.summary}
             </Card.Description>
@@ -58,10 +99,10 @@ export default function PostCard({
           <img
             src={post.imageURL}
             alt=""
-            className="size-20 shrink-0 rounded-lg object-cover sm:size-24"
+            className="size-24 shrink-0 rounded-xl object-cover transition-transform duration-500 group-hover:scale-[1.03] sm:size-28"
           />
         ) : (
-          <div className="size-20 shrink-0 rounded-lg bg-zinc-100 dark:bg-zinc-800 sm:size-24" />
+          <div className="size-24 shrink-0 rounded-xl bg-zinc-100 dark:bg-zinc-800 sm:size-28" />
         )}
         <div className="min-w-0 flex-1">
           {categoryName ? (
@@ -69,7 +110,7 @@ export default function PostCard({
               {categoryName}
             </span>
           ) : null}
-          <h3 className="mt-0.5 line-clamp-2 font-medium text-ink group-hover:text-teal-700 dark:group-hover:text-teal-400">
+          <h3 className="mt-0.5 line-clamp-2 font-medium text-ink transition-colors group-hover:text-accent">
             {post.title}
           </h3>
           <p className="mt-1 line-clamp-2 text-sm text-muted">{post.summary}</p>
