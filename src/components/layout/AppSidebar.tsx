@@ -14,8 +14,7 @@ import {
   Folder,
 } from "@phosphor-icons/react";
 import { Button, Drawer } from "@heroui/react";
-import { useDispatch } from "react-redux";
-import { clearUserData } from "../../redux/slices/userDataSlice";
+import { signOut } from "../../actions/auth";
 import { cn } from "../../lib/cn";
 import ThemeToggle from "../theme/ThemeToggle";
 
@@ -33,7 +32,7 @@ function getNavItems(variant: "user" | "admin"): NavItem[] {
         href: "/admin/users",
         label: "Users",
         icon: <Users className="size-4" />,
-        match: (p) => p === "/admin/users",
+        match: (p) => p.startsWith("/admin/users"),
       },
       {
         href: "/admin/categories",
@@ -86,13 +85,13 @@ function SidebarNav({
   onNavigate?: () => void;
 }) {
   const pathname = usePathname();
-  const dispatch = useDispatch();
   const router = useRouter();
   const items = getNavItems(variant);
   const homeHref = variant === "admin" ? "/admin" : "/";
 
-  const logout = () => {
-    dispatch(clearUserData());
+  const logout = async () => {
+    await signOut();
+    router.refresh();
     router.push("/");
     onNavigate?.();
   };

@@ -1,86 +1,105 @@
 "use client";
 
-import { useEffect } from "react";
 import { useFormik } from "formik";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
 import * as yup from "yup";
 import { Camera } from "@phosphor-icons/react";
 import {
   Alert,
   Avatar,
   Button,
+  Checkbox,
   Input,
   Label,
   Spinner,
   TextArea,
   TextField,
 } from "@heroui/react";
-import { getUserById, updateUser } from "../../data/userQueryFunctions";
-import { SINGLE_AUTHOR_DATA } from "../../definitions/reactQueryConstants/queryConstants";
+import {
+  getUserById,
+  updateUser,
+  updateUserById,
+} from "../../data/userQueryFunctions";
+import type { ProfileInput } from "../../actions/users";
+import {
+  SINGLE_AUTHOR_DATA,
+  USER_DATA,
+} from "../../definitions/reactQueryConstants/queryConstants";
 import { getAuthorNameInitials, sanitizeSocialURL } from "../../utils/dataFormat";
+import { useCurrentUser } from "../auth/AuthProvider";
 
 const schema = yup.object({
   name: yup.string().required("Required"),
   bio: yup.string(),
+  email: yup.string().email("Please enter a valid email address"),
+});
+
+const adminEditSchema = schema.shape({
+  email: yup
+    .string()
+    .required("Required")
+    .email("Please enter a valid email address"),
 });
 
 type ProfileViewProps = {
   admin?: boolean;
+  userId?: string;
 };
 
-export default function ProfileView({ admin = false }: ProfileViewProps) {
-  const router = useRouter();
+export default function ProfileView({ admin = false, userId }: ProfileViewProps) {
   const queryClient = useQueryClient();
-  const { user, isRehydrated } = useSelector(
-    (state: {
-      userData: {
-        user: { _id?: string; isAdmin?: boolean };
-        isRehydrated: boolean;
-      };
-    }) => state.userData
-  );
+  const currentUser = useCurrentUser();
+  const targetId = userId ?? currentUser?.id;
+  const isAdminUserEdit = Boolean(admin && userId);
 
   const { data, isLoading } = useQuery({
-    queryKey: [SINGLE_AUTHOR_DATA, user._id],
-    queryFn: () => getUserById(user._id!),
-    enabled: Boolean(user._id),
+    queryKey: [SINGLE_AUTHOR_DATA, targetId],
+    queryFn: () => getUserById(targetId!),
+    enabled: Boolean(targetId),
   });
 
   const mutation = useMutation({
-    mutationFn: updateUser,
+    mutationFn: (values: ProfileInput) => {
+      if (userId) {
+        return updateUserById({ userId, values });
+      }
+      return updateUser(values);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [SINGLE_AUTHOR_DATA] });
+      if (userId) {
+        queryClient.invalidateQueries({ queryKey: [USER_DATA] });
+      }
     },
   });
-
-  useEffect(() => {
-    if (!isRehydrated) return;
-    if (admin && !user.isAdmin) router.push("/");
-    if (!admin && (user.isAdmin || !user._id)) router.push("/");
-  }, [admin, isRehydrated, router, user]);
 
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
       name: data?.name ?? "",
+      email: data?.email ?? "",
       bio: data?.bio ?? "",
       facebookId: data?.facebookId ?? "",
       linkedinId: data?.linkedinId ?? "",
       twitterId: data?.twitterId ?? "",
+      isAdmin: data?.isAdmin ?? false,
       image: null as File | null,
     },
-    validationSchema: schema,
+    validationSchema: isAdminUserEdit ? adminEditSchema : schema,
     onSubmit: (values) => {
-      mutation.mutate({
+      const payload: ProfileInput = {
         name: values.name,
         bio: values.bio,
         facebookId: sanitizeSocialURL(values.facebookId),
         linkedinId: sanitizeSocialURL(values.linkedinId),
         twitterId: sanitizeSocialURL(values.twitterId),
         image: values.image,
-      });
+      };
+      if (isAdminUserEdit) {
+        payload.email = values.email;
+        payload.isAdmin = values.isAdmin;
+      }
+      mutation.mutate(payload);
     },
   });
 
@@ -96,13 +115,17 @@ export default function ProfileView({ admin = false }: ProfileViewProps) {
 
   return (
     <form onSubmit={formik.handleSubmit} className="mx-auto max-w-lg space-y-4">
-      <h1 className="text-2xl font-semibold">Profile</h1>
+      <h1 className="text-2xl font-semibold">
+        {isAdminUserEdit ? "Edit user" : "Profile"}
+      </h1>
 
       {mutation.isSuccess ? (
         <Alert status="success">
           <Alert.Indicator />
           <Alert.Content>
-            <Alert.Description>Profile updated</Alert.Description>
+            <Alert.Description>
+              {isAdminUserEdit ? "User updated" : "Profile updated"}
+            </Alert.Description>
           </Alert.Content>
         </Alert>
       ) : null}
@@ -133,6 +156,31 @@ export default function ProfileView({ admin = false }: ProfileViewProps) {
         <Label>Name</Label>
         <Input name="name" value={formik.values.name} onChange={formik.handleChange} />
       </TextField>
+
+      {isAdminUserEdit ? (
+        <>
+          <TextField name="email">
+            <Label>Email</Label>
+            <Input
+              name="email"
+              type="email"
+              value={formik.values.email}
+              onChange={formik.handleChange}
+            />
+          </TextField>
+          <Checkbox
+            isSelected={formik.values.isAdmin}
+            onChange={(isSelected) => formik.setFieldValue("isAdmin", isSelected)}
+          >
+            <Checkbox.Content>
+              <Checkbox.Control>
+                <Checkbox.Indicator />
+              </Checkbox.Control>
+              <Label>Admin</Label>
+            </Checkbox.Content>
+          </Checkbox>
+        </>
+      ) : null}
 
       <TextField name="bio">
         <Label>Bio</Label>
@@ -172,7 +220,7 @@ export default function ProfileView({ admin = false }: ProfileViewProps) {
       </TextField>
 
       <Button type="submit" isDisabled={mutation.isPending}>
-        Save profile
+        {isAdminUserEdit ? "Save user" : "Save profile"}
       </Button>
     </form>
   );

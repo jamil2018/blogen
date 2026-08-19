@@ -1,14 +1,14 @@
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import type { NextConfig } from "next";
-
-const apiInternalUrl = process.env.API_INTERNAL_URL ?? "http://localhost:8000";
-const frontendRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
   agentRules: false,
+  experimental: {
+    serverActions: {
+      // post-covers allow 10MB; leave headroom for multipart encoding.
+      bodySizeLimit: "12mb",
+    },
+  },
   turbopack: {
-    root: frontendRoot,
     rules: {
       "*.svg": {
         type: "asset",
@@ -22,19 +22,18 @@ const nextConfig: NextConfig = {
     });
     return config;
   },
-  async rewrites() {
-    return [
-      {
-        source: "/api/:path*",
-        destination: `${apiInternalUrl}/api/:path*`,
-      },
-    ];
-  },
   images: {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "firebasestorage.googleapis.com",
+        hostname: "*.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
+      {
+        protocol: "http",
+        hostname: "127.0.0.1",
+        port: "54321",
+        pathname: "/storage/v1/object/public/**",
       },
     ],
   },

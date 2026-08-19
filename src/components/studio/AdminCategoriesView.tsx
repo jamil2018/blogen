@@ -1,15 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
 import { useFormik } from "formik";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useSelector } from "react-redux";
 import * as yup from "yup";
 import { Plus, Trash } from "@phosphor-icons/react";
 import {
   Button,
-  Checkbox,
   Input,
   Label,
   Modal,
@@ -27,15 +24,10 @@ import {
 } from "../../data/categoryQueryFunctions";
 import { CATEGORY_DATA } from "../../definitions/reactQueryConstants/queryConstants";
 import type { Category } from "../../types";
+import { selectionToIds } from "../../lib/selection";
 
 export default function AdminCategoriesView() {
-  const router = useRouter();
   const queryClient = useQueryClient();
-  const { user, isRehydrated } = useSelector(
-    (state: {
-      userData: { user: { isAdmin?: boolean }; isRehydrated: boolean };
-    }) => state.userData
-  );
   const [selected, setSelected] = useState<string[]>([]);
   const [search, setSearch] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
@@ -71,11 +63,6 @@ export default function AdminCategoriesView() {
     validationSchema: yup.object({ title: yup.string().required() }),
     onSubmit: (values) => createMutation.mutate(values),
   });
-
-  useEffect(() => {
-    if (!isRehydrated) return;
-    if (!user.isAdmin) router.push("/");
-  }, [isRehydrated, router, user]);
 
   const rows = useMemo(() => {
     if (!data) return [];
@@ -121,30 +108,28 @@ export default function AdminCategoriesView() {
         onChange={(e) => setSearch(e.target.value)}
         className="max-w-sm"
       />
-      <Table aria-label="Categories">
-        <Table.Header>
-          <Table.Column width={48}> </Table.Column>
-          <Table.Column isRowHeader>Title</Table.Column>
-        </Table.Header>
-        <Table.Body items={rows}>
-          {(cat: Category) => (
-            <Table.Row id={cat._id}>
-              <Table.Cell>
-                <Checkbox
-                  isSelected={selected.includes(cat._id)}
-                  onChange={() =>
-                    setSelected((prev) =>
-                      prev.includes(cat._id)
-                        ? prev.filter((x) => x !== cat._id)
-                        : [...prev, cat._id]
-                    )
-                  }
-                />
-              </Table.Cell>
-              <Table.Cell>{cat.title}</Table.Cell>
-            </Table.Row>
-          )}
-        </Table.Body>
+      <Table>
+        <Table.ScrollContainer>
+          <Table.Content
+            aria-label="Categories"
+            selectionMode="multiple"
+            selectedKeys={new Set(selected)}
+            onSelectionChange={(keys) =>
+              setSelected(selectionToIds(keys, rows.map((c: Category) => c.id)))
+            }
+          >
+            <Table.Header>
+              <Table.Column isRowHeader>Title</Table.Column>
+            </Table.Header>
+            <Table.Body items={rows}>
+              {(cat: Category) => (
+                <Table.Row id={cat.id}>
+                  <Table.Cell>{cat.title}</Table.Cell>
+                </Table.Row>
+              )}
+            </Table.Body>
+          </Table.Content>
+        </Table.ScrollContainer>
       </Table>
 
       <Modal isOpen={createOpen} onOpenChange={setCreateOpen}>

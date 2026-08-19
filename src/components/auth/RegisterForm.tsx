@@ -3,24 +3,13 @@
 import { useFormik } from "formik";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
 import * as yup from "yup";
 import Link from "next/link";
-import { Camera } from "@phosphor-icons/react";
-import {
-  Alert,
-  Button,
-  FieldError,
-  Input,
-  Label,
-  TextArea,
-  TextField,
-} from "@heroui/react";
+import { Alert, Button } from "@heroui/react";
 import FormField from "./FormField";
+import OAuthButtons from "./OAuthButtons";
 import { createUser } from "../../data/userQueryFunctions";
 import { USER_DATA } from "../../definitions/reactQueryConstants/queryConstants";
-import { storeUserData } from "../../redux/slices/userDataSlice";
-import { sanitizeSocialURL } from "../../utils/dataFormat";
 import { useState } from "react";
 
 const schema = yup.object({
@@ -44,20 +33,28 @@ export default function RegisterForm({
   onSuccess,
   showLoginLink = true,
 }: RegisterFormProps) {
-  const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [confirmEmail, setConfirmEmail] = useState<string | null>(null);
   const router = useRouter();
-  const dispatch = useDispatch();
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationFn: createUser,
-    onSuccess: (data) => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: [USER_DATA] });
-      dispatch(storeUserData(data));
+      if (result.status === "confirm_email") {
+        setErrorMessage(null);
+        setConfirmEmail(result.email);
+        return;
+      }
+      router.refresh();
       router.push("/user/dashboard");
       onSuccess?.();
     },
-    onError: () => setShowError(true),
+    onError: (error: Error) => {
+      setConfirmEmail(null);
+      setErrorMessage(error.message || "Registration failed. Please try again.");
+    },
   });
 
   const formik = useFormik({
@@ -65,44 +62,47 @@ export default function RegisterForm({
       name: "",
       email: "",
       password: "",
-      bio: "",
-      facebookId: "",
-      linkedinId: "",
-      twitterId: "",
-      image: null as File | null,
     },
     validationSchema: schema,
     onSubmit: (values) => {
-      mutation.mutate({
-        ...values,
-        facebookId: values.facebookId
-          ? sanitizeSocialURL(values.facebookId)
-          : "",
-        linkedinId: values.linkedinId
-          ? sanitizeSocialURL(values.linkedinId)
-          : "",
-        twitterId: values.twitterId
-          ? sanitizeSocialURL(values.twitterId)
-          : "",
-        isAdmin: false,
-      });
+      mutation.mutate(values);
     },
   });
 
   return (
-    <div className="mx-auto w-full max-w-lg space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Create account</h1>
-        <p className="mt-1 text-sm text-muted">Join the Blogen community</p>
-      </div>
+    <div className="space-y-6">
+      <header>
+        <h2 className="text-xl font-semibold tracking-tight text-ink">
+          Create account
+        </h2>
+        <p className="mt-1.5 text-sm text-muted">
+          Use your email or Google account.
+        </p>
+      </header>
 
-      {showError ? (
-        <Alert status="danger">
+      {confirmEmail ? (
+        <Alert status="success">
           <Alert.Indicator />
           <Alert.Content>
             <Alert.Description>
-              Registration failed. Please try again.
+              Account created. Check {confirmEmail} to confirm your email, then{" "}
+              <Link
+                href="/login"
+                className="font-medium text-teal-700 underline-offset-4 hover:underline dark:text-teal-400"
+              >
+                sign in
+              </Link>
+              .
             </Alert.Description>
+          </Alert.Content>
+        </Alert>
+      ) : null}
+
+      {errorMessage ? (
+        <Alert status="danger">
+          <Alert.Indicator />
+          <Alert.Content>
+            <Alert.Description>{errorMessage}</Alert.Description>
           </Alert.Content>
         </Alert>
       ) : null}
@@ -147,63 +147,34 @@ export default function RegisterForm({
           }
         />
 
-        <TextField name="bio">
-          <Label>Bio</Label>
-          <TextArea
-            id="bio"
-            name="bio"
-            rows={3}
-            value={formik.values.bio}
-            onChange={formik.handleChange}
-          />
-        </TextField>
-
-        <FormField
-          label="Facebook handle"
-          name="facebookId"
-          value={formik.values.facebookId}
-          onChange={formik.handleChange}
-        />
-        <FormField
-          label="LinkedIn handle"
-          name="linkedinId"
-          value={formik.values.linkedinId}
-          onChange={formik.handleChange}
-        />
-        <FormField
-          label="Twitter handle"
-          name="twitterId"
-          value={formik.values.twitterId}
-          onChange={formik.handleChange}
-        />
-
-        <div>
-          <label className="flex cursor-pointer items-center gap-2 text-sm">
-            <Camera className="size-4" />
-            Profile photo
-            <input
-              type="file"
-              accept="image/*"
-              className="sr-only"
-              onChange={(e) =>
-                formik.setFieldValue("image", e.target.files?.[0] ?? null)
-              }
-            />
-          </label>
-          {formik.values.image ? (
-            <p className="mt-1 text-xs text-muted">{formik.values.image.name}</p>
-          ) : null}
-        </div>
-
-        <Button type="submit" fullWidth isDisabled={mutation.isPending}>
-          Register
+        <Button
+          type="submit"
+          fullWidth
+          isDisabled={mutation.isPending}
+          className="transition-transform active:scale-[0.98]"
+        >
+          {mutation.isPending ? "Creating account…" : "Create account"}
         </Button>
       </form>
+
+      <div className="relative py-1">
+        <div className="absolute inset-0 flex items-center" aria-hidden>
+          <div className="w-full border-t border-border" />
+        </div>
+        <div className="relative flex justify-center">
+          <span className="bg-paper px-3 text-xs font-medium text-muted">or</span>
+        </div>
+      </div>
+
+      <OAuthButtons />
 
       {showLoginLink ? (
         <p className="text-center text-sm text-muted">
           Already have an account?{" "}
-          <Link href="/login" className="text-teal-700 dark:text-teal-400">
+          <Link
+            href="/login"
+            className="font-medium text-teal-700 underline-offset-4 hover:underline dark:text-teal-400"
+          >
             Sign in
           </Link>
         </p>

@@ -1,8 +1,11 @@
 "use client";
 
+import { useRef } from "react";
 import { Camera } from "@phosphor-icons/react";
 import { Button } from "@heroui/react";
 import { cn } from "../../lib/cn";
+
+const COVER_ACCEPT = "image/jpeg,image/png,image/webp,image/gif,image/avif";
 
 type PostCoverUploadProps = {
   value?: File | string | null;
@@ -17,26 +20,31 @@ export default function PostCoverUpload({
   previewUrl,
   className,
 }: PostCoverUploadProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
   const fileName = value instanceof File ? value.name : null;
   const displayUrl =
     previewUrl ?? (value instanceof File ? URL.createObjectURL(value) : null);
 
   return (
     <div className={cn("space-y-2", className)}>
-      <label className="inline-flex cursor-pointer">
-        <input
-          type="file"
-          accept="image/*"
-          className="sr-only"
-          onChange={(e) => onChange(e.target.files?.[0] ?? null)}
-        />
-        <Button variant="secondary">
-          <span className="inline-flex items-center">
-            <Camera className="mr-2 size-4" />
-            Upload cover
-          </span>
-        </Button>
-      </label>
+      <input
+        ref={inputRef}
+        type="file"
+        accept={COVER_ACCEPT}
+        aria-label="Cover image"
+        className="sr-only"
+        onChange={(e) => onChange(e.target.files?.[0] ?? null)}
+      />
+      <Button
+        type="button"
+        variant="secondary"
+        onPress={() => inputRef.current?.click()}
+      >
+        <span className="inline-flex items-center">
+          <Camera className="mr-2 size-4" />
+          Upload cover
+        </span>
+      </Button>
       {fileName ? (
         <p className="text-xs text-muted">{fileName}</p>
       ) : null}

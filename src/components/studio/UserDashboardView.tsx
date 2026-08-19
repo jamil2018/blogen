@@ -1,9 +1,7 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useSelector } from "react-redux";
 import {
   Bar,
   BarChart,
@@ -20,16 +18,6 @@ import { POST_DATA } from "../../definitions/reactQueryConstants/queryConstants"
 import { formatData } from "../../utils/dataFormat";
 
 export default function UserDashboardView() {
-  const router = useRouter();
-  const { user, isRehydrated } = useSelector(
-    (state: {
-      userData: {
-        user: { _id?: string; isAdmin?: boolean };
-        isRehydrated: boolean;
-      };
-    }) => state.userData
-  );
-
   const { isLoading, isError, isFetching, data } = useQuery({
     queryKey: [POST_DATA, "author-curated"],
     queryFn: getCuratedPostListByAuthor,
@@ -39,11 +27,6 @@ export default function UserDashboardView() {
     () => (data ? formatData(data, "createdAt") : []),
     [data]
   );
-
-  useEffect(() => {
-    if (!isRehydrated) return;
-    if (user.isAdmin || !user._id) router.push("/");
-  }, [isRehydrated, router, user]);
 
   if (isLoading || isFetching) {
     return (

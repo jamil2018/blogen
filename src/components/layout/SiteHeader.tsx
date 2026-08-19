@@ -17,10 +17,10 @@ import {
 import ThemeToggle from "../theme/ThemeToggle";
 import { SEARCH_POST_DATA } from "../../definitions/reactQueryConstants/queryConstants";
 import { searchPosts } from "../../data/postQueryFunctions";
-import { useDispatch, useSelector } from "react-redux";
-import { clearUserData } from "../../redux/slices/userDataSlice";
+import { signOut } from "../../actions/auth";
+import { useCurrentUser } from "../auth/AuthProvider";
 import { getAuthorNameInitials } from "../../utils/dataFormat";
-import type { Post, User } from "../../types";
+import type { Post } from "../../types";
 import { cn } from "../../lib/cn";
 import AppIcon from "../../assets/appIcon.svg";
 import { SignIn, UserPlus } from "@phosphor-icons/react";
@@ -30,8 +30,6 @@ const navLinks = [
   { href: "/categories", label: "Categories" },
   { href: "/authors", label: "Authors" },
 ];
-
-type UserDataState = { user: Partial<User> };
 
 function SearchBar({ className }: { className?: string }) {
   const router = useRouter();
@@ -83,9 +81,9 @@ function SearchBar({ className }: { className?: string }) {
           ) : (data as Post[] | undefined)?.length ? (
             <ul className="max-h-60 overflow-y-auto">
               {(data as Post[]).map((post) => (
-                <li key={post._id}>
+                <li key={post.id}>
                   <Link
-                    href={`/posts/${post._id}`}
+                    href={`/posts/${post.id}`}
                     className="block rounded-lg px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800"
                     onClick={() => setOpen(false)}
                   >
@@ -104,12 +102,16 @@ function SearchBar({ className }: { className?: string }) {
 }
 
 function UserMenu() {
-  const dispatch = useDispatch();
-  const { user } = useSelector(
-    (state: { userData: UserDataState }) => state.userData
-  );
+  const router = useRouter();
+  const user = useCurrentUser();
 
-  if (!user._id) {
+  const handleLogout = async () => {
+    await signOut();
+    router.refresh();
+    router.push("/");
+  };
+
+  if (!user?.id) {
     return (
       <div className="flex items-center gap-2">
         <Link href="/login">
@@ -134,30 +136,40 @@ function UserMenu() {
 
   return (
     <Dropdown>
-      <Dropdown.Trigger>
-        <Button variant="ghost" className="gap-2">
-          <Avatar size="sm">
-            {user.imageURL ? (
-              <Avatar.Image src={user.imageURL} alt={user.name} />
-            ) : (
-              <Avatar.Fallback>{initials}</Avatar.Fallback>
-            )}
-          </Avatar>
-          <span className="hidden sm:inline">{user.name}</span>
-        </Button>
+      <Dropdown.Trigger
+        aria-label={user.name}
+        className="button button--md button--ghost gap-2"
+      >
+        <Avatar size="sm">
+          {user.imageURL ? (
+            <Avatar.Image src={user.imageURL} alt="" />
+          ) : (
+            <Avatar.Fallback>{initials}</Avatar.Fallback>
+          )}
+        </Avatar>
+        <span className="hidden sm:inline">{user.name}</span>
       </Dropdown.Trigger>
       <Dropdown.Popover>
         <Dropdown.Menu>
-          <Dropdown.Item id="dashboard" href="/user/dashboard">
+          <Dropdown.Item
+            id="dashboard"
+            href={user.isAdmin ? "/admin" : "/user/dashboard"}
+          >
             Dashboard
           </Dropdown.Item>
-          <Dropdown.Item id="posts" href="/user/posts">
+          <Dropdown.Item
+            id="posts"
+            href={user.isAdmin ? "/admin/posts" : "/user/posts"}
+          >
             Posts
           </Dropdown.Item>
-          <Dropdown.Item id="profile" href="/user/profile">
+          <Dropdown.Item
+            id="profile"
+            href={user.isAdmin ? "/admin/profile" : "/user/profile"}
+          >
             Profile
           </Dropdown.Item>
-          <Dropdown.Item id="logout" onAction={() => dispatch(clearUserData())}>
+          <Dropdown.Item id="logout" onAction={handleLogout}>
             Logout
           </Dropdown.Item>
         </Dropdown.Menu>
@@ -239,29 +251,41 @@ export default function SiteHeader() {
 }
 
 function MobileAuthLinks({ onClose }: { onClose: () => void }) {
-  const dispatch = useDispatch();
-  const { user } = useSelector(
-    (state: { userData: UserDataState }) => state.userData
-  );
+  const router = useRouter();
+  const user = useCurrentUser();
 
-  if (user._id) {
+  if (user?.id) {
     return (
       <div className="space-y-2 border-t border-border pt-4">
-        <Link href="/user/dashboard" className="block py-2 text-sm" onClick={onClose}>
+        <Link
+          href={user.isAdmin ? "/admin" : "/user/dashboard"}
+          className="block py-2 text-sm"
+          onClick={onClose}
+        >
           Dashboard
         </Link>
-        <Link href="/user/posts" className="block py-2 text-sm" onClick={onClose}>
+        <Link
+          href={user.isAdmin ? "/admin/posts" : "/user/posts"}
+          className="block py-2 text-sm"
+          onClick={onClose}
+        >
           Posts
         </Link>
-        <Link href="/user/profile" className="block py-2 text-sm" onClick={onClose}>
+        <Link
+          href={user.isAdmin ? "/admin/profile" : "/user/profile"}
+          className="block py-2 text-sm"
+          onClick={onClose}
+        >
           Profile
         </Link>
         <Button
           variant="ghost"
           fullWidth
-          onPress={() => {
-            dispatch(clearUserData());
+          onPress={async () => {
+            await signOut();
+            router.refresh();
             onClose();
+            router.push("/");
           }}
         >
           Logout

@@ -9,7 +9,7 @@ type PostPageProps = {
 
 function getAuthorId(post: Post | undefined): string | undefined {
   if (!post) return undefined;
-  return typeof post.author === "string" ? post.author : post.author?._id;
+  return typeof post.author === "string" ? post.author : post.author?.id;
 }
 
 export async function generateMetadata({

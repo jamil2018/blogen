@@ -43,7 +43,7 @@ export default function PostsByCategoryView({
       ) : (
         <div>
           {list.map((post: Post) => (
-            <PostCard key={post._id} post={post} />
+            <PostCard key={post.id} post={post} />
           ))}
         </div>
       )}

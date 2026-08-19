@@ -17,7 +17,7 @@ import {
   TextField,
 } from "@heroui/react";
 
-import { useSelector } from "react-redux";
+import { useCurrentUser } from "../auth/AuthProvider";
 import { createCommentByPostId } from "../../data/commentQueryFunctions";
 import { COMMENT_DATA } from "../../definitions/reactQueryConstants/queryConstants";
 import { getAuthorNameInitials } from "../../utils/dataFormat";
@@ -43,9 +43,7 @@ export default function CommentThread({
   onEdit,
   onDelete,
 }: CommentThreadProps) {
-  const { user } = useSelector(
-    (state: { userData: { user: Partial<User> } }) => state.userData
-  );
+  const user = useCurrentUser();
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
@@ -80,10 +78,10 @@ export default function CommentThread({
             const initials = getAuthorNameInitials(author.name ?? "")
               .filter(Boolean)
               .join("");
-            const canEdit = user._id === author._id;
+            const canEdit = user?.id === author.id;
 
             return (
-              <li key={comment._id}>
+              <li key={comment.id}>
                 <Card className="p-4">
                   <div className="flex gap-4">
                     <div className="flex shrink-0 flex-col items-center gap-1">
@@ -95,7 +93,7 @@ export default function CommentThread({
                         )}
                       </Avatar>
                       <Link
-                        href={`/authors/${author._id}`}
+                        href={`/authors/${author.id}`}
                         className="text-xs text-muted hover:text-ink"
                       >
                         {author.name}
@@ -109,7 +107,7 @@ export default function CommentThread({
                           variant="ghost"
                           size="sm"
                           aria-label="Edit comment"
-                          onPress={() => onEdit(comment._id)}
+                          onPress={() => onEdit(comment.id)}
                         >
                           <PencilSimple className="size-4" />
                         </Button>
@@ -118,7 +116,7 @@ export default function CommentThread({
                           variant="ghost"
                           size="sm"
                           aria-label="Delete comment"
-                          onPress={() => onDelete(comment._id)}
+                          onPress={() => onDelete(comment.id)}
                         >
                           <Trash className="size-4" />
                         </Button>
@@ -134,7 +132,7 @@ export default function CommentThread({
         <EmptyState title="No comments yet" description="Be the first to share your thoughts." />
       )}
 
-      {!user._id ? (
+      {!user?.id ? (
         <Alert status="warning">
           <Alert.Indicator />
           <Alert.Content>
@@ -151,7 +149,7 @@ export default function CommentThread({
       <form onSubmit={formik.handleSubmit} className="space-y-3">
         <TextField
           name="text"
-          isDisabled={!user._id || mutation.isPending}
+          isDisabled={!user?.id || mutation.isPending}
           isInvalid={Boolean(formik.touched.text && formik.errors.text)}
         >
           <Label>Post a comment</Label>
@@ -171,7 +169,7 @@ export default function CommentThread({
         <Button
           type="submit"
           variant="secondary"
-          isDisabled={!user._id || mutation.isPending}
+          isDisabled={!user?.id || mutation.isPending}
         >
           Save
         </Button>

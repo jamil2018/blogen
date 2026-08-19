@@ -3,6 +3,7 @@ import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import Providers from "../providers";
 import { ThemeProvider } from "../components/theme/ThemeProvider";
+import { getCurrentUser } from "../lib/db/auth";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -10,11 +11,13 @@ export const metadata: Metadata = {
   description: "Blogen - Simple tech blog",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getCurrentUser();
+
   return (
     <html
       lang="en"
@@ -23,7 +26,7 @@ export default function RootLayout({
     >
       <body>
         <ThemeProvider>
-          <Providers>{children}</Providers>
+          <Providers user={user}>{children}</Providers>
         </ThemeProvider>
       </body>
     </html>
