@@ -6,66 +6,121 @@ Blogen is a simple tech blog: readers browse posts, authors, and categories; sig
 
 - **Node.js >= 20.9** (required by Next.js 16)
 
-## Monorepo layout
+## App layout
 
-| Path | Role |
-|------|------|
-| `frontend/` | Next.js 16 App Router (React 19, TypeScript, MUI v5) |
-| `backend/` | Express 4 API (MongoDB, JWT) |
+Single Next.js 16 App Router app at the repo root (React 19, TypeScript, HeroUI). Data lives in Supabase (Postgres, Auth, Storage) and is accessed from Server Components and Server Actions.
 
-The frontend does not implement `/api` Route Handlers. Browser calls to `/api/*` are rewritten to Express. See [ADR-001](docs/decisions/ADR-001-nextjs-app-router.md).
+Architecture notes: [ADR-001](docs/decisions/ADR-001-nextjs-app-router.md), [ADR-002](docs/decisions/ADR-002-heroui-tailwind-tiptap.md).
 
 ## Quick start
 
-1. Clone the repo and install dependencies from the **root** and each package:
+1. Clone the repo and install dependencies from the root:
 
    ```bash
    npm install
-   npm install --prefix ./frontend
-   npm install --prefix ./backend
    ```
 
-2. Configure environment variables (no secrets live in the repo):
-   - Frontend: copy [`frontend/.env.example`](frontend/.env.example) to `frontend/.env` and fill in values.
-   - Backend: create `backend/.env` using the variables listed in [`backend/README.md`](backend/README.md).
+2. Copy [`.env.example`](.env.example) to `.env.local` and fill in your Supabase project values. Do not invent or commit secrets.
 
-3. Run the full stack from the repo root:
+3. Run the app:
 
    ```bash
    npm run dev
    ```
 
-   - Next.js: [http://localhost:3000](http://localhost:3000)
-   - Express: [http://localhost:8000](http://localhost:8000) (default `PORT` from the backend `.env`)
+   Open [http://localhost:3000](http://localhost:3000).
+
+## Seed data
+
+[`supabase/seed.sql`](supabase/seed.sql) loads six categories, eight posts, and a few comments. It runs after migrations on `supabase db reset`.
+
+- **Empty database:** also creates two demo authors (`maya@blogen.local` / `jordan@blogen.local`, password `blogen-seed-dev`). Maya is an admin.
+- **Existing profiles:** skips those accounts and attributes posts to the people already in `profiles`.
+
+To load the same sample content into an already-running project, run the SQL in the seed file against that database (SQL editor or `psql`). Inserts are keyed by id and can be re-run.
 
 ## Environment variables
 
-Do not commit real keys. Use the templates and docs:
+Do not commit real keys. Use [`.env.example`](.env.example):
 
-- **Frontend** — [`frontend/.env.example`](frontend/.env.example)
-  - `API_INTERNAL_URL` — server-only Express origin for RSC fetches (e.g. `http://localhost:8000`)
-  - `NEXT_PUBLIC_API_URL` — optional public API origin; leave empty in development so the browser uses relative `/api` plus Next rewrites
-  - `NEXT_PUBLIC_FIREBASE_*` — Firebase Storage client config
-- **Backend** — see [`backend/README.md`](backend/README.md) (`PORT`, `NODE_ENV`, `MONGO_URI`, `JWT_SECRET`, `FILE_UPLOAD_PATH`)
+| Variable | Where | Purpose |
+|----------|--------|---------|
+| `NEXT_PUBLIC_SUPABASE_URL` | client + server | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | client + server | Supabase anon / publishable key |
+| `SUPABASE_SERVICE_ROLE_KEY` | server only | Admin bootstrap / privileged server tasks (never expose to the browser) |
+
+OAuth provider credentials (Google) are **not** Next.js env vars. Configure them in the Supabase Dashboard for hosted projects, or via `supabase/config.toml` + local env for `supabase start`. See [OAuth setup](#oauth-setup-google) below.
+
+## OAuth setup (Google)
+
+Blogen uses Supabase Auth social login. Provider secrets live in Supabase configuration, not in Next.js environment variables.
+
+### 1. Create OAuth apps
+
+**Google Cloud Console**
+
+1. Create an OAuth 2.0 **Web application** client.
+2. Add **Authorized redirect URI** (points to Supabase, not your app):
+   - Local: `http://127.0.0.1:54321/auth/v1/callback`
+   - Production: `https://<project-ref>.supabase.co/auth/v1/callback`
+3. Copy the Client ID and Client Secret.
+
+### 2. Enable providers in Supabase
+
+**Remote project:** In **Authentication → Providers**, enable **Google** with the credentials from step 1.
+
+**Local CLI:** Set these in `.env.local` (or your shell) before `supabase start` — see [`.env.example`](.env.example). They are read by [`supabase/config.toml`](supabase/config.toml).
+
+### 3. Redirect URL checklist
+
+In **Authentication → URL Configuration** (remote) or [`supabase/config.toml`](supabase/config.toml) `additional_redirect_urls` (local):
+
+| Environment | App callback (allow-list) | Supabase callback (IdP redirect) |
+|-------------|---------------------------|----------------------------------|
+| Local | `http://localhost:3000/auth/callback`, `http://127.0.0.1:3000/auth/callback` | `http://127.0.0.1:54321/auth/v1/callback` |
+| Production | `https://<your-domain>/auth/callback` | `https://<project-ref>.supabase.co/auth/v1/callback` |
+
+Set **Site URL** to your production domain (and `http://localhost:3000` for local dev).
+
+### 4. Flow
+
+1. User clicks **Continue with Google** on `/login` or `/register`.
+2. Supabase redirects to the provider, then back to `/auth/callback?code=...`.
+3. The callback route exchanges the code for a session cookie and redirects admins to `/admin`, others to `/user/dashboard` (or the `?next=` path from middleware).
+
+Email/password sign-in is unchanged.
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start Express and Next.js together |
-| `npm run start-backend` | Express only (`npm run dev --prefix ./backend`) |
-| `npm run start-frontend` | Next.js only (`npm run dev --prefix ./frontend`) |
-| `npm run dev --prefix ./frontend` | Next.js dev server |
-| `npm run build --prefix ./frontend` | Production build of the Next.js app |
-| `npm start --prefix ./frontend` | Serve the production Next.js build |
-| `npm run lint --prefix ./frontend` | Lint the frontend |
-| `npm run dev --prefix ./backend` | Express with nodemon |
-| `npm start --prefix ./backend` | Express in production mode |
+| `npm run dev` | Next.js development server |
+| `npm run build` | Production build |
+| `npm start` | Serve the production build |
+| `npm run lint` | ESLint (`eslint-config-next`) |
 
-## Architecture
+## App structure
 
-- Public routes are thin React Server Components that fetch from Express and pass data into the existing client screens.
-- User and admin routes stay client-side because JWT auth lives in Redux / `localStorage`.
-- Existing MUI components and screens are preserved; a later phase may replace them with Hero UI.
+```
+src/app/            App Router pages and layouts
+src/actions/        Server Actions (auth, posts, comments, categories, users)
+src/components/     UI
+src/lib/supabase/   Browser, server, and middleware clients
+src/lib/db/         Shared query helpers
+src/lib/api.ts      RSC data helpers
+src/types/          Shared TypeScript types
+supabase/           CLI config and SQL migrations
+docs/               Architecture decision records
+```
 
-Details and rejected alternatives: [ADR-001 — Next.js 16 App Router](docs/decisions/ADR-001-nextjs-app-router.md).
+Public `page.tsx` files are Server Components that load data from Supabase. Protected `/user/*` and `/admin/*` routes are gated by Next.js middleware and cookie sessions.
+
+## First admin
+
+After the first signup, promote that account in the SQL editor (or `psql`):
+
+```sql
+update public.profiles
+set is_admin = true
+where id = '<your-auth-user-uuid>';
+```

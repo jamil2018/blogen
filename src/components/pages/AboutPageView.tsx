@@ -59,7 +59,7 @@ export default function AboutPageView({ users }: { users?: User[] }) {
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
               {userList?.map((user: User) => (
-                <AuthorCard key={user._id} author={user} />
+                <AuthorCard key={user.id} author={user} />
               ))}
             </div>
           )}

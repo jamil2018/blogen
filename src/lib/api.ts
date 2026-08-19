@@ -1,87 +1,59 @@
-import axios from "axios";
+import {
+  findPosts,
+  getPostById as getPostByIdQuery,
+  listLatestPosts,
+  listPaginatedPosts,
+  listPostsByAuthor,
+  searchPosts,
+} from "./db/posts";
+import { listCategories } from "./db/categories";
+import { getProfileById } from "./db/auth";
+import { listLatestUsers, listUsers } from "./db/users";
 import type { Category, PaginatedPosts, Post, User } from "../types";
 
-const isServer = typeof window === "undefined";
-
-function getBaseURL(): string {
-  if (isServer) {
-    return process.env.API_INTERNAL_URL ?? "http://localhost:8000";
-  }
-
-  return process.env.NEXT_PUBLIC_API_URL ?? "";
+export async function fetchLatestPosts() {
+  return listLatestPosts();
 }
 
-export const api = axios.create({
-  baseURL: getBaseURL(),
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-/** Server-safe GET that never throws — RSC pages stay renderable if Express is down. */
-export async function serverGet<T>(
-  url: string,
-  config?: { params?: Record<string, string | number> }
-): Promise<T | undefined> {
-  try {
-    const { data } = await api.get<T>(url, config);
-    return data;
-  } catch {
-    return undefined;
-  }
+export async function fetchPaginatedPosts(page = 1, limit = 5) {
+  return listPaginatedPosts(page, limit) as Promise<PaginatedPosts | undefined>;
 }
 
-export function fetchLatestPosts() {
-  return serverGet<Post[]>("/api/posts/latest");
+export async function fetchPostById(postId: string) {
+  return getPostByIdQuery(postId);
 }
 
-export function fetchPaginatedPosts(page = 1, limit = 5) {
-  return serverGet<PaginatedPosts>(
-    `/api/posts/paginated?page=${page}&limit=${limit}`
-  );
+export async function fetchAllCategories() {
+  return listCategories();
 }
 
-export function fetchPostById(postId: string) {
-  return serverGet<Post>(`/api/posts/${postId}`);
+export async function fetchAllUsers() {
+  return listUsers();
 }
 
-export function fetchAllCategories() {
-  return serverGet<Category[]>("/api/categories");
+export async function fetchLatestUsers() {
+  return listLatestUsers();
 }
 
-export function fetchAllUsers() {
-  return serverGet<User[]>("/api/users/");
+export async function fetchUserById(userId: string): Promise<User | undefined> {
+  if (!userId) return undefined;
+  return getProfileById(userId);
 }
 
-export function fetchLatestUsers() {
-  return serverGet<User[]>("/api/users/latest");
+export async function fetchPostsByAuthorId(authorId: string) {
+  return listPostsByAuthor(authorId);
 }
 
-export function fetchUserById(userId: string) {
-  if (!userId) {
-    return Promise.resolve(undefined);
-  }
-  return serverGet<User>(`/api/users/${userId}`);
+export async function fetchPostsByCategoryName(categoryName: string) {
+  return findPosts({ category: categoryName });
 }
 
-export function fetchPostsByAuthorId(authorId: string) {
-  return serverGet<Post[]>(`/api/posts/author/${authorId}`);
+export async function fetchPostsByTagName(tagName: string) {
+  return findPosts({ tag: tagName });
 }
 
-export function fetchPostsByCategoryName(categoryName: string) {
-  return serverGet<Post[]>("/api/posts/find", {
-    params: { category: categoryName },
-  });
+export async function fetchSearchPostResults(searchQuery: string) {
+  return searchPosts(searchQuery);
 }
 
-export function fetchPostsByTagName(tagName: string) {
-  return serverGet<Post[]>("/api/posts/find", {
-    params: { tag: tagName },
-  });
-}
-
-export function fetchSearchPostResults(searchQuery: string) {
-  return serverGet<Post[]>(
-    `/api/posts/searchresult?query=${encodeURIComponent(searchQuery)}`
-  );
-}
+export type { Category, PaginatedPosts, Post, User };

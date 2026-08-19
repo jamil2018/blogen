@@ -47,7 +47,7 @@ export default function SearchResultsView({
       ) : (
         <div>
           {posts.map((post: Post) => (
-            <PostCard key={post._id} post={post} />
+            <PostCard key={post.id} post={post} />
           ))}
         </div>
       )}

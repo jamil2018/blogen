@@ -1,5 +1,5 @@
 export type User = {
-  _id: string;
+  id: string;
   name: string;
   email: string;
   isAdmin: boolean;
@@ -9,7 +9,6 @@ export type User = {
   twitterId?: string;
   imageURL?: string;
   imageFileName?: string;
-  token?: string;
   createdAt?: string;
   updatedAt?: string;
 };

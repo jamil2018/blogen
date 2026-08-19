@@ -15,7 +15,7 @@ export default function AuthorCard({ author, className }: AuthorCardProps) {
     .join("");
 
   return (
-    <Link href={`/authors/${author._id}`} className={cn("block", className)}>
+    <Link href={`/authors/${author.id}`} className={cn("block", className)}>
       <Card className="p-4 text-center transition-shadow hover:shadow-md">
         <Avatar size="lg" className="mx-auto">
           {author.imageURL ? (

@@ -23,7 +23,7 @@ import {
   getPaginatedPosts,
 } from "../../data/postQueryFunctions";
 import { getAllCategories } from "../../data/categoryQueryFunctions";
-import type { Category, PaginatedPosts, Post, User } from "../../types";
+import type { Category, PaginatedPosts, Post } from "../../types";
 
 type HomePageViewProps = {
   latestPosts?: Post[];
@@ -112,7 +112,7 @@ export default function HomePageView({
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {latest?.map((post: Post) => (
-              <PostCard key={post._id} post={post} variant="featured" />
+              <PostCard key={post.id} post={post} variant="featured" />
             ))}
           </div>
         )}
@@ -142,8 +142,8 @@ export default function HomePageView({
             ) : (
               <>
                 <div>
-                  {paginated?.docs.map((post: Post) => (
-                    <PostCard key={post._id} post={post} />
+                  {paginated?.data.map((post: Post) => (
+                    <PostCard key={post.id} post={post} />
                   ))}
                 </div>
                 {paginated && paginated.totalPages > 1 ? (

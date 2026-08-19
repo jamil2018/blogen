@@ -78,19 +78,23 @@ export default function DevUiPage() {
 
       <section className="space-y-3">
         <h2 className="text-sm font-medium text-muted">Table</h2>
-        <Table aria-label="Sample table">
-          <Table.Header>
-            <Table.Column isRowHeader>Name</Table.Column>
-            <Table.Column>Role</Table.Column>
-          </Table.Header>
-          <Table.Body items={rows}>
-            {(item) => (
-              <Table.Row id={item.id}>
-                <Table.Cell>{item.name}</Table.Cell>
-                <Table.Cell>{item.role}</Table.Cell>
-              </Table.Row>
-            )}
-          </Table.Body>
+        <Table>
+          <Table.ScrollContainer>
+            <Table.Content aria-label="Sample table">
+              <Table.Header>
+                <Table.Column isRowHeader>Name</Table.Column>
+                <Table.Column>Role</Table.Column>
+              </Table.Header>
+              <Table.Body items={rows}>
+                {(item) => (
+                  <Table.Row id={item.id}>
+                    <Table.Cell>{item.name}</Table.Cell>
+                    <Table.Cell>{item.role}</Table.Cell>
+                  </Table.Row>
+                )}
+              </Table.Body>
+            </Table.Content>
+          </Table.ScrollContainer>
         </Table>
       </section>
 

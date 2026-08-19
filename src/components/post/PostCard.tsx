@@ -22,7 +22,7 @@ export default function PostCard({
 
   if (variant === "featured") {
     return (
-      <Link href={`/posts/${post._id}`} className={cn("block group", className)}>
+      <Link href={`/posts/${post.id}`} className={cn("block group", className)}>
         <Card className="overflow-hidden transition-shadow hover:shadow-md">
           {post.imageURL ? (
             <div className="aspect-[16/10] overflow-hidden">
@@ -52,7 +52,7 @@ export default function PostCard({
   }
 
   return (
-    <Link href={`/posts/${post._id}`} className={cn("block group", className)}>
+    <Link href={`/posts/${post.id}`} className={cn("block group", className)}>
       <article className="flex gap-4 border-b border-border py-5 transition-colors hover:bg-zinc-50/50 dark:hover:bg-zinc-900/30">
         {post.imageURL ? (
           <img

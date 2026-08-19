@@ -33,7 +33,7 @@ export default function FeaturedPost({ post, className }: FeaturedPostProps) {
       </div>
       <div className="relative overflow-hidden rounded-xl">
         {post?.imageURL ? (
-          <Link href={`/posts/${post._id}`} className="block">
+          <Link href={`/posts/${post.id}`} className="block">
             <img
               src={post.imageURL}
               alt={post.title}

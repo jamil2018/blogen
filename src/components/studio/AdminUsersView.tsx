@@ -1,13 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useSelector } from "react-redux";
-import { Plus, PencilSimple, Trash } from "@phosphor-icons/react";
+import { PencilSimple, Trash } from "@phosphor-icons/react";
 import {
   Button,
-  Checkbox,
   Input,
   Modal,
   Spinner,
@@ -22,18 +20,11 @@ import {
 } from "../../data/userQueryFunctions";
 import type { User } from "../../types";
 import { USER_DATA } from "../../definitions/reactQueryConstants/queryConstants";
+import { selectionToIds } from "../../lib/selection";
 
 export default function AdminUsersView() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { user, isRehydrated } = useSelector(
-    (state: {
-      userData: {
-        user: { isAdmin?: boolean };
-        isRehydrated: boolean;
-      };
-    }) => state.userData
-  );
   const [selected, setSelected] = useState<string[]>([]);
   const [search, setSearch] = useState("");
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -52,11 +43,6 @@ export default function AdminUsersView() {
       toast("User(s) deleted", { variant: "success" });
     },
   });
-
-  useEffect(() => {
-    if (!isRehydrated) return;
-    if (!user.isAdmin) router.push("/");
-  }, [isRehydrated, router, user]);
 
   const rows = useMemo(() => {
     if (!data) return [];
@@ -85,6 +71,15 @@ export default function AdminUsersView() {
         <div className="flex gap-2">
           <Button
             size="sm"
+            variant="secondary"
+            isDisabled={selected.length !== 1}
+            onPress={() => router.push(`/admin/users/edit/${selected[0]}`)}
+          >
+            <PencilSimple className="mr-1 size-4" />
+            Edit
+          </Button>
+          <Button
+            size="sm"
             variant="danger"
             isDisabled={selected.length === 0}
             onPress={() => setDeleteOpen(true)}
@@ -100,34 +95,32 @@ export default function AdminUsersView() {
         onChange={(e) => setSearch(e.target.value)}
         className="max-w-sm"
       />
-      <Table aria-label="Users">
-        <Table.Header>
-          <Table.Column width={48}> </Table.Column>
-          <Table.Column isRowHeader>Name</Table.Column>
-          <Table.Column>Email</Table.Column>
-          <Table.Column>Admin</Table.Column>
-        </Table.Header>
-        <Table.Body items={rows}>
-          {(u: User) => (
-            <Table.Row id={u._id}>
-              <Table.Cell>
-                <Checkbox
-                  isSelected={selected.includes(u._id)}
-                  onChange={() =>
-                    setSelected((prev) =>
-                      prev.includes(u._id)
-                        ? prev.filter((x) => x !== u._id)
-                        : [...prev, u._id]
-                    )
-                  }
-                />
-              </Table.Cell>
-              <Table.Cell>{u.name}</Table.Cell>
-              <Table.Cell>{u.email}</Table.Cell>
-              <Table.Cell>{u.isAdmin ? "Yes" : "No"}</Table.Cell>
-            </Table.Row>
-          )}
-        </Table.Body>
+      <Table>
+        <Table.ScrollContainer>
+          <Table.Content
+            aria-label="Users"
+            selectionMode="multiple"
+            selectedKeys={new Set(selected)}
+            onSelectionChange={(keys) =>
+              setSelected(selectionToIds(keys, rows.map((u: User) => u.id)))
+            }
+          >
+            <Table.Header>
+              <Table.Column isRowHeader>Name</Table.Column>
+              <Table.Column>Email</Table.Column>
+              <Table.Column>Admin</Table.Column>
+            </Table.Header>
+            <Table.Body items={rows}>
+              {(u: User) => (
+                <Table.Row id={u.id}>
+                  <Table.Cell>{u.name}</Table.Cell>
+                  <Table.Cell>{u.email}</Table.Cell>
+                  <Table.Cell>{u.isAdmin ? "Yes" : "No"}</Table.Cell>
+                </Table.Row>
+              )}
+            </Table.Body>
+          </Table.Content>
+        </Table.ScrollContainer>
       </Table>
 
       <Modal isOpen={deleteOpen} onOpenChange={setDeleteOpen}>

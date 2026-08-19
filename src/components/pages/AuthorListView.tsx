@@ -32,7 +32,7 @@ export default function AuthorListView({ authors }: { authors?: User[] }) {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
           {list.map((author: User) => (
-            <AuthorCard key={author._id} author={author} />
+            <AuthorCard key={author.id} author={author} />
           ))}
         </div>
       )}

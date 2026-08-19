@@ -3,7 +3,7 @@ import type { Comment } from "./comment";
 import type { User } from "./user";
 
 export type Post = {
-  _id: string;
+  id: string;
   title: string;
   description: string;
   summary: string;
@@ -18,8 +18,9 @@ export type Post = {
 };
 
 export type PaginatedPosts = {
-  docs: Post[];
+  data: Post[];
+  count: number;
+  page: number;
+  limit: number;
   totalPages: number;
-  page?: number;
-  limit?: number;
 };

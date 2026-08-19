@@ -91,7 +91,7 @@ export default function AuthorProfileView({
         ) : (
           <div className="max-h-[70vh] overflow-y-auto pr-2">
             {postList?.map((post: Post) => (
-              <PostCard key={post._id} post={post} />
+              <PostCard key={post.id} post={post} />
             ))}
           </div>
         )}

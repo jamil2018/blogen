@@ -4,12 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useSelector } from "react-redux";
 import { Plus, PencilSimple, Trash } from "@phosphor-icons/react";
 import {
-  Alert,
   Button,
-  Checkbox,
   Input,
   Modal,
   Spinner,
@@ -18,9 +15,14 @@ import {
   toast,
 } from "@heroui/react";
 import ErrorState from "../feedback/ErrorState";
-import { getAllPosts, deleteMultiplePostsById } from "../../data/postQueryFunctions";
+import {
+  getAllPosts,
+  getMyPosts,
+  deleteMultiplePostsById,
+} from "../../data/postQueryFunctions";
 import { POST_DATA } from "../../definitions/reactQueryConstants/queryConstants";
 import type { Post } from "../../types";
+import { selectionToIds } from "../../lib/selection";
 
 type PostsTableViewProps = {
   basePath: string;
@@ -33,14 +35,11 @@ export default function PostsTableView({
   requireAdmin = false,
   filterByAuthor = false,
 }: PostsTableViewProps) {
+  void requireAdmin;
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
-  const { user, isRehydrated } = useSelector(
-    (state: { userData: { user: { _id?: string; isAdmin?: boolean }; isRehydrated: boolean } }) =>
-      state.userData
-  );
 
   const [selected, setSelected] = useState<string[]>([]);
   const [search, setSearch] = useState("");
@@ -48,7 +47,7 @@ export default function PostsTableView({
 
   const { data, isLoading, isError } = useQuery({
     queryKey: [POST_DATA, { filterByAuthor }],
-    queryFn: getAllPosts,
+    queryFn: filterByAuthor ? getMyPosts : getAllPosts,
     refetchOnWindowFocus: false,
     refetchInterval: 10 * 60 * 1000,
   });
@@ -64,12 +63,6 @@ export default function PostsTableView({
   });
 
   useEffect(() => {
-    if (!isRehydrated) return;
-    if (requireAdmin && !user.isAdmin) router.push("/");
-    if (!requireAdmin && (user.isAdmin || !user._id)) router.push("/");
-  }, [isRehydrated, requireAdmin, router, user]);
-
-  useEffect(() => {
     if (searchParams.get("created") === "1") {
       toast("Post created", { variant: "success" });
       router.replace(pathname);
@@ -83,24 +76,12 @@ export default function PostsTableView({
   const rows = useMemo(() => {
     if (!data) return [];
     let posts = data as Post[];
-    if (filterByAuthor && user._id) {
-      posts = posts.filter((p) => {
-        const authorId = typeof p.author === "string" ? p.author : p.author?._id;
-        return authorId === user._id;
-      });
-    }
     if (search.trim()) {
       const q = search.toLowerCase();
       posts = posts.filter((p) => p.title.toLowerCase().includes(q));
     }
     return posts;
-  }, [data, filterByAuthor, search, user._id]);
-
-  const toggleRow = (id: string) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
-  };
+  }, [data, search]);
 
   if (isLoading) {
     return (
@@ -153,37 +134,40 @@ export default function PostsTableView({
         className="max-w-sm"
       />
 
-      <Table aria-label="Posts">
-        <Table.Header>
-          <Table.Column width={48}> </Table.Column>
-          <Table.Column isRowHeader>Title</Table.Column>
-          <Table.Column>Author</Table.Column>
-          <Table.Column>Category</Table.Column>
-          <Table.Column>Tags</Table.Column>
-        </Table.Header>
-        <Table.Body items={rows}>
-          {(post: Post) => (
-            <Table.Row id={post._id}>
-              <Table.Cell>
-                <Checkbox
-                  isSelected={selected.includes(post._id)}
-                  onChange={() => toggleRow(post._id)}
-                  aria-label={`Select ${post.title}`}
-                />
-              </Table.Cell>
-              <Table.Cell>{post.title}</Table.Cell>
-              <Table.Cell>
-                {typeof post.author === "object" ? post.author.name : "—"}
-              </Table.Cell>
-              <Table.Cell>
-                {typeof post.category === "object"
-                  ? post.category.title
-                  : "—"}
-              </Table.Cell>
-              <Table.Cell>{post.tags?.join(", ")}</Table.Cell>
-            </Table.Row>
-          )}
-        </Table.Body>
+      <Table>
+        <Table.ScrollContainer>
+          <Table.Content
+            aria-label="Posts"
+            selectionMode="multiple"
+            selectedKeys={new Set(selected)}
+            onSelectionChange={(keys) =>
+              setSelected(selectionToIds(keys, rows.map((p) => p.id)))
+            }
+          >
+            <Table.Header>
+              <Table.Column isRowHeader>Title</Table.Column>
+              <Table.Column>Author</Table.Column>
+              <Table.Column>Category</Table.Column>
+              <Table.Column>Tags</Table.Column>
+            </Table.Header>
+            <Table.Body items={rows}>
+              {(post: Post) => (
+                <Table.Row id={post.id}>
+                  <Table.Cell>{post.title}</Table.Cell>
+                  <Table.Cell>
+                    {typeof post.author === "object" ? post.author.name : "—"}
+                  </Table.Cell>
+                  <Table.Cell>
+                    {typeof post.category === "object"
+                      ? post.category.title
+                      : "—"}
+                  </Table.Cell>
+                  <Table.Cell>{post.tags?.join(", ")}</Table.Cell>
+                </Table.Row>
+              )}
+            </Table.Body>
+          </Table.Content>
+        </Table.ScrollContainer>
       </Table>
 
       <Modal isOpen={deleteOpen} onOpenChange={setDeleteOpen}>

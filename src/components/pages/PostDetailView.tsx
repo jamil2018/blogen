@@ -72,7 +72,7 @@ export default function PostDetailView({
   const data = hasPost ? post : queriedPost;
 
   const authorId =
-    typeof data?.author === "string" ? data.author : data?.author?._id;
+    typeof data?.author === "string" ? data.author : data?.author?.id;
   const hasAuthor = author !== undefined;
   const { isLoading: authorLoading, data: queriedAuthor } = useQuery({
     queryKey: [SINGLE_AUTHOR_DATA, authorId],
@@ -125,7 +125,7 @@ export default function PostDetailView({
           </Avatar>
           <div>
             <Link
-              href={`/authors/${authorObj._id}`}
+              href={`/authors/${authorObj.id}`}
               className="text-sm font-medium text-teal-700 dark:text-teal-400"
             >
               {authorObj.name}

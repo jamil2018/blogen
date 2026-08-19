@@ -20,7 +20,7 @@ Constraints for this milestone:
 
 ## Decision
 
-Use **Next.js 16 App Router** in `frontend/`, with these rules:
+Use **Next.js 16 App Router** at the repo root (originally in `frontend/`), with these rules:
 
 1. **App Router pages wrap existing UI.** Thin `src/app/**/page.tsx` files render the current screens. No parallel component library, no Hero UI.
 

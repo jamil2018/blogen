@@ -3,13 +3,12 @@
 import { useFormik } from "formik";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
 import * as yup from "yup";
 import Link from "next/link";
 import { Alert, Button } from "@heroui/react";
 import FormField from "./FormField";
+import OAuthButtons from "./OAuthButtons";
 import { signInUser } from "../../data/userQueryFunctions";
-import { storeUserData } from "../../redux/slices/userDataSlice";
 import { useState } from "react";
 
 const schema = yup.object({
@@ -23,29 +22,32 @@ const schema = yup.object({
 type LoginFormProps = {
   onSuccess?: () => void;
   showRegisterLink?: boolean;
+  next?: string;
+  error?: string;
 };
 
 export default function LoginForm({
   onSuccess,
   showRegisterLink = true,
+  next = "/user/dashboard",
+  error,
 }: LoginFormProps) {
-  const [showError, setShowError] = useState(false);
+  const [showError, setShowError] = useState(Boolean(error));
+  const [errorDetail, setErrorDetail] = useState(
+    error ?? "Incorrect email or password"
+  );
   const router = useRouter();
-  const dispatch = useDispatch();
 
   const mutation = useMutation({
     mutationFn: signInUser,
     onSuccess: (data) => {
-      dispatch(storeUserData(data));
-      if (data.isAdmin) {
-        router.push("/admin");
-      } else {
-        router.push("/user/dashboard");
-      }
+      router.refresh();
+      router.push(data.isAdmin ? "/admin" : next);
       onSuccess?.();
     },
-    onError: (error: Error & { status?: number }) => {
-      if (error.status === 401) setShowError(true);
+    onError: (error: Error) => {
+      setShowError(true);
+      setErrorDetail(error.message);
     },
   });
 
@@ -56,17 +58,19 @@ export default function LoginForm({
   });
 
   return (
-    <div className="mx-auto w-full max-w-md space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Sign in</h1>
-        <p className="mt-1 text-sm text-muted">Welcome back to Blogen</p>
-      </div>
+    <div className="space-y-6">
+      <header>
+        <h2 className="text-xl font-semibold tracking-tight text-ink">Sign in</h2>
+        <p className="mt-1.5 text-sm text-muted">
+          Use your email or Google account.
+        </p>
+      </header>
 
       {showError ? (
         <Alert status="danger">
           <Alert.Indicator />
           <Alert.Content>
-            <Alert.Description>Incorrect email or password</Alert.Description>
+            <Alert.Description>{errorDetail}</Alert.Description>
           </Alert.Content>
         </Alert>
       ) : null}
@@ -98,15 +102,34 @@ export default function LoginForm({
               : undefined
           }
         />
-        <Button type="submit" fullWidth isDisabled={mutation.isPending}>
-          Submit
+        <Button
+          type="submit"
+          fullWidth
+          isDisabled={mutation.isPending}
+          className="transition-transform active:scale-[0.98]"
+        >
+          {mutation.isPending ? "Signing in…" : "Sign in"}
         </Button>
       </form>
+
+      <div className="relative py-1">
+        <div className="absolute inset-0 flex items-center" aria-hidden>
+          <div className="w-full border-t border-border" />
+        </div>
+        <div className="relative flex justify-center">
+          <span className="bg-paper px-3 text-xs font-medium text-muted">or</span>
+        </div>
+      </div>
+
+      <OAuthButtons next={next} />
 
       {showRegisterLink ? (
         <p className="text-center text-sm text-muted">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="text-teal-700 dark:text-teal-400">
+          <Link
+            href="/register"
+            className="font-medium text-teal-700 underline-offset-4 hover:underline dark:text-teal-400"
+          >
             Sign up
           </Link>
         </p>

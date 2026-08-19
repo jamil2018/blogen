@@ -1,7 +1,5 @@
-import Link from "next/link";
-import { Tag } from "@heroui/react";
+import { Tag, TagGroup } from "@heroui/react";
 import type { Category } from "../../types";
-import { cn } from "../../lib/cn";
 
 type CategoryListProps = {
   categories: Category[];
@@ -13,17 +11,19 @@ export default function CategoryList({
   className,
 }: CategoryListProps) {
   return (
-    <div className={cn("flex flex-wrap gap-2", className)}>
-      {categories.map((cat) => (
-        <Link
-          key={cat._id}
-          href={`/posts/search/categories/${encodeURIComponent(cat.title)}`}
-        >
-          <Tag variant="surface" className="cursor-pointer capitalize">
+    <TagGroup variant="surface" aria-label="Categories">
+      <TagGroup.List className={className}>
+        {categories.map((cat) => (
+          <Tag
+            key={cat.id}
+            id={cat.id}
+            href={`/posts/search/categories/${encodeURIComponent(cat.title)}`}
+            className="capitalize"
+          >
             {cat.title}
           </Tag>
-        </Link>
-      ))}
-    </div>
+        ))}
+      </TagGroup.List>
+    </TagGroup>
   );
 }

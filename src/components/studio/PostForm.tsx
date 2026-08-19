@@ -71,7 +71,22 @@ export default function PostForm({
   });
 
   const mutation = useMutation({
-    mutationFn: mode === "create" ? createPost : updatePostById,
+    mutationFn: (input: {
+      postId?: string;
+      values: {
+        title: string;
+        description: string;
+        summary: string;
+        category: string;
+        tags: string[];
+        image: File | null;
+      };
+    }) => {
+      if (mode === "edit" && input.postId) {
+        return updatePostById({ postId: input.postId, values: input.values });
+      }
+      return createPost(input.values);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [POST_DATA] });
       onSuccess();
@@ -86,7 +101,7 @@ export default function PostForm({
       category:
         typeof existingPost?.category === "string"
           ? existingPost.category
-          : existingPost?.category?._id ?? "",
+          : existingPost?.category?.id ?? "",
       tags: existingPost?.tags?.join(", ") ?? "",
       description: existingPost?.description ?? "",
       image: null as File | null,
@@ -105,11 +120,7 @@ export default function PostForm({
         tags,
         image: values.image,
       };
-      if (mode === "edit" && postId) {
-        mutation.mutate({ postId, values: postData });
-      } else {
-        mutation.mutate(postData);
-      }
+      mutation.mutate({ postId, values: postData });
     },
   });
 
@@ -136,7 +147,11 @@ export default function PostForm({
         <Alert status="danger">
           <Alert.Indicator />
           <Alert.Content>
-            <Alert.Description>Failed to save post</Alert.Description>
+            <Alert.Description>
+              {mutation.error instanceof Error
+                ? mutation.error.message
+                : "Failed to save post"}
+            </Alert.Description>
           </Alert.Content>
         </Alert>
       ) : null}
@@ -191,7 +206,7 @@ export default function PostForm({
         <Select.Popover>
           <ListBox>
             {categoryList.map((cat) => (
-              <ListBoxItem key={cat._id} id={cat._id} textValue={cat.title}>
+              <ListBoxItem key={cat.id} id={cat.id} textValue={cat.title}>
                 {cat.title}
               </ListBoxItem>
             ))}
@@ -216,7 +231,10 @@ export default function PostForm({
       <PostCoverUpload
         value={formik.values.image}
         previewUrl={existingPost?.imageURL}
-        onChange={(file) => formik.setFieldValue("image", file)}
+        onChange={(file) => {
+          formik.setFieldValue("image", file);
+          formik.setFieldTouched("image", true, false);
+        }}
       />
       {formik.touched.image && formik.errors.image ? (
         <p className="text-xs text-red-600">{String(formik.errors.image)}</p>
