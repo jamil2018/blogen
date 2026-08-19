@@ -1,12 +1,14 @@
 import {
   createComment,
   deleteComment,
+  getAuthorCommentCount,
   getComment,
   getCommentsByPost,
   updateComment,
 } from "../actions/comments";
 
 export const getCommentsByPostId = getCommentsByPost;
+export const getMyCommentCount = getAuthorCommentCount;
 
 export function getCommentByPostIdCommentId({
   postId,

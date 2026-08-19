@@ -1,12 +1,21 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getCommentById, listCommentsByPost } from "../lib/db/comments";
+import {
+  countCommentsOnAuthorPosts,
+  getCommentById,
+  listCommentsByPost,
+} from "../lib/db/comments";
 import { requireUser } from "../lib/db/auth";
 import { COMMENT_SELECT, mapComment, type CommentRow } from "../lib/db/mappers";
 
 export async function getCommentsByPost(postId: string) {
   return listCommentsByPost(postId);
+}
+
+export async function getAuthorCommentCount() {
+  const { user } = await requireUser();
+  return countCommentsOnAuthorPosts(user.id);
 }
 
 export async function getComment(postId: string, commentId: string) {
