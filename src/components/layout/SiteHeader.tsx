@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, type ComponentProps } from "react";
 import { debounce } from "lodash";
 import { useQuery } from "@tanstack/react-query";
 import { List as MenuIcon } from "@phosphor-icons/react";
@@ -30,6 +30,25 @@ const navLinks = [
   { href: "/categories", label: "Categories" },
   { href: "/authors", label: "Authors" },
 ];
+
+type NavButtonProps = Omit<ComponentProps<typeof Button>, "onPress"> & {
+  href: string;
+  onNavigate?: () => void;
+};
+
+function NavButton({ href, onNavigate, ...props }: NavButtonProps) {
+  const router = useRouter();
+
+  return (
+    <Button
+      {...props}
+      onPress={() => {
+        onNavigate?.();
+        router.push(href);
+      }}
+    />
+  );
+}
 
 function SearchBar({ className }: { className?: string }) {
   const router = useRouter();
@@ -114,18 +133,14 @@ function UserMenu() {
   if (!user?.id) {
     return (
       <div className="flex items-center gap-2">
-        <Link href="/login">
-          <Button variant="ghost" size="sm">
-            <SignIn className="mr-1 size-4" />
-            Sign in
-          </Button>
-        </Link>
-        <Link href="/register">
-          <Button size="sm">
-            <UserPlus className="mr-1 size-4" />
-            Register
-          </Button>
-        </Link>
+        <NavButton variant="ghost" size="sm" href="/login">
+          <SignIn className="mr-1 size-4" />
+          Sign in
+        </NavButton>
+        <NavButton size="sm" href="/register">
+          <UserPlus className="mr-1 size-4" />
+          Register
+        </NavButton>
       </div>
     );
   }
@@ -197,11 +212,9 @@ export default function SiteHeader() {
 
         <nav className="hidden items-center gap-1 md:flex">
           {navLinks.map((link) => (
-            <Link key={link.href} href={link.href}>
-              <Button variant="ghost" size="sm">
-                {link.label}
-              </Button>
-            </Link>
+            <NavButton key={link.href} variant="ghost" size="sm" href={link.href}>
+              {link.label}
+            </NavButton>
           ))}
           <ThemeToggle />
           <UserMenu />
@@ -296,14 +309,12 @@ function MobileAuthLinks({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="flex gap-2 border-t border-border pt-4">
-      <Link href="/login" className="flex-1" onClick={onClose}>
-        <Button variant="ghost" fullWidth>
-          Sign in
-        </Button>
-      </Link>
-      <Link href="/register" className="flex-1" onClick={onClose}>
-        <Button fullWidth>Register</Button>
-      </Link>
+      <NavButton variant="ghost" fullWidth href="/login" onNavigate={onClose}>
+        Sign in
+      </NavButton>
+      <NavButton fullWidth href="/register" onNavigate={onClose}>
+        Register
+      </NavButton>
     </div>
   );
 }
