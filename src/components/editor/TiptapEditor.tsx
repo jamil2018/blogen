@@ -43,7 +43,7 @@ export default function TiptapEditor({
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-lg border border-border bg-paper",
+        "overflow-hidden rounded-xl border border-border bg-paper shadow-sm",
         className
       )}
     >

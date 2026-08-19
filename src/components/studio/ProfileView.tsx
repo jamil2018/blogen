@@ -1,13 +1,22 @@
 "use client";
 
+import { useCallback, useRef, useState } from "react";
 import { useFormik } from "formik";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  Camera,
+  EnvelopeSimple,
+  FacebookLogo,
+  LinkedinLogo,
+  TwitterLogo,
+  User,
+} from "@phosphor-icons/react";
 import * as yup from "yup";
-import { Camera } from "@phosphor-icons/react";
 import {
   Alert,
   Avatar,
   Button,
+  Card,
   Checkbox,
   Input,
   Label,
@@ -27,6 +36,7 @@ import {
 } from "../../definitions/reactQueryConstants/queryConstants";
 import { getAuthorNameInitials, sanitizeSocialURL } from "../../utils/dataFormat";
 import { useCurrentUser } from "../auth/AuthProvider";
+import { cn } from "../../lib/cn";
 
 const schema = yup.object({
   name: yup.string().required("Required"),
@@ -46,11 +56,118 @@ type ProfileViewProps = {
   userId?: string;
 };
 
+function SocialField({
+  name,
+  label,
+  icon,
+  value,
+  onChange,
+  placeholder,
+}: {
+  name: string;
+  label: string;
+  icon: React.ReactNode;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+}) {
+  return (
+    <TextField name={name}>
+      <Label>{label}</Label>
+      <div className="relative">
+        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted">
+          {icon}
+        </span>
+        <Input
+          name={name}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className="pl-10"
+        />
+      </div>
+    </TextField>
+  );
+}
+
+function LiveAuthorPreview({
+  name,
+  bio,
+  imageUrl,
+  previewUrl,
+  twitterId,
+  linkedinId,
+  facebookId,
+  email,
+}: {
+  name: string;
+  bio: string;
+  imageUrl?: string;
+  previewUrl: string | null;
+  twitterId: string;
+  linkedinId: string;
+  facebookId: string;
+  email: string;
+}) {
+  const initials = getAuthorNameInitials(name).filter(Boolean).join("");
+  const avatarSrc = previewUrl ?? imageUrl;
+
+  const socials = [
+    { icon: TwitterLogo, href: twitterId, label: "Twitter" },
+    { icon: LinkedinLogo, href: linkedinId, label: "LinkedIn" },
+    { icon: FacebookLogo, href: facebookId, label: "Facebook" },
+    { icon: EnvelopeSimple, href: email ? `mailto:${email}` : "", label: "Email" },
+  ].filter((s) => s.href);
+
+  return (
+    <Card className="overflow-hidden">
+      <div className="border-b border-border bg-zinc-50 px-4 py-3 dark:bg-zinc-900/50">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted">
+          Live preview
+        </p>
+      </div>
+      <div className="p-6 text-center">
+        <Avatar size="lg" className="mx-auto">
+          {avatarSrc ? (
+            <Avatar.Image src={avatarSrc} alt={name || "Author"} />
+          ) : (
+            <Avatar.Fallback>{initials || "?"}</Avatar.Fallback>
+          )}
+        </Avatar>
+        <p className="mt-4 text-lg font-semibold tracking-tight">
+          {name || "Your name"}
+        </p>
+        <p className="mt-2 line-clamp-4 text-sm text-muted">
+          {bio || "Your bio will appear on public author pages."}
+        </p>
+        {socials.length ? (
+          <div className="mt-4 flex justify-center gap-2">
+            {socials.map(({ icon: Icon, label }) => (
+              <span
+                key={label}
+                className="inline-flex size-8 items-center justify-center rounded-full border border-border text-muted"
+                title={label}
+                aria-label={label}
+              >
+                <Icon className="size-4" />
+              </span>
+            ))}
+          </div>
+        ) : null}
+      </div>
+    </Card>
+  );
+}
+
 export default function ProfileView({ admin = false, userId }: ProfileViewProps) {
   const queryClient = useQueryClient();
   const currentUser = useCurrentUser();
   const targetId = userId ?? currentUser?.id;
   const isAdminUserEdit = Boolean(admin && userId);
+
+  const [dragging, setDragging] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: [SINGLE_AUTHOR_DATA, targetId],
@@ -103,6 +220,19 @@ export default function ProfileView({ admin = false, userId }: ProfileViewProps)
     },
   });
 
+  const handleAvatar = useCallback(
+    (file: File | null) => {
+      if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+      if (file) {
+        setAvatarPreview(URL.createObjectURL(file));
+      } else {
+        setAvatarPreview(null);
+      }
+      formik.setFieldValue("image", file);
+    },
+    [avatarPreview, formik]
+  );
+
   if (isLoading) {
     return (
       <div className="flex justify-center py-12">
@@ -114,13 +244,18 @@ export default function ProfileView({ admin = false, userId }: ProfileViewProps)
   const initials = getAuthorNameInitials(formik.values.name).filter(Boolean).join("");
 
   return (
-    <form onSubmit={formik.handleSubmit} className="mx-auto max-w-lg space-y-4">
-      <h1 className="text-2xl font-semibold">
+    <form onSubmit={formik.handleSubmit} className="mx-auto max-w-5xl">
+      <h1 className="text-2xl font-semibold tracking-tight">
         {isAdminUserEdit ? "Edit user" : "Profile"}
       </h1>
+      <p className="mt-1 text-sm text-muted">
+        {isAdminUserEdit
+          ? "Update account details and permissions."
+          : "Shape how readers see you across Blogen."}
+      </p>
 
       {mutation.isSuccess ? (
-        <Alert status="success">
+        <Alert status="success" className="mt-4">
           <Alert.Indicator />
           <Alert.Content>
             <Alert.Description>
@@ -130,98 +265,158 @@ export default function ProfileView({ admin = false, userId }: ProfileViewProps)
         </Alert>
       ) : null}
 
-      <div className="flex items-center gap-4">
-        <Avatar size="lg">
-          {data?.imageURL ? (
-            <Avatar.Image src={data.imageURL} alt={data.name} />
-          ) : (
-            <Avatar.Fallback>{initials}</Avatar.Fallback>
-          )}
-        </Avatar>
-        <label className="cursor-pointer text-sm text-teal-700 dark:text-teal-400">
-          <Camera className="mr-1 inline size-4" />
-          Change photo
-          <input
-            type="file"
-            accept="image/*"
-            className="sr-only"
-            onChange={(e) =>
-              formik.setFieldValue("image", e.target.files?.[0] ?? null)
-            }
+      <div className="mt-6 grid gap-8 lg:grid-cols-[320px_1fr]">
+        <div className="space-y-4">
+          <LiveAuthorPreview
+            name={formik.values.name}
+            bio={formik.values.bio}
+            imageUrl={data?.imageURL}
+            previewUrl={avatarPreview}
+            twitterId={formik.values.twitterId}
+            linkedinId={formik.values.linkedinId}
+            facebookId={formik.values.facebookId}
+            email={formik.values.email}
           />
-        </label>
-      </div>
+        </div>
 
-      <TextField name="name">
-        <Label>Name</Label>
-        <Input name="name" value={formik.values.name} onChange={formik.handleChange} />
-      </TextField>
+        <div className="space-y-5">
+          <div>
+            <Label>Avatar</Label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              onChange={(e) => handleAvatar(e.target.files?.[0] ?? null)}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragging(true);
+              }}
+              onDragLeave={() => setDragging(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setDragging(false);
+                const file = e.dataTransfer.files?.[0];
+                if (file?.type.startsWith("image/")) handleAvatar(file);
+              }}
+              className={cn(
+                "mt-2 flex w-full items-center gap-4 rounded-xl border-2 border-dashed px-4 py-4 text-left transition-colors",
+                dragging
+                  ? "border-accent bg-accent/5"
+                  : "border-border hover:border-accent/40"
+              )}
+            >
+              <Avatar size="md">
+                {avatarPreview || data?.imageURL ? (
+                  <Avatar.Image
+                    src={avatarPreview ?? data?.imageURL}
+                    alt={formik.values.name}
+                  />
+                ) : (
+                  <Avatar.Fallback>{initials}</Avatar.Fallback>
+                )}
+              </Avatar>
+              <div>
+                <p className="flex items-center text-sm font-medium">
+                  <Camera className="mr-1.5 size-4" />
+                  Drop photo or browse
+                </p>
+                <p className="text-xs text-muted">PNG, JPG, or WebP</p>
+              </div>
+            </button>
+          </div>
 
-      {isAdminUserEdit ? (
-        <>
-          <TextField name="email">
-            <Label>Email</Label>
-            <Input
-              name="email"
-              type="email"
-              value={formik.values.email}
+          <TextField name="name">
+            <Label>Name</Label>
+            <div className="relative">
+              <User className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted" />
+              <Input
+                name="name"
+                value={formik.values.name}
+                onChange={formik.handleChange}
+                className="pl-10"
+              />
+            </div>
+          </TextField>
+
+          {isAdminUserEdit ? (
+            <>
+              <TextField name="email">
+                <Label>Email</Label>
+                <div className="relative">
+                  <EnvelopeSimple className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted" />
+                  <Input
+                    name="email"
+                    type="email"
+                    value={formik.values.email}
+                    onChange={formik.handleChange}
+                    className="pl-10"
+                  />
+                </div>
+              </TextField>
+              <Checkbox
+                isSelected={formik.values.isAdmin}
+                onChange={(isSelected) =>
+                  formik.setFieldValue("isAdmin", isSelected)
+                }
+              >
+                <Checkbox.Content>
+                  <Checkbox.Control>
+                    <Checkbox.Indicator />
+                  </Checkbox.Control>
+                  <Label>Admin</Label>
+                </Checkbox.Content>
+              </Checkbox>
+            </>
+          ) : null}
+
+          <TextField name="bio">
+            <Label>Bio</Label>
+            <TextArea
+              name="bio"
+              rows={4}
+              value={formik.values.bio}
               onChange={formik.handleChange}
+              placeholder="A short introduction for readers"
             />
           </TextField>
-          <Checkbox
-            isSelected={formik.values.isAdmin}
-            onChange={(isSelected) => formik.setFieldValue("isAdmin", isSelected)}
-          >
-            <Checkbox.Content>
-              <Checkbox.Control>
-                <Checkbox.Indicator />
-              </Checkbox.Control>
-              <Label>Admin</Label>
-            </Checkbox.Content>
-          </Checkbox>
-        </>
-      ) : null}
 
-      <TextField name="bio">
-        <Label>Bio</Label>
-        <TextArea
-          name="bio"
-          rows={4}
-          value={formik.values.bio}
-          onChange={formik.handleChange}
-        />
-      </TextField>
+          <SocialField
+            name="twitterId"
+            label="Twitter / X"
+            icon={<TwitterLogo className="size-4" />}
+            value={formik.values.twitterId}
+            onChange={(v) => formik.setFieldValue("twitterId", v)}
+            placeholder="handle"
+          />
 
-      <TextField name="facebookId">
-        <Label>Facebook</Label>
-        <Input
-          name="facebookId"
-          value={formik.values.facebookId}
-          onChange={formik.handleChange}
-        />
-      </TextField>
+          <SocialField
+            name="linkedinId"
+            label="LinkedIn"
+            icon={<LinkedinLogo className="size-4" />}
+            value={formik.values.linkedinId}
+            onChange={(v) => formik.setFieldValue("linkedinId", v)}
+            placeholder="profile slug"
+          />
 
-      <TextField name="linkedinId">
-        <Label>LinkedIn</Label>
-        <Input
-          name="linkedinId"
-          value={formik.values.linkedinId}
-          onChange={formik.handleChange}
-        />
-      </TextField>
+          <SocialField
+            name="facebookId"
+            label="Facebook"
+            icon={<FacebookLogo className="size-4" />}
+            value={formik.values.facebookId}
+            onChange={(v) => formik.setFieldValue("facebookId", v)}
+            placeholder="username"
+          />
 
-      <TextField name="twitterId">
-        <Label>Twitter</Label>
-        <Input
-          name="twitterId"
-          value={formik.values.twitterId}
-          onChange={formik.handleChange}
-        />
-      </TextField>
-
-      <Button type="submit" isDisabled={mutation.isPending}>
-        {isAdminUserEdit ? "Save user" : "Save profile"}
-      </Button>
+          <Button type="submit" className="rounded-full" isDisabled={mutation.isPending}>
+            {isAdminUserEdit ? "Save user" : "Save profile"}
+          </Button>
+        </div>
+      </div>
     </form>
   );
 }

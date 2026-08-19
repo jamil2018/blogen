@@ -3,8 +3,8 @@
 import { useMemo, useState } from "react";
 import { useFormik } from "formik";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { MagnifyingGlass, Plus, Trash } from "@phosphor-icons/react";
 import * as yup from "yup";
-import { Plus, Trash } from "@phosphor-icons/react";
 import {
   Button,
   Input,
@@ -22,9 +22,21 @@ import {
   createCategory,
   deleteMultipleCategoriesById,
 } from "../../data/categoryQueryFunctions";
-import { CATEGORY_DATA } from "../../definitions/reactQueryConstants/queryConstants";
-import type { Category } from "../../types";
+import { getAllPosts } from "../../data/postQueryFunctions";
+import {
+  CATEGORY_DATA,
+  POST_DATA,
+} from "../../definitions/reactQueryConstants/queryConstants";
+import type { Category, Post } from "../../types";
 import { selectionToIds } from "../../lib/selection";
+
+function categoryHue(title: string): number {
+  let hash = 0;
+  for (let i = 0; i < title.length; i += 1) {
+    hash = title.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return Math.abs(hash) % 360;
+}
 
 export default function AdminCategoriesView() {
   const queryClient = useQueryClient();
@@ -37,6 +49,24 @@ export default function AdminCategoriesView() {
     queryKey: [CATEGORY_DATA],
     queryFn: getAllCategories,
   });
+
+  const { data: posts } = useQuery({
+    queryKey: [POST_DATA, "admin-category-counts"],
+    queryFn: getAllPosts,
+  });
+
+  const postCountByCategory = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const post of (posts ?? []) as Post[]) {
+      const title =
+        typeof post.category === "object"
+          ? post.category.title
+          : String(post.category ?? "");
+      if (!title) continue;
+      counts.set(title, (counts.get(title) ?? 0) + 1);
+    }
+    return counts;
+  }, [posts]);
 
   const createMutation = useMutation({
     mutationFn: createCategory,
@@ -85,15 +115,21 @@ export default function AdminCategoriesView() {
     <div className="space-y-4">
       <Toast.Provider placement="bottom end" />
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-2xl font-semibold">Categories</h1>
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Categories</h1>
+          <p className="mt-1 text-sm text-muted">
+            Organize topics and monitor archive volume.
+          </p>
+        </div>
         <div className="flex gap-2">
-          <Button size="sm" onPress={() => setCreateOpen(true)}>
+          <Button size="sm" className="rounded-full" onPress={() => setCreateOpen(true)}>
             <Plus className="mr-1 size-4" />
             Create
           </Button>
           <Button
             size="sm"
             variant="danger"
+            className="rounded-full"
             isDisabled={selected.length === 0}
             onPress={() => setDeleteOpen(true)}
           >
@@ -102,12 +138,17 @@ export default function AdminCategoriesView() {
           </Button>
         </div>
       </div>
-      <Input
-        placeholder="Search categories…"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="max-w-sm"
-      />
+
+      <div className="relative max-w-sm">
+        <MagnifyingGlass className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted" />
+        <Input
+          placeholder="Search categories"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="pl-9"
+        />
+      </div>
+
       <Table>
         <Table.ScrollContainer>
           <Table.Content
@@ -119,14 +160,41 @@ export default function AdminCategoriesView() {
             }
           >
             <Table.Header>
-              <Table.Column isRowHeader>Title</Table.Column>
+              <Table.Column isRowHeader>Category</Table.Column>
+              <Table.Column>Posts</Table.Column>
+              <Table.Column>Created</Table.Column>
             </Table.Header>
             <Table.Body items={rows}>
-              {(cat: Category) => (
-                <Table.Row id={cat.id}>
-                  <Table.Cell>{cat.title}</Table.Cell>
-                </Table.Row>
-              )}
+              {(cat: Category) => {
+                const count = postCountByCategory.get(cat.title) ?? 0;
+                const hue = categoryHue(cat.title);
+                return (
+                  <Table.Row id={cat.id}>
+                    <Table.Cell>
+                      <div className="flex items-center gap-3">
+                        <span
+                          className="size-3 shrink-0 rounded-full"
+                          style={{
+                            backgroundColor: `oklch(0.62 0.14 ${hue})`,
+                          }}
+                          aria-hidden
+                        />
+                        <span className="font-medium capitalize">{cat.title}</span>
+                      </div>
+                    </Table.Cell>
+                    <Table.Cell>
+                      <span className="inline-flex rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium tabular-nums text-ink dark:bg-zinc-800">
+                        {count} {count === 1 ? "post" : "posts"}
+                      </span>
+                    </Table.Cell>
+                    <Table.Cell className="text-sm text-muted">
+                      {cat.createdAt
+                        ? new Date(cat.createdAt).toLocaleDateString()
+                        : "N/A"}
+                    </Table.Cell>
+                  </Table.Row>
+                );
+              }}
             </Table.Body>
           </Table.Content>
         </Table.ScrollContainer>
@@ -147,9 +215,10 @@ export default function AdminCategoriesView() {
                       name="title"
                       value={formik.values.title}
                       onChange={formik.handleChange}
+                      placeholder="e.g. engineering"
                     />
                   </TextField>
-                  <Button type="submit" className="mt-4">
+                  <Button type="submit" className="mt-4 rounded-full">
                     Create
                   </Button>
                 </form>
