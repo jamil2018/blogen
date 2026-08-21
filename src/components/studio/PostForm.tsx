@@ -36,6 +36,7 @@ import {
   SINGLE_POST_DATA,
 } from "../../definitions/reactQueryConstants/queryConstants";
 import type { Category, Post, PostRevision } from "../../types";
+import { getMyPublications } from "../../actions/publications";
 import {
   calculateReadingTime,
   convertToText,
@@ -163,7 +164,10 @@ export default function PostForm({
     queryFn: getAllCategories,
   });
 
-  const myPublications: { id: string; name: string }[] = [];
+  const { data: myPublications } = useQuery({
+    queryKey: ["my-publications"],
+    queryFn: getMyPublications,
+  });
 
   const { data: existingPost, isLoading: postLoading } = useQuery({
     queryKey: [SINGLE_POST_DATA, savedPostId],
