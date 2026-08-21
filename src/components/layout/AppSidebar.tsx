@@ -83,7 +83,14 @@ function getNavItems(variant: "user" | "admin"): NavItem[] {
       href: "/user/posts",
       label: "Posts",
       icon: <Article className="size-4" weight="duotone" />,
-      match: (p) => p.includes("/user/posts"),
+      match: (p) =>
+        p.includes("/user/posts") && !p.includes("/user/posts/portability"),
+    },
+    {
+      href: "/user/posts/portability",
+      label: "Import / Export",
+      icon: <Folder className="size-4" weight="duotone" />,
+      match: (p) => p.includes("/user/posts/portability"),
     },
     {
       href: "/user/profile",

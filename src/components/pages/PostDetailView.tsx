@@ -39,6 +39,7 @@ import { extractHeadingToc } from "../../lib/posts/contracts";
 import type { Post, User } from "../../types";
 import DeleteCommentForm from "../post/DeleteCommentForm";
 import EditCommentForm from "../post/EditCommentForm";
+import FollowButton from "../follow/FollowButton";
 
 type PostDetailViewProps = {
   postId?: string;
@@ -183,8 +184,14 @@ export default function PostDetailView({
                 </Avatar>
                 <span className="text-sm font-medium text-ink">{authorObj.name}</span>
               </Link>
+              <FollowButton targetType="author" targetId={authorObj.id} />
               {typeof data.category !== "string" && data.category?.id ? (
-                ) : null}
+                <FollowButton
+                  targetType="category"
+                  targetId={data.category.id}
+                  label="Follow topic"
+                />
+              ) : null}
               <span className="text-muted">·</span>
               {data.createdAt ? (
                 <time className="text-sm text-muted" dateTime={data.createdAt}>

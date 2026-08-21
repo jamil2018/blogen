@@ -30,21 +30,13 @@ import {
   updateUserById,
 } from "../../data/userQueryFunctions";
 import type { ProfileInput } from "../../actions/users";
-async function clearMyReadingProgress() {
-  return;
-}
-async function deleteMyReaderData() {
-  return { ok: true };
-}
-async function exportMyAccountData() {
-  return { exportedAt: new Date().toISOString() };
-}
-async function getMyPreferences() {
-  return { readingHistoryEnabled: false };
-}
-async function updateMyPreferences(_input: { readingHistoryEnabled: boolean }) {
-  return { readingHistoryEnabled: false };
-}
+import {
+  clearMyReadingProgress,
+  deleteMyReaderData,
+  exportMyAccountData,
+  getMyPreferences,
+  updateMyPreferences,
+} from "../../actions/reading";
 import {
   SINGLE_AUTHOR_DATA,
   USER_DATA,
