@@ -286,9 +286,25 @@ export default function PostsTableView({
                         </span>
                       </Table.Cell>
                       <Table.Cell className="text-sm text-muted">
-                        {post.createdAt
-                          ? getPostFormattedDate(post.createdAt)
-                          : "Draft"}
+                        <div className="flex flex-col gap-1">
+                          <span
+                            className={cn(
+                              "inline-flex w-fit rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide",
+                              post.status === "published"
+                                ? "bg-teal-50 text-teal-800 dark:bg-teal-950 dark:text-teal-300"
+                                : post.status === "archived"
+                                  ? "bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+                                  : "bg-amber-50 text-amber-800 dark:bg-amber-950 dark:text-amber-200"
+                            )}
+                          >
+                            {post.status ?? "draft"}
+                          </span>
+                          {post.publishedAt
+                            ? getPostFormattedDate(post.publishedAt)
+                            : post.createdAt
+                              ? getPostFormattedDate(post.createdAt)
+                              : null}
+                        </div>
                       </Table.Cell>
                       <Table.Cell>
                         <span className="inline-flex items-center gap-1 text-xs text-muted">

@@ -26,7 +26,9 @@ import AppIcon from "../../assets/appIcon.svg";
 import { SignIn, UserPlus } from "@phosphor-icons/react";
 
 const navLinks = [
-  { href: "/about", label: "About" },
+  { href: "/", label: "Explore" },
+  { href: "/following", label: "Following" },
+  { href: "/library", label: "Library" },
   { href: "/categories", label: "Categories" },
   { href: "/authors", label: "Authors" },
 ];
@@ -55,10 +57,10 @@ function SearchBar({ className }: { className?: string }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
 
-  const { isLoading, data } = useQuery({
+  const { isLoading, data, isError } = useQuery({
     queryKey: [SEARCH_POST_DATA, query],
     queryFn: ({ queryKey }) => searchPosts(queryKey[1] as string),
-    enabled: query.length > 0,
+    enabled: query.length >= 2,
     refetchOnWindowFocus: false,
   });
 
@@ -91,12 +93,18 @@ function SearchBar({ className }: { className?: string }) {
           />
         </SearchField.Group>
       </SearchField>
-      {open && query ? (
-        <div className="absolute top-full z-50 mt-1 w-full min-w-[16rem] rounded-xl border border-border bg-paper p-2 shadow-lg">
+      {open && query.length >= 2 ? (
+        <div
+          className="absolute top-full z-50 mt-1 w-full min-w-[16rem] rounded-xl border border-border bg-paper p-2 shadow-lg"
+          role="listbox"
+          aria-label="Search suggestions"
+        >
           {isLoading ? (
             <div className="flex justify-center py-4">
               <Spinner size="sm" />
             </div>
+          ) : isError ? (
+            <p className="px-3 py-2 text-sm text-muted">Search failed. Try again.</p>
           ) : (data as Post[] | undefined)?.length ? (
             <ul className="max-h-60 overflow-y-auto">
               {(data as Post[]).map((post) => (
@@ -105,6 +113,7 @@ function SearchBar({ className }: { className?: string }) {
                     href={`/posts/${post.id}`}
                     className="block rounded-lg px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800"
                     onClick={() => setOpen(false)}
+                    role="option"
                   >
                     {post.title}
                   </Link>
@@ -166,6 +175,18 @@ function UserMenu() {
       </Dropdown.Trigger>
       <Dropdown.Popover>
         <Dropdown.Menu>
+          <Dropdown.Item
+            id="create"
+            href={user.isAdmin ? "/admin/posts/create" : "/user/posts/create"}
+          >
+            Create
+          </Dropdown.Item>
+          <Dropdown.Item id="library" href="/library">
+            Library
+          </Dropdown.Item>
+          <Dropdown.Item id="following" href="/following">
+            Following
+          </Dropdown.Item>
           <Dropdown.Item
             id="dashboard"
             href={user.isAdmin ? "/admin" : "/user/dashboard"}

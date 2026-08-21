@@ -16,6 +16,8 @@ export type ProfileInput = {
   facebookId?: string;
   linkedinId?: string;
   twitterId?: string;
+  websiteUrl?: string;
+  expertiseTopics?: string[];
   isAdmin?: boolean;
   image?: File | null;
 };
@@ -61,6 +63,10 @@ async function applyProfileUpdates(
   if (input.facebookId !== undefined) updates.facebook_id = input.facebookId;
   if (input.linkedinId !== undefined) updates.linkedin_id = input.linkedinId;
   if (input.twitterId !== undefined) updates.twitter_id = input.twitterId;
+  if (input.websiteUrl !== undefined) updates.website_url = input.websiteUrl;
+  if (input.expertiseTopics !== undefined) {
+    updates.expertise_topics = input.expertiseTopics;
+  }
   if (allowAdminFlag && input.isAdmin !== undefined) {
     updates.is_admin = input.isAdmin;
   }

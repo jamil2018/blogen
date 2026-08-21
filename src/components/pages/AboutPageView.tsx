@@ -8,12 +8,8 @@ import AuthorCard from "../post/AuthorCard";
 import Reveal from "../motion/Reveal";
 import ErrorState from "../feedback/ErrorState";
 import { getLatestUsers } from "../../data/userQueryFunctions";
-import { getAllPosts } from "../../data/postQueryFunctions";
-import { getAllCategories } from "../../data/categoryQueryFunctions";
-import {
-  CATEGORY_DATA,
-  DETAILED_USER_DATA,
-} from "../../definitions/reactQueryConstants/queryConstants";
+import { getPlatformStats } from "../../data/postQueryFunctions";
+import { DETAILED_USER_DATA } from "../../definitions/reactQueryConstants/queryConstants";
 import type { User } from "../../types";
 
 const PHILOSOPHY = [
@@ -47,30 +43,24 @@ export default function AboutPageView({ users }: { users?: User[] }) {
   });
   const userList = hasUsers ? users : data;
 
-  const { data: allPosts } = useQuery({
-    queryKey: ["about-post-count"],
-    queryFn: getAllPosts,
-    refetchOnWindowFocus: false,
-  });
-
-  const { data: categories } = useQuery({
-    queryKey: [CATEGORY_DATA],
-    queryFn: getAllCategories,
+  const { data: stats } = useQuery({
+    queryKey: ["platform-stats"],
+    queryFn: getPlatformStats,
     refetchOnWindowFocus: false,
   });
 
   const metrics = [
     {
       label: "Community of Writers",
-      value: userList?.length ?? 0,
+      value: stats?.authorsWithPosts ?? 0,
     },
     {
       label: "Articles Published",
-      value: allPosts?.length ?? 0,
+      value: stats?.publishedPosts ?? 0,
     },
     {
       label: "Topics Covered",
-      value: categories?.length ?? 0,
+      value: stats?.categoriesWithPosts ?? 0,
     },
   ];
 
@@ -81,12 +71,11 @@ export default function AboutPageView({ users }: { users?: User[] }) {
           Our manifesto
         </p>
         <h1 className="mt-3 text-4xl font-semibold tracking-tighter text-ink sm:text-5xl lg:text-6xl">
-          Where thoughtful ideas find their audience
+          Where durable knowledge finds its audience
         </h1>
         <p className="mt-4 max-w-lg text-base leading-relaxed text-muted md:text-lg">
-          Blogen is a publishing platform for developers, designers, and curious
-          minds. Write with clarity, connect with readers, and grow your voice
-          in a community that values substance over noise.
+          Blogen is a knowledge-oriented publishing community. Write with clarity,
+          connect ideas across topics, and grow a body of work readers can trust.
         </p>
       </div>
       <div className="grid grid-cols-3 gap-4">

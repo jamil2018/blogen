@@ -1,4 +1,13 @@
-export type { Category } from "./category";
-export type { Comment } from "./comment";
-export type { PaginatedPosts, Post } from "./post";
-export type { User } from "./user";
+import type { Category } from "./category";
+import type { Comment } from "./comment";
+import type { PaginatedPosts, Post, PostRevision } from "./post";
+import type { User } from "./user";
+export type {
+  Publication,
+  PublicationMember,
+  PublicationSection,
+  Newsletter,
+  Subscription,
+} from "./publication";
+
+export type { Category, Comment, PaginatedPosts, Post, PostRevision, User };

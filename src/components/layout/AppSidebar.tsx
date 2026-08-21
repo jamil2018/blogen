@@ -6,6 +6,7 @@ import { useState, type ReactNode } from "react";
 import {
   Article,
   ChartBar,
+  CurrencyDollar,
   Folder,
   List as MenuIcon,
   PenNib,
@@ -13,6 +14,7 @@ import {
   SignOut,
   User,
   Users,
+  Ticket,
 } from "@phosphor-icons/react";
 import { Avatar, Button, Drawer } from "@heroui/react";
 import { signOut } from "../../actions/auth";
@@ -48,6 +50,18 @@ function getNavItems(variant: "user" | "admin"): NavItem[] {
         label: "Posts",
         icon: <Article className="size-4" weight="duotone" />,
         match: (p) => p.includes("/admin/posts"),
+      },
+      {
+        href: "/admin/moderation",
+        label: "Moderation",
+        icon: <ShieldCheck className="size-4" weight="duotone" />,
+        match: (p) => p.startsWith("/admin/moderation"),
+      },
+      {
+        href: "/admin/payments",
+        label: "Payments",
+        icon: <CurrencyDollar className="size-4" weight="duotone" />,
+        match: (p) => p.startsWith("/admin/payments"),
       },
       {
         href: "/admin/profile",

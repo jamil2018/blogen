@@ -5,10 +5,12 @@ import { motion, useReducedMotion } from "motion/react";
 
 type ReadingProgressBarProps = {
   targetId?: string;
+  postId?: string;
 };
 
 export default function ReadingProgressBar({
   targetId = "article-content",
+  postId: _postId,
 }: ReadingProgressBarProps) {
   const [progress, setProgress] = useState(0);
   const prefersReducedMotion = useReducedMotion();
@@ -38,29 +40,20 @@ export default function ReadingProgressBar({
     return () => window.removeEventListener("scroll", update);
   }, [targetId]);
 
-  const bar = (
-    <div
-      className="h-full bg-gradient-to-r from-accent/70 to-accent"
-      style={{ width: `${progress}%` }}
-    />
-  );
-
   return (
     <div
-      className="pointer-events-none fixed inset-x-0 top-0 z-50 h-0.5 bg-border/50"
+      className="fixed left-0 right-0 top-0 z-50 h-0.5 bg-transparent"
       role="progressbar"
       aria-valuenow={Math.round(progress)}
       aria-valuemin={0}
       aria-valuemax={100}
       aria-label="Reading progress"
     >
-      {prefersReducedMotion ? bar : (
-        <motion.div
-          className="h-full bg-gradient-to-r from-accent/70 to-accent"
-          animate={{ width: `${progress}%` }}
-          transition={{ duration: 0.1, ease: [0.16, 1, 0.3, 1] }}
-        />
-      )}
+      <motion.div
+        className="h-full origin-left bg-accent"
+        style={{ scaleX: progress / 100 }}
+        transition={prefersReducedMotion ? { duration: 0 } : { type: "spring", stiffness: 120, damping: 30 }}
+      />
     </div>
   );
 }

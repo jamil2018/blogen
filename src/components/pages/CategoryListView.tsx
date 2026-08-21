@@ -10,33 +10,11 @@ import Reveal from "../motion/Reveal";
 import ErrorState from "../feedback/ErrorState";
 import { CategorySkeletonGrid } from "../feedback/PageSkeleton";
 import { getAllCategories } from "../../data/categoryQueryFunctions";
-import { getAllPosts } from "../../data/postQueryFunctions";
+import { getCategoryPostCounts } from "../../data/postQueryFunctions";
 import { CATEGORY_DATA } from "../../definitions/reactQueryConstants/queryConstants";
-import type { Category, Post } from "../../types";
+import type { Category } from "../../types";
 import { cn } from "../../lib/cn";
-
-function buildCategoryStats(posts: Post[]) {
-  const stats = new Map<
-    string,
-    { count: number; tags: Set<string>; latestTitle?: string }
-  >();
-
-  for (const post of posts) {
-    const title =
-      typeof post.category === "string"
-        ? post.category
-        : post.category?.title;
-    if (!title) continue;
-
-    const entry = stats.get(title) ?? { count: 0, tags: new Set<string>() };
-    entry.count += 1;
-    if (!entry.latestTitle) entry.latestTitle = post.title;
-    post.tags?.slice(0, 2).forEach((tag) => entry.tags.add(tag));
-    stats.set(title, entry);
-  }
-
-  return stats;
-}
+import FollowButton from "../follow/FollowButton";
 
 export default function CategoryListView({
   categories,
@@ -55,28 +33,27 @@ export default function CategoryListView({
   });
   const list = hasCategories ? categories : data;
 
-  const { data: allPosts } = useQuery({
-    queryKey: ["all-posts-stats"],
-    queryFn: getAllPosts,
+  const { data: counts } = useQuery({
+    queryKey: ["category-post-counts"],
+    queryFn: getCategoryPostCounts,
     refetchOnWindowFocus: false,
   });
 
-  const stats = useMemo(
-    () => (allPosts ? buildCategoryStats(allPosts) : new Map()),
-    [allPosts]
-  );
+  const countMap = useMemo(() => {
+    const map = new Map<string, number>();
+    counts?.forEach((row) => map.set(row.categoryId, row.postCount));
+    return map;
+  }, [counts]);
 
   const enriched = useMemo(() => {
     if (!list) return [];
     return list
       .map((cat) => ({
         ...cat,
-        postCount: stats.get(cat.title)?.count ?? 0,
-        tags: Array.from(stats.get(cat.title)?.tags ?? []).slice(0, 3) as string[],
-        latestTitle: stats.get(cat.title)?.latestTitle,
+        postCount: countMap.get(cat.id) ?? 0,
       }))
       .sort((a, b) => b.postCount - a.postCount);
-  }, [list, stats]);
+  }, [list, countMap]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -84,7 +61,7 @@ export default function CategoryListView({
     return enriched.filter((cat) => cat.title.toLowerCase().includes(q));
   }, [enriched, query]);
 
-  const trending = enriched.slice(0, 3);
+  const trending = enriched.filter((c) => c.postCount > 0).slice(0, 3);
 
   const bentoSpans = [
     "sm:col-span-2 sm:row-span-2",
@@ -149,43 +126,39 @@ export default function CategoryListView({
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((cat, index) => (
             <Reveal key={cat.id} delay={index * 0.03}>
-              <Link
-                href={`/posts/search/categories/${encodeURIComponent(cat.title)}`}
-                className={cn("group block h-full", bentoSpans[index % bentoSpans.length])}
+              <div
+                className={cn(
+                  "group relative h-full",
+                  bentoSpans[index % bentoSpans.length]
+                )}
               >
-                <Card className="flex h-full flex-col justify-between p-5 transition-all hover:-translate-y-0.5 hover:shadow-md">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-accent">
-                      {cat.postCount} {cat.postCount === 1 ? "article" : "articles"}
-                    </p>
-                    <h2 className="mt-2 text-xl font-semibold capitalize tracking-tight text-ink transition-colors group-hover:text-accent">
-                      {cat.title}
-                    </h2>
-                    {cat.latestTitle ? (
-                      <p className="mt-2 line-clamp-2 text-sm text-muted">
-                        Latest: {cat.latestTitle}
+                <Link
+                  href={`/posts/search/categories/${encodeURIComponent(cat.title)}`}
+                  className="block h-full"
+                >
+                  <Card className="flex h-full flex-col justify-between p-5 transition-all hover:-translate-y-0.5 hover:shadow-md">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-accent">
+                        {cat.postCount}{" "}
+                        {cat.postCount === 1 ? "article" : "articles"}
                       </p>
-                    ) : null}
-                  </div>
-                  {cat.tags.length > 0 ? (
-                    <div className="mt-4 flex flex-wrap gap-1.5">
-                      {cat.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-muted dark:bg-zinc-800"
-                        >
-                          {tag}
-                        </span>
-                      ))}
+                      <h2 className="mt-2 text-xl font-semibold capitalize tracking-tight text-ink transition-colors group-hover:text-accent">
+                        {cat.title}
+                      </h2>
                     </div>
-                  ) : null}
-                </Card>
-              </Link>
+                  </Card>
+                </Link>
+                <div className="absolute bottom-4 right-4">
+                  <FollowButton targetType="category" targetId={cat.id} />
+                </div>
+              </div>
             </Reveal>
           ))}
         </div>
       ) : (
-        <p className="py-12 text-center text-muted">No categories match your search.</p>
+        <p className="py-12 text-center text-muted">
+          No categories match your search.
+        </p>
       )}
     </>
   );
