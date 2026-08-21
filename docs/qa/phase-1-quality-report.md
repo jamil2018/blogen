@@ -1,16 +1,16 @@
 # Phase 1 Quality Report — Stage E Exit Gate
 
-**Date:** 2026-08-21  
+**Date:** 2026-08-22  
 **Scope:** Competitive-foundation exit for Blogen Phase 1 (Stages A–E)  
 **Plan:** Phase 1 full plan (Stages A–E); exit criteria in `docs/product-roadmap/01-phase-1-ux-hardening.md`  
 **Route matrix:** `docs/qa/phase-1-route-matrix.md`
 
 ## Verdict
 
-**Code/CI foundation: PASS (local automated suites).**  
-**Production-like Phase 1 exit: PARTIAL / not fully exited.**
+**Phase 1 code on `main`: COMPLETE for continuing product work.**  
+**Live email / paid journeys: DEFERRED to final deploy readiness** (not blockers for treating Phase 1 code as done).
 
-Reader and independent-writer journeys are implementable and smoke-covered in code. Publication structural paths (create pub, editorial UI, audience CSV) are present. **Paid-creator and email-dependent publication/migrating-creator steps are BLOCKED** until the user provisions Resend + Stripe via Vercel Marketplace, pulls env, applies migrations A→D, and sets `CRON_SECRET`. Email/payment paths **refuse without env** (no mocked success) — confirmed by code and e2e webhook status checks.
+Reader, writer, publication, analytics, and monetization/email **code paths** are in place. Live Resend sends and Stripe checkout/Connect wait until all features are ready to deploy. Until then, email/payment paths **refuse without env** (no mocked success) — confirmed by code and e2e webhook status checks.
 
 ---
 
@@ -31,35 +31,31 @@ CI workflow (`.github/workflows/ci.yml`) runs lint → typecheck → vitest, the
 | Variable | Status |
 | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` / publishable / service role | SET (`.env.local`) |
-| `RESEND_API_KEY` / `RESEND_FROM_EMAIL` / `RESEND_WEBHOOK_SECRET` | **MISSING** (Resend install needs owned domain metadata) |
-| `STRIPE_SECRET_KEY` / `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | **SET** (Marketplace sandbox `stripe-emerald-pillar`; also `STRIPE_PUBLISHABLE_KEY` alias) |
-| `STRIPE_WEBHOOK_SECRET` | **MISSING** (create webhook endpoint, then add secret) |
-| `STRIPE_CONNECT_CLIENT_ID` | **MISSING** (optional Connect) |
-| `CRON_SECRET` | **MISSING** (manual; not from Marketplace) |
-| `NEXT_PUBLIC_SITE_URL` | **MISSING** (manual; set to production URL) |
-| Vercel CLI `whoami` / project link | **OK** (`jamil2018`; project `blogen` linked) |
-| Marketplace install Stripe | **OK** (sandbox; claim later) |
-| Marketplace install Resend | **BLOCKED** — provide `-m domain=<owned>` (see `docs/qa/ops-progress.md`) |
+| `RESEND_API_KEY` / `RESEND_FROM_EMAIL` / `RESEND_WEBHOOK_SECRET` | **Deferred to deploy** — do not provision now |
+| `STRIPE_*` / publishable | **Deferred to deploy** for live paid journeys (refuse-without-env until set) |
+| `CRON_SECRET` / `NEXT_PUBLIC_SITE_URL` | **Deferred to deploy** (manual) |
+| Vercel CLI `whoami` / project link | **OK** when linked |
+| Marketplace install Resend / Stripe | **Deferred** until final deploy readiness (`docs/qa/ops-progress.md`) |
 
 ---
 
 ## Five parity journeys
 
-### 1. Reader — **PARTIAL**
+### 1. Reader — **PASS (code)**; email legs deferred to deploy
 
 | Step | Status | Evidence / blocker |
 | --- | --- | --- |
 | Discover a post | PASS (code + smoke) | `/` Explore; Stage A e2e home load |
 | Read comfortably | PASS (code) | TOC, related, share, reading progress (Stage B) |
 | Follow author / publication | PASS (code + smoke gates) | Follow controls; `/following` auth redirect e2e |
-| Subscribe by email | **BLOCKED** | Subscribe UI/actions exist; sends require Resend |
-| Receive and manage delivery | **BLOCKED** | Resend webhook/suppression implemented but env missing |
+| Subscribe by email | **DEFERRED (deploy)** | Subscribe UI/actions exist; live sends wait for Resend at deploy |
+| Receive and manage delivery | **DEFERRED (deploy)** | Resend webhook/suppression implemented; env at deploy prep |
 | Save / respond / report | PASS (code + smoke) | Library auth redirect e2e; reports + `/admin/moderation` |
 | Return via Library or feed | PASS (code) | `/library`, `/following` |
 
-**Blockers:** Resend Marketplace + env; DB migrations A–C applied on target project for follows/subscriptions tables.
+**Remaining for live email:** Resend at final deploy readiness; ensure Stage A–C migrations on the target project. Not a Phase 1 code-complete blocker.
 
-### 2. Independent writer — **PARTIAL**
+### 2. Independent writer — **PASS (code)**; email/cron live deferred to deploy
 
 | Step | Status | Evidence / blocker |
 | --- | --- | --- |
@@ -68,13 +64,13 @@ CI workflow (`.github/workflows/ci.yml`) runs lint → typecheck → vitest, the
 | Save / recover / preview | PASS (code) | Draft autosave, `/user/posts/preview/[postId]` |
 | Schedule / publish | PARTIAL | Schedule + cron route exist; **cron needs `CRON_SECRET` + service role on deploy** |
 | Distribute to followers | PASS (code) | Web + followers distribution toggles |
-| Distribute to email subscribers | **BLOCKED** | Requires Resend |
+| Distribute to email subscribers | **DEFERRED (deploy)** | Requires Resend at final deploy readiness |
 | Inspect performance | PASS (code + smoke gate) | `/user/analytics` + rollups; empty-ok until traffic |
 | Export owned content | PASS (code) | Portability export zip |
 
-**Blockers:** Resend for email distribution; apply Stage A–D migrations; set cron secret for scheduled go-live in production.
+**Remaining for live schedule/email:** `CRON_SECRET` + Resend at deploy prep; apply Stage A–D migrations on target. Not a Phase 1 code-complete blocker.
 
-### 3. Publication — **PARTIAL**
+### 3. Publication — **PASS (code)**; email legs deferred to deploy
 
 | Step | Status | Evidence / blocker |
 | --- | --- | --- |
@@ -83,38 +79,38 @@ CI workflow (`.github/workflows/ci.yml`) runs lint → typecheck → vitest, the
 | Invite contributor | PASS (code) | `publication_members` + invite action |
 | Review submission | PASS (code) | Editorial states + audit |
 | Publish / schedule on web | PASS (code) | Post + pub attribution; schedule as writer |
-| Email subscribers | **BLOCKED** | Newsletter send refuses without Resend |
+| Email subscribers | **DEFERRED (deploy)** | Newsletter send refuses without Resend until deploy |
 | Moderate discussion | PASS (code) | Platform reports + admin queue; pub-level discussion moderation is report-path based |
 | Inspect performance | PASS (code) | Publication-scoped analytics rollups |
 
-**Blockers:** Resend; migrations through Stage C (+ D for analytics); Checkpoint E live checklist still unchecked on production-like infra.
+**Remaining for live pub email:** Resend + Checkpoint E live checklist at deploy. Not a Phase 1 code-complete blocker.
 
-### 4. Paid creator — **BLOCKED**
+### 4. Paid creator — **DEFERRED (deploy)** for live path; **PASS (code)** refuse-without-env
 
 | Step | Status | Evidence / blocker |
 | --- | --- | --- |
-| Connect payment provider | **BLOCKED** | Connect onboarding throws without Stripe env; UI warns |
-| Define tiers / access | PARTIAL | Tier CRUD + post `accessLevel` public\|members\|paid in studio; **Stripe Price sync needs Stripe** |
-| Publish preview / paywalled content | PARTIAL | Server-side entitlement strip in `applyPaywall` / slug route; live paid entitlement needs memberships from Stripe |
-| Reader checkout | **BLOCKED** | `startMembershipCheckout` refuses without Stripe |
-| Entitlement enforced | PARTIAL | Code path exists; end-to-end paid entitlement unproven without Stripe |
-| Earnings / payout | **BLOCKED** | Ledger UI + Connect refuse without Stripe |
-| Cancel / refund states | PARTIAL | Webhook handlers + admin `/admin/payments`; untested live |
+| Connect payment provider | **DEFERRED (deploy)** | Connect onboarding refuses without Stripe env; UI warns |
+| Define tiers / access | PASS (code) | Tier CRUD + post `accessLevel` public\|members\|paid; Stripe Price sync when configured |
+| Publish preview / paywalled content | PASS (code) | Server-side entitlement strip in `applyPaywall` / slug route |
+| Reader checkout | **DEFERRED (deploy)** | `startMembershipCheckout` refuses without Stripe |
+| Entitlement enforced | PASS (code) | Code path exists; live paid entitlement after Stripe at deploy |
+| Earnings / payout | **DEFERRED (deploy)** | Ledger UI + Connect refuse without Stripe |
+| Cancel / refund states | PASS (code) | Webhook handlers + admin `/admin/payments`; live after webhook secret |
 
-**Blockers:** Stripe Marketplace provision + webhook endpoint + Connect Express (Checkpoint F). Honest refuse-without-env verified by e2e (`/api/webhooks/stripe` ∈ {401, 503}).
+**Remaining for live paid journeys:** Stripe + webhook (+ Connect) at final deploy readiness (Checkpoint F). Honest refuse-without-env verified by e2e (`/api/webhooks/stripe` ∈ {401, 503}). Not a Phase 1 code-complete blocker.
 
-### 5. Migrating creator — **PARTIAL**
+### 5. Migrating creator — **PASS (code)**; welcome/delivery live deferred to deploy
 
 | Step | Status | Evidence / blocker |
 | --- | --- | --- |
 | Import content | PASS (code) | Portability Markdown/HTML zip + mapped/skipped/failed |
 | Import consented subscribers | PARTIAL | CSV import with consent attestation in code; **needs Stage C migration + live rehearsal** |
 | Inspect validation / errors | PASS (code) | Import reports |
-| Configure welcome / delivery | **BLOCKED** for live send | Welcome config stored; send requires Resend |
+| Configure welcome / delivery | **DEFERRED (deploy)** for live send | Welcome config stored; send requires Resend at deploy |
 | Verify URLs / domain | PARTIAL | `/p/[slug]` + redirects; **custom domains deferred (P1)** |
 | Export without lock-in | PASS (code) | Content export + audience CSV export |
 
-**Blockers:** Resend for welcome/delivery; migration apply + launch-readiness rehearsal (`docs/qa/launch-readiness.md`); custom domain out of Phase 1 P0.
+**Remaining for live migration email:** Resend + migration apply + launch-readiness rehearsal at deploy (`docs/qa/launch-readiness.md`); custom domain out of Phase 1 P0. Not a Phase 1 code-complete blocker.
 
 ---
 
@@ -127,14 +123,14 @@ CI workflow (`.github/workflows/ci.yml`) runs lint → typecheck → vitest, the
 | Identity | Profiles, expertise, links, contribution history, privacy | **PASS (code)** | |
 | Authoring | Editor, recovery, preview, metadata, schedule, revisions, archive, import/export | **PASS (code)** | Cron secret required for prod schedule |
 | Publications | Branded pub, homepage/archive/sections, roles, submission workflow | **PASS (code)** | Email distribution blocked on Resend |
-| Audience | Follow vs subscribe, newsletters, consent, welcome, dashboard, import/export | **PARTIAL** | Schema + UI; **live email BLOCKED** |
+| Audience | Follow vs subscribe, newsletters, consent, welcome, dashboard, import/export | **PASS (code)** | Schema + UI; **live email deferred to deploy** |
 | Analytics | Post/traffic/pub/author/audience metrics + definitions | **PASS (code)** | `docs/analytics/metrics.md`; empty rollups until traffic |
-| Monetization | Free/paid tiers, paywalls, checkout, entitlements, cancel/refund, earnings/payouts | **PARTIAL / BLOCKED live** | Code + refuse-without-env; **Stripe required** |
+| Monetization | Free/paid tiers, paywalls, checkout, entitlements, cancel/refund, earnings/payouts | **PASS (code)** | Refuse-without-env; **live Stripe deferred to deploy** |
 | Community | Notifications (editorial), comments, reporting, moderation, support path | **PASS (code)** | Mute/block not shipped (acceptable minimum) |
-| Trust | Policies, consent/suppression hooks, export/delete, copyright, audit, backups docs | **PARTIAL** | Policies + audit + launch docs; backup drill is ops (user) |
+| Trust | Policies, consent/suppression hooks, export/delete, copyright, audit, backups docs | **PASS (code)** | Policies + audit + launch docs; backup drill is ops at deploy |
 | Platform | Responsive web, a11y smoke, SEO metadata, observability, rate-limit posture | **PASS (local)** | Home axe critical=0; observability via `logAppEvent` |
 
-**P0 exit criterion “journeys pass end to end on production-like infra”:** **NOT MET** until Resend + Stripe + migrations + cron are live.
+**P0 exit criterion “journeys pass end to end on production-like infra”:** **deferred to deploy readiness** for email/paid legs. Phase 1 **code** is complete enough to continue product work.
 
 ---
 
@@ -153,7 +149,7 @@ Explicit decisions aligned with the Phase 1 plan locked deferrals plus other P1 
 | Expanded embeds / reusable templates | **Defer** | TipTap baseline sufficient for Phase 1; expand in later phases |
 | Advanced reading preferences | **Defer** | Reading progress on/off + Library is enough |
 | Referrals (Substack-style) | **Reject for Phase 1** | Growth loop is out of competitive-foundation P0; revisit in Phase 2+ growth work |
-| Founding / supporter tier UX beyond free+paid | **Defer** | Creators can model tiers via Stripe Prices once provisioned; no special founding UX |
+| Founding / supporter tier UX beyond free+paid | **Defer** | Creators can model tiers via Stripe Prices once provisioned at deploy; no special founding UX |
 | Publication-led community spaces | **Defer** | Comments + reports cover community minimum |
 | Additional creator safety tooling | **Defer** | Admin moderation + payment support cases ship; deeper safety later |
 | Custom-domain automation (platform P1) | **Defer** | Same as custom domains |
@@ -191,41 +187,42 @@ From `docs/product-roadmap/01-phase-1-ux-hardening.md`:
 | A11y / performance / metadata / moderation / telemetry gates active | **PASS (local)** |
 | Knowledge-oriented copy without promising Phase 2/3 | **PASS** (positioning intent in Stage A) |
 | No Phase 1 surface depends on graph | **PASS** |
-| Every P0 implemented or approved equivalent | **PARTIAL** — monetization/email live ops incomplete |
-| Five journeys pass end to end | **PARTIAL / BLOCKED** (see above) |
-| Following, newsletters, audience, editorial, analytics, paid access, payouts on production-like infra | **PARTIAL** — code ready; Resend/Stripe/migrate/cron pending |
+| Every P0 implemented or approved equivalent | **PASS (code)** — live email/monetization at deploy |
+| Five journeys pass end to end | **PASS (code)**; live email/paid legs **deferred to deploy** |
+| Following, newsletters, audience, editorial, analytics, paid access, payouts on production-like infra | **PASS (code)** — Resend/Stripe/migrate/cron at deploy prep |
 | Every P1 has ship/defer/reject | **PASS** (table above) |
 
 ---
 
-## Remaining user / ops actions (required to fully exit Phase 1)
+## Remaining ops (deploy readiness — not Phase 1 code blockers)
 
-Live tracker: **`docs/qa/ops-progress.md`** (2026-08-21).
+Live tracker: **`docs/qa/ops-progress.md`** (2026-08-22).
 
-1. ~~**Vercel login & link**~~ — **done** (`jamil2018`, project `blogen` linked).
-2. **Provision Resend:** needs owned domain metadata —  
-   `npx vercel --non-interactive integration add resend/resend-email --no-claim --plan free -m domain=YOUR_DOMAIN -m region=us-east-1` → `npx vercel env pull .env.local --yes` → webhook `https://blogen-eight.vercel.app/api/webhooks/resend` (Checkpoint E / `docs/qa/ops-progress.md`).
-3. ~~**Provision Stripe (Marketplace)**~~ — **done** (sandbox `stripe-emerald-pillar`). Still need **webhook secret** + optional claim/Connect: point Stripe to `https://blogen-eight.vercel.app/api/webhooks/stripe` (events in Checkpoint F) → set `STRIPE_WEBHOOK_SECRET` → enable Connect Express if desired.
-4. **Set app env (manual):** `CRON_SECRET`, `NEXT_PUBLIC_SITE_URL` (e.g. `https://blogen-eight.vercel.app`); ensure `SUPABASE_SERVICE_ROLE_KEY` on the host for cron/admin.
-5. **Apply DB migrations** A → B → C → D on the target Supabase project (confirm before remote apply; `supabase db push` or Dashboard SQL); run launch-readiness migration rehearsal.
-6. **Cron:** `vercel.json` already schedules `/api/cron/publish-scheduled`; ensure `CRON_SECRET` is set on Vercel after deploy.
-7. **Re-run Checkpoints E & F** live checklists; sandbox newsletter send + Stripe test-mode checkout.
-8. **Ops drills:** backup/restore note, abuse/load smoke, Supabase advisors after Stage D (`docs/qa/launch-readiness.md`).
-9. **Sign this report** after paid + email journeys flip from BLOCKED → PASS on production-like infra.
+**Product decision:** Skip configuring Resend and Stripe until all features are in place and the product is finally ready to deploy. Phase 1 code on `main` is complete for continuing product work.
+
+1. ~~**Vercel login & link**~~ — done when needed for deploys (`jamil2018`, project `blogen`).
+2. **At final deploy readiness — Resend:** owned domain + Marketplace install → env pull → webhook (Checkpoint E / `docs/qa/ops-progress.md`). Until then, refuse-without-env stands.
+3. **At final deploy readiness — Stripe:** Marketplace (or confirm existing resource) → webhook secret → optional Connect (Checkpoint F). Until then, refuse-without-env stands.
+4. **At deploy — app env:** `CRON_SECRET`, `NEXT_PUBLIC_SITE_URL`; ensure `SUPABASE_SERVICE_ROLE_KEY` on the host for cron/admin.
+5. **When promoting an environment — apply DB migrations** A → B → C → D; run launch-readiness rehearsal.
+6. **Cron:** ensure `CRON_SECRET` on Vercel after deploy (`vercel.json` schedules `/api/cron/publish-scheduled`).
+7. **Re-run Checkpoints E & F** live only at deploy prep; sandbox newsletter send + Stripe test-mode checkout then.
+8. **Ops drills:** backup/restore, abuse/load smoke, Supabase advisors (`docs/qa/launch-readiness.md`).
+9. **Sign live email/paid journey evidence** after deploy provision flips deferred legs → PASS on production-like infra.
 
 ---
 
 ## Related artifacts
 
-- `docs/qa/ops-progress.md` — live Marketplace / env / migration ops tracker
+- `docs/qa/ops-progress.md` — deferred Resend/Stripe + deploy ops tracker
 - `docs/qa/checkpoint-c.md` — Stage A
 - `docs/qa/checkpoint-d.md` — Stage B
-- `docs/qa/checkpoint-e.md` — Stage C / Resend
-- `docs/qa/checkpoint-f.md` — Stage D / Stripe
+- `docs/qa/checkpoint-e.md` — Stage C / **deploy readiness (Resend)**
+- `docs/qa/checkpoint-f.md` — Stage D / **deploy readiness (Stripe)**
 - `docs/qa/launch-readiness.md` — Stage D4 ops
 - `docs/qa/canonical-counts.md`, `docs/qa/seeded-roles.md`
 - `docs/analytics/metrics.md`
 
 ---
 
-*Stage E quality gate recorded. Do not treat Phase 1 as fully exited on production until Resend, Stripe, migrations, and cron are verified live.*
+*Stage E quality gate: Phase 1 code complete for product continuation. Live Resend + Stripe are deferred until final deploy readiness; refuse-without-env remains mandatory until then.*

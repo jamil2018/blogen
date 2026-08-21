@@ -2,6 +2,8 @@
 
 Operational checklist for production-like exit. Pair with Checkpoints C–F.
 
+**Note:** Live **Resend** and **Stripe** Marketplace provisioning is deferred until all features are in place and the product is finally ready to deploy. Code already refuses email/payments without env. Use Checkpoints E/F as the deploy-readiness checklists when that time comes — do not block continuing Phase 1+ product work on provisioning now.
+
 ## Migration rehearsal (content + subscribers)
 
 1. Snapshot staging DB (`pg_dump` or Supabase backup).
@@ -54,6 +56,6 @@ Blogen does not store card PAN; payment state is recovered from Stripe + `member
 
 - Vercel deployment health + runtime logs
 - Supabase advisors (RLS, unused indexes) after Stage D migration
-- Stripe test → live switch checklist
-- Resend domain + webhook health (Checkpoint E)
+- **At final deploy readiness:** Stripe test → live switch (Checkpoint F)
+- **At final deploy readiness:** Resend domain + webhook health (Checkpoint E)
 - Cron `/api/cron/publish-scheduled` with `CRON_SECRET`
