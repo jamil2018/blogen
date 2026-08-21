@@ -11,19 +11,9 @@ import EmptyState from "../feedback/EmptyState";
 import ErrorState from "../feedback/ErrorState";
 import { AuthorCardSkeletonGrid } from "../feedback/PageSkeleton";
 import { getAllUsers } from "../../data/userQueryFunctions";
-import { getAllPosts } from "../../data/postQueryFunctions";
+import { getAuthorPostCounts } from "../../data/postQueryFunctions";
 import { USER_DATA } from "../../definitions/reactQueryConstants/queryConstants";
-import type { Post, User } from "../../types";
-
-function buildAuthorPostCounts(posts: Post[]) {
-  const counts = new Map<string, number>();
-  for (const post of posts) {
-    const authorId =
-      typeof post.author === "string" ? post.author : post.author?.id;
-    if (authorId) counts.set(authorId, (counts.get(authorId) ?? 0) + 1);
-  }
-  return counts;
-}
+import type { User } from "../../types";
 
 export default function AuthorListView({ authors }: { authors?: User[] }) {
   const [query, setQuery] = useState("");
@@ -36,16 +26,17 @@ export default function AuthorListView({ authors }: { authors?: User[] }) {
   });
   const list = hasAuthors ? authors : data;
 
-  const { data: allPosts } = useQuery({
-    queryKey: ["all-posts-author-counts"],
-    queryFn: getAllPosts,
+  const { data: counts } = useQuery({
+    queryKey: ["author-post-counts"],
+    queryFn: getAuthorPostCounts,
     refetchOnWindowFocus: false,
   });
 
-  const postCounts = useMemo(
-    () => (allPosts ? buildAuthorPostCounts(allPosts) : new Map()),
-    [allPosts]
-  );
+  const postCounts = useMemo(() => {
+    const map = new Map<string, number>();
+    counts?.forEach((row) => map.set(row.authorId, row.postCount));
+    return map;
+  }, [counts]);
 
   const enriched = useMemo(() => {
     if (!list) return [];
@@ -67,7 +58,7 @@ export default function AuthorListView({ authors }: { authors?: User[] }) {
     );
   }, [enriched, query]);
 
-  const featured = enriched[0];
+  const featured = enriched.find((e) => e.postCount > 0) ?? enriched[0];
 
   return (
     <>
@@ -114,7 +105,10 @@ export default function AuthorListView({ authors }: { authors?: User[] }) {
       ) : isError ? (
         <ErrorState />
       ) : !filtered.length ? (
-        <EmptyState title="No authors found" description="Try a different search term." />
+        <EmptyState
+          title="No authors found"
+          description="Try a different search term."
+        />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
           {filtered.map(({ author, postCount }, index) => (

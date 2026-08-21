@@ -1,31 +1,49 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import HomePageView from "../../components/pages/HomePageView";
 import {
   fetchAllCategories,
   fetchLatestPosts,
   fetchPaginatedPosts,
 } from "../../lib/api";
+import { clampPage, computeTotalPages } from "../../lib/posts/contracts";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "Blogen",
+    title: "Explore | Blogen",
     description:
-      "Blogen is a place where creative minds grow. Share your knowledge and get inspired.",
+      "Discover published writing on Blogen — a knowledge-oriented publishing community.",
   };
 }
 
-export default async function HomePage() {
-  const [latestPosts, paginatedPosts, categories] = await Promise.all([
+type HomePageProps = {
+  searchParams: Promise<{ page?: string }>;
+};
+
+export default async function HomePage({ searchParams }: HomePageProps) {
+  const params = await searchParams;
+  const requestedPage = Number(params.page ?? "1") || 1;
+  const limit = 5;
+
+  const [latestPosts, firstPage, categories] = await Promise.all([
     fetchLatestPosts(),
-    fetchPaginatedPosts(1, 5),
+    fetchPaginatedPosts(1, limit),
     fetchAllCategories(),
   ]);
 
+  const totalPages = computeTotalPages(firstPage?.count ?? 0, limit);
+  const page = clampPage(requestedPage, totalPages);
+  const paginatedPosts =
+    page === 1 ? firstPage : await fetchPaginatedPosts(page, limit);
+
   return (
-    <HomePageView
-      latestPosts={latestPosts}
-      paginatedPosts={paginatedPosts}
-      categories={categories}
-    />
+    <Suspense fallback={null}>
+      <HomePageView
+        latestPosts={latestPosts}
+        paginatedPosts={paginatedPosts}
+        categories={categories}
+        initialPage={page}
+      />
+    </Suspense>
   );
 }

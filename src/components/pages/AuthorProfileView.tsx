@@ -7,7 +7,6 @@ import { useParams } from "next/navigation";
 import {
   Article,
   ChatCircle,
-  EnvelopeSimple,
   FacebookLogo,
   LinkedinLogo,
   MagnifyingGlass,
@@ -28,6 +27,7 @@ import {
 } from "../../definitions/reactQueryConstants/queryConstants";
 import { getAuthorNameInitials } from "../../utils/dataFormat";
 import type { Post, User } from "../../types";
+import FollowButton from "../follow/FollowButton";
 
 export default function AuthorProfileView({
   authorId: authorIdProp,
@@ -135,16 +135,40 @@ export default function AuthorProfileView({
                     {authorData.bio}
                   </p>
                 ) : null}
-                <div className="mt-4 flex flex-wrap gap-1">
-                  <Button
-                    isIconOnly
-                    variant="ghost"
-                    size="sm"
-                    aria-label="Email author"
-                    onPress={() => window.open(`mailto:${authorData.email}`)}
-                  >
-                    <EnvelopeSimple className="size-4" />
-                  </Button>
+                {authorData.expertiseTopics?.length ? (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {authorData.expertiseTopics.map((topic) => (
+                      <span
+                        key={topic}
+                        className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs text-muted dark:bg-zinc-800"
+                      >
+                        {topic}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  <FollowButton targetType="author" targetId={authorData.id} />
+                  {(authorData.websiteUrl ||
+                    authorData.facebookId ||
+                    authorData.twitterId ||
+                    authorData.linkedinId) && (
+                    <Button size="sm" variant="ghost" className="rounded-full" isDisabled>
+                      Contact via public links
+                    </Button>
+                  )}
+                  {authorData.websiteUrl ? (
+                    <a
+                      href={authorData.websiteUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Website"
+                    >
+                      <Button isIconOnly variant="ghost" size="sm" aria-label="Website">
+                        <Article className="size-4" />
+                      </Button>
+                    </a>
+                  ) : null}
                   {authorData.facebookId ? (
                     <a
                       href={`https://www.facebook.com/${authorData.facebookId}`}

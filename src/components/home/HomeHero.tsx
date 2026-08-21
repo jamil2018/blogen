@@ -95,7 +95,7 @@ export default function HomeHero({ post, className }: HomeHeroProps) {
 
             {prefersReducedMotion ? (
               <h1 className="text-4xl font-semibold tracking-tighter text-white md:text-6xl">
-                Blogen is a place where creative minds grow
+                Blogen is where durable ideas grow
               </h1>
             ) : (
               <motion.h1
@@ -104,13 +104,13 @@ export default function HomeHero({ post, className }: HomeHeroProps) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={revealTransition(1)}
               >
-                Blogen is a place where creative minds grow
+                Blogen is where durable ideas grow
               </motion.h1>
             )}
 
             {prefersReducedMotion ? (
               <p className="text-base text-white/85 md:text-lg">
-                Share your knowledge and get inspired.{" "}
+                Share knowledge readers can trust.{" "}
                 {post ? (
                   <Link
                     href={`/posts/${post.id}`}
@@ -127,7 +127,7 @@ export default function HomeHero({ post, className }: HomeHeroProps) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={revealTransition(2)}
               >
-                Share your knowledge and get inspired.{" "}
+                Share knowledge readers can trust.{" "}
                 {post ? (
                   <Link
                     href={`/posts/${post.id}`}

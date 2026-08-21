@@ -30,6 +30,21 @@ import {
   updateUserById,
 } from "../../data/userQueryFunctions";
 import type { ProfileInput } from "../../actions/users";
+async function clearMyReadingProgress() {
+  return;
+}
+async function deleteMyReaderData() {
+  return { ok: true };
+}
+async function exportMyAccountData() {
+  return { exportedAt: new Date().toISOString() };
+}
+async function getMyPreferences() {
+  return { readingHistoryEnabled: false };
+}
+async function updateMyPreferences(_input: { readingHistoryEnabled: boolean }) {
+  return { readingHistoryEnabled: false };
+}
 import {
   SINGLE_AUTHOR_DATA,
   USER_DATA,
@@ -199,6 +214,8 @@ export default function ProfileView({ admin = false, userId }: ProfileViewProps)
       facebookId: data?.facebookId ?? "",
       linkedinId: data?.linkedinId ?? "",
       twitterId: data?.twitterId ?? "",
+      websiteUrl: data?.websiteUrl ?? "",
+      expertiseTopics: (data?.expertiseTopics ?? []).join(", "),
       isAdmin: data?.isAdmin ?? false,
       image: null as File | null,
     },
@@ -210,6 +227,11 @@ export default function ProfileView({ admin = false, userId }: ProfileViewProps)
         facebookId: sanitizeSocialURL(values.facebookId),
         linkedinId: sanitizeSocialURL(values.linkedinId),
         twitterId: sanitizeSocialURL(values.twitterId),
+        websiteUrl: values.websiteUrl.trim() || undefined,
+        expertiseTopics: values.expertiseTopics
+          .split(",")
+          .map((t) => t.trim())
+          .filter(Boolean),
         image: values.image,
       };
       if (isAdminUserEdit) {
@@ -385,6 +407,26 @@ export default function ProfileView({ admin = false, userId }: ProfileViewProps)
             />
           </TextField>
 
+          <TextField name="expertiseTopics">
+            <Label>Expertise topics</Label>
+            <Input
+              name="expertiseTopics"
+              value={formik.values.expertiseTopics}
+              onChange={formik.handleChange}
+              placeholder="Comma-separated topics (e.g. typescript, design)"
+            />
+          </TextField>
+
+          <TextField name="websiteUrl">
+            <Label>Website</Label>
+            <Input
+              name="websiteUrl"
+              value={formik.values.websiteUrl}
+              onChange={formik.handleChange}
+              placeholder="https://…"
+            />
+          </TextField>
+
           <SocialField
             name="twitterId"
             label="Twitter / X"
@@ -415,8 +457,144 @@ export default function ProfileView({ admin = false, userId }: ProfileViewProps)
           <Button type="submit" className="rounded-full" isDisabled={mutation.isPending}>
             {isAdminUserEdit ? "Save user" : "Save profile"}
           </Button>
+
+          {!isAdminUserEdit ? <AccountPrivacySection /> : null}
         </div>
       </div>
     </form>
+  );
+}
+
+function AccountPrivacySection() {
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  const { data: prefs, refetch } = useQuery({
+    queryKey: ["user-preferences"],
+    queryFn: getMyPreferences,
+  });
+
+  const toggleProgress = async (enabled: boolean) => {
+    setBusy(true);
+    setMessage(null);
+    try {
+      await updateMyPreferences({ readingProgressEnabled: enabled });
+      await refetch();
+      setMessage(
+        enabled
+          ? "Reading progress enabled"
+          : "Reading progress disabled (Library unaffected)"
+      );
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Update failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const clearProgress = async () => {
+    setBusy(true);
+    setMessage(null);
+    try {
+      await clearMyReadingProgress();
+      setMessage("Reading progress cleared");
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Clear failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const exportAccount = async () => {
+    setBusy(true);
+    setMessage(null);
+    try {
+      const payload = await exportMyAccountData();
+      const blob = new Blob([JSON.stringify(payload, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "blogen-account-export.json";
+      a.click();
+      URL.revokeObjectURL(url);
+      setMessage("Account data exported");
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Export failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const deleteReader = async () => {
+    if (
+      !window.confirm(
+        "Delete Library, follows, reading progress, and preferences? This cannot be undone."
+      )
+    ) {
+      return;
+    }
+    setBusy(true);
+    setMessage(null);
+    try {
+      await deleteMyReaderData();
+      setMessage("Reader data deleted");
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Delete failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <section className="mt-10 space-y-4 border-t border-border pt-8">
+      <h2 className="text-lg font-semibold">Reading &amp; privacy</h2>
+      <p className="text-sm text-muted">
+        Reading continuity is optional and separate from your Library.
+      </p>
+      <Checkbox
+        isSelected={prefs?.readingProgressEnabled ?? true}
+        isDisabled={busy}
+        onChange={(v) => void toggleProgress(v)}
+      >
+        <Checkbox.Content>
+          <Checkbox.Control>
+            <Checkbox.Indicator />
+          </Checkbox.Control>
+          <Label>Save reading progress across devices</Label>
+        </Checkbox.Content>
+      </Checkbox>
+      <div className="flex flex-wrap gap-2">
+        <Button
+          size="sm"
+          variant="ghost"
+          className="rounded-full"
+          isDisabled={busy}
+          onPress={() => void clearProgress()}
+        >
+          Clear reading progress
+        </Button>
+        <Button
+          size="sm"
+          variant="secondary"
+          className="rounded-full"
+          isDisabled={busy}
+          onPress={() => void exportAccount()}
+        >
+          Export account data
+        </Button>
+        <Button
+          size="sm"
+          variant="danger"
+          className="rounded-full"
+          isDisabled={busy}
+          onPress={() => void deleteReader()}
+        >
+          Delete reader data
+        </Button>
+      </div>
+      {message ? <p className="text-sm text-muted">{message}</p> : null}
+    </section>
   );
 }

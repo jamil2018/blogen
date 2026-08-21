@@ -28,7 +28,7 @@ export default function PageHero({
   className,
 }: PageHeroProps) {
   return (
-    <Reveal className={cn("mb-10", className)}>
+    <Reveal className={cn("mb-10 min-h-[7rem]", className)}>
       {breadcrumbs?.length ? (
         <nav aria-label="Breadcrumb" className="mb-4 flex flex-wrap items-center gap-1 text-sm text-muted">
           {breadcrumbs.map((crumb, index) => (

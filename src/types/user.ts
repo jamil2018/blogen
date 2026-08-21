@@ -7,6 +7,8 @@ export type User = {
   facebookId?: string;
   linkedinId?: string;
   twitterId?: string;
+  websiteUrl?: string;
+  expertiseTopics?: string[];
   imageURL?: string;
   imageFileName?: string;
   createdAt?: string;

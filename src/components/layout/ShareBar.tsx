@@ -1,16 +1,25 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BookmarkSimple,
   ChatCircle,
   Copy,
+  Flag,
   LinkedinLogo,
   TwitterLogo,
 } from "@phosphor-icons/react";
 import { Button, toast } from "@heroui/react";
 import { motion, useReducedMotion } from "motion/react";
 import { cn } from "../../lib/cn";
+import { useCurrentUser } from "../auth/AuthProvider";
+import {
+  getIsPostSaved,
+  toggleLibrarySave,
+} from "../../actions/library";
+import { createReport } from "../../actions/reports";
 
 type ShareBarProps = {
   postId: string;
@@ -19,22 +28,6 @@ type ShareBarProps = {
   className?: string;
 };
 
-const BOOKMARK_KEY = "blogen-bookmarks";
-
-function readBookmarks(): string[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(BOOKMARK_KEY);
-    return raw ? (JSON.parse(raw) as string[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeBookmarks(ids: string[]) {
-  localStorage.setItem(BOOKMARK_KEY, JSON.stringify(ids));
-}
-
 export default function ShareBar({
   postId,
   title,
@@ -42,9 +35,30 @@ export default function ShareBar({
   className,
 }: ShareBarProps) {
   const prefersReducedMotion = useReducedMotion();
-  const [bookmarked, setBookmarked] = useState(
-    () => typeof window !== "undefined" && readBookmarks().includes(postId)
-  );
+  const user = useCurrentUser();
+  const router = useRouter();
+  const pathname = usePathname();
+  const queryClient = useQueryClient();
+
+  const { data: bookmarked = false } = useQuery({
+    queryKey: ["library-saved", postId, user?.id],
+    queryFn: () => getIsPostSaved(postId),
+    enabled: Boolean(user?.id),
+  });
+
+  const toggleMutation = useMutation({
+    mutationFn: () => toggleLibrarySave(postId),
+    onSuccess: (result) => {
+      queryClient.setQueryData(["library-saved", postId, user?.id], result.saved);
+      queryClient.invalidateQueries({ queryKey: ["library-posts"] });
+      toast(result.saved ? "Saved to Library" : "Removed from Library", {
+        variant: "success",
+      });
+    },
+    onError: () => {
+      toast("Could not update Library. Try again.", { variant: "danger" });
+    },
+  });
 
   const getShareUrl = useCallback(
     () => (typeof window !== "undefined" ? window.location.href : ""),
@@ -61,16 +75,32 @@ export default function ShareBar({
   }, [getShareUrl]);
 
   const toggleBookmark = useCallback(() => {
-    const current = readBookmarks();
-    const next = current.includes(postId)
-      ? current.filter((id) => id !== postId)
-      : [...current, postId];
-    writeBookmarks(next);
-    setBookmarked(next.includes(postId));
-    toast(next.includes(postId) ? "Saved to bookmarks" : "Removed from bookmarks", {
-      variant: "success",
-    });
-  }, [postId]);
+    if (!user?.id) {
+      router.push(`/login?next=${encodeURIComponent(pathname)}`);
+      return;
+    }
+    toggleMutation.mutate();
+  }, [user?.id, router, pathname, toggleMutation]);
+
+  const reportPost = useCallback(async () => {
+    if (!user?.id) {
+      router.push(`/login?next=${encodeURIComponent(pathname)}`);
+      return;
+    }
+    try {
+      await createReport({
+        targetType: "post",
+        targetId: postId,
+        reason: "user_report",
+        details: `Reported from share bar: ${title}`,
+      });
+      toast("Report submitted. Thanks for helping keep Blogen safe.", {
+        variant: "success",
+      });
+    } catch {
+      toast("Could not submit report", { variant: "danger" });
+    }
+  }, [user?.id, router, pathname, postId, title]);
 
   const shareTwitter = useCallback(() => {
     const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(getShareUrl())}`;
@@ -119,11 +149,24 @@ export default function ShareBar({
         isIconOnly
         variant="ghost"
         size="sm"
-        aria-label={bookmarked ? "Remove bookmark" : "Bookmark post"}
+        aria-label={bookmarked ? "Remove from Library" : "Save to Library"}
         onPress={toggleBookmark}
+        isDisabled={toggleMutation.isPending}
         className={bookmarked ? "text-accent" : undefined}
       >
-        <BookmarkSimple className="size-4" weight={bookmarked ? "fill" : "regular"} />
+        <BookmarkSimple
+          className="size-4"
+          weight={bookmarked ? "fill" : "regular"}
+        />
+      </Button>
+      <Button
+        isIconOnly
+        variant="ghost"
+        size="sm"
+        aria-label="Report post"
+        onPress={reportPost}
+      >
+        <Flag className="size-4" />
       </Button>
       <Button
         isIconOnly

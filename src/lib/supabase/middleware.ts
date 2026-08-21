@@ -6,7 +6,21 @@ import { getSupabaseEnv, isSupabaseConfigured } from "./env";
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
+  const pathname = request.nextUrl.pathname;
+  const isUserRoute = pathname.startsWith("/user");
+  const isAdminRoute = pathname.startsWith("/admin");
+  const isLibraryRoute =
+    pathname === "/library" || pathname.startsWith("/library/");
+  const isFollowingRoute =
+    pathname === "/following" || pathname.startsWith("/following/");
+
   if (!isSupabaseConfigured()) {
+    if (isUserRoute || isAdminRoute || isLibraryRoute || isFollowingRoute) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/login";
+      redirectUrl.searchParams.set("next", pathname);
+      return NextResponse.redirect(redirectUrl);
+    }
     return supabaseResponse;
   }
 
@@ -35,11 +49,10 @@ export async function updateSession(request: NextRequest) {
   const { data: claimsData } = await supabase.auth.getClaims();
   const userId = claimsData?.claims?.sub as string | undefined;
 
-  const pathname = request.nextUrl.pathname;
-  const isUserRoute = pathname.startsWith("/user");
-  const isAdminRoute = pathname.startsWith("/admin");
-
-  if ((isUserRoute || isAdminRoute) && !userId) {
+  if (
+    (isUserRoute || isAdminRoute || isLibraryRoute || isFollowingRoute) &&
+    !userId
+  ) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/login";
     redirectUrl.searchParams.set("next", pathname);

@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { toast } from "@heroui/react";
 import { cn } from "../../lib/cn";
 import { sanitizePostHtml } from "../../lib/sanitize-html";
+import { injectHeadingAnchors } from "../../lib/posts/contracts";
 
 type PostProseProps = {
   html: string;
@@ -12,7 +13,7 @@ type PostProseProps = {
 
 export default function PostProse({ html, className }: PostProseProps) {
   const containerRef = useRef<HTMLElement>(null);
-  const sanitized = sanitizePostHtml(html);
+  const sanitized = injectHeadingAnchors(sanitizePostHtml(html));
 
   useEffect(() => {
     const container = containerRef.current;

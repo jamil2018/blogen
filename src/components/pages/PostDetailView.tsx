@@ -21,7 +21,7 @@ import ShareBar from "../layout/ShareBar";
 import Reveal from "../motion/Reveal";
 import ErrorState from "../feedback/ErrorState";
 import { PostDetailSkeleton } from "../feedback/PageSkeleton";
-import { getPostById, getAllPostsByAuthorId } from "../../data/postQueryFunctions";
+import { getPostById, getAllPostsByAuthorId, getRelatedPostsForId } from "../../data/postQueryFunctions";
 import { getUserById } from "../../data/userQueryFunctions";
 import { getCommentsByPostId } from "../../data/commentQueryFunctions";
 import {
@@ -35,6 +35,7 @@ import {
   getAuthorNameInitials,
 } from "../../utils/dataFormat";
 import { getPostFormattedDate } from "../../utils/dateUtils";
+import { extractHeadingToc } from "../../lib/posts/contracts";
 import type { Post, User } from "../../types";
 import DeleteCommentForm from "../post/DeleteCommentForm";
 import EditCommentForm from "../post/EditCommentForm";
@@ -92,19 +93,30 @@ export default function PostDetailView({
     refetchInterval: 5 * 60 * 1000,
   });
 
-  const { data: authorPosts } = useQuery({
-    queryKey: ["author-posts", authorId],
-    queryFn: () => getAllPostsByAuthorId(authorId as string),
-    enabled: Boolean(authorId),
+  const { data: relatedFromApi } = useQuery({
+    queryKey: ["related-posts", postId],
+    queryFn: () => getRelatedPostsForId(postId),
+    enabled: Boolean(postId),
     refetchOnWindowFocus: false,
   });
 
-  const relatedPosts = useMemo(
-    () =>
-      authorPosts
-        ?.filter((p) => p.id !== postId)
-        .slice(0, 2) ?? [],
-    [authorPosts, postId]
+  const { data: authorPosts } = useQuery({
+    queryKey: ["author-posts", authorId],
+    queryFn: () => getAllPostsByAuthorId(authorId as string),
+    enabled: Boolean(authorId) && !relatedFromApi?.length,
+    refetchOnWindowFocus: false,
+  });
+
+  const relatedPosts = useMemo(() => {
+    if (relatedFromApi?.length) return relatedFromApi.slice(0, 3);
+    return (
+      authorPosts?.filter((p) => p.id !== postId).slice(0, 2) ?? []
+    );
+  }, [relatedFromApi, authorPosts, postId]);
+
+  const toc = useMemo(
+    () => (data ? extractHeadingToc(data.description) : []),
+    [data]
   );
 
   if (postLoading || authorLoading) {
@@ -131,7 +143,7 @@ export default function PostDetailView({
 
   return (
     <>
-      <ReadingProgressBar targetId="article-content" />
+      <ReadingProgressBar targetId="article-content" postId={postId} />
       <ShareBar
         key={postId}
         postId={postId}
@@ -171,6 +183,8 @@ export default function PostDetailView({
                 </Avatar>
                 <span className="text-sm font-medium text-ink">{authorObj.name}</span>
               </Link>
+              {typeof data.category !== "string" && data.category?.id ? (
+                ) : null}
               <span className="text-muted">·</span>
               {data.createdAt ? (
                 <time className="text-sm text-muted" dateTime={data.createdAt}>
@@ -197,8 +211,32 @@ export default function PostDetailView({
           </Reveal>
         ) : null}
 
-        <div id="article-content">
-          <PostProse html={data.description} className="mt-8" />
+        <div id="article-content" className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_12rem]">
+          <div>
+            <PostProse html={data.description} />
+            </div>
+          {toc.length >= 2 ? (
+            <nav
+              aria-label="Table of contents"
+              className="hidden lg:block lg:sticky lg:top-24 lg:self-start"
+            >
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted">
+                On this page
+              </p>
+              <ul className="mt-3 space-y-2 text-sm">
+                {toc.map((item) => (
+                  <li key={item.id} className={item.level === 3 ? "pl-3" : undefined}>
+                    <a
+                      href={`#${item.id}`}
+                      className="text-muted transition-colors hover:text-accent"
+                    >
+                      {item.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ) : null}
         </div>
 
         <PostTags tags={data.tags} className="mt-8" />
@@ -228,7 +266,7 @@ export default function PostDetailView({
         {relatedPosts.length > 0 ? (
           <Reveal delay={0.06} className="mt-10">
             <h2 className="mb-4 text-lg font-semibold tracking-tight text-ink">
-              More from {authorObj.name}
+              Related reading
             </h2>
             <div className="grid gap-6 sm:grid-cols-2">
               {relatedPosts.map((relatedPost) => (

@@ -1,9 +1,13 @@
 import {
   findPosts,
+  getAuthorPostCounts,
+  getCategoryPostCounts,
+  getPlatformStats,
   getPostById as getPostByIdQuery,
   listLatestPosts,
   listPaginatedPosts,
   listPostsByAuthor,
+  listRelatedPosts,
   searchPosts,
 } from "./db/posts";
 import { listCategories } from "./db/categories";
@@ -54,6 +58,22 @@ export async function fetchPostsByTagName(tagName: string) {
 
 export async function fetchSearchPostResults(searchQuery: string) {
   return searchPosts(searchQuery);
+}
+
+export async function fetchRelatedPosts(post: Post) {
+  return listRelatedPosts(post);
+}
+
+export async function fetchPlatformStats() {
+  return getPlatformStats();
+}
+
+export async function fetchAuthorPostCounts() {
+  return getAuthorPostCounts();
+}
+
+export async function fetchCategoryPostCounts() {
+  return getCategoryPostCounts();
 }
 
 export type { Category, PaginatedPosts, Post, User };
