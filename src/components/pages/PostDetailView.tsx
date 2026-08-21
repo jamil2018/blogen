@@ -40,6 +40,7 @@ import type { Post, User } from "../../types";
 import DeleteCommentForm from "../post/DeleteCommentForm";
 import EditCommentForm from "../post/EditCommentForm";
 import FollowButton from "../follow/FollowButton";
+import PostAnalyticsBeacon from "../post/PostAnalyticsBeacon";
 
 type PostDetailViewProps = {
   postId?: string;
@@ -145,6 +146,11 @@ export default function PostDetailView({
   return (
     <>
       <ReadingProgressBar targetId="article-content" postId={postId} />
+      <PostAnalyticsBeacon
+        postId={postId}
+        authorId={authorObj?.id}
+        publicationId={data.publicationId}
+      />
       <ShareBar
         key={postId}
         postId={postId}
@@ -221,7 +227,24 @@ export default function PostDetailView({
         <div id="article-content" className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_12rem]">
           <div>
             <PostProse html={data.description} />
-            </div>
+            {data.accessGranted === false ? (
+              <div className="mt-8 rounded-xl border border-border bg-paper/80 p-6 text-center">
+                <p className="text-sm font-medium text-ink">
+                  This post is for members
+                </p>
+                <p className="mt-2 text-sm text-muted">
+                  Subscribe to unlock the full article. Entitlements are checked
+                  server-side on every request.
+                </p>
+                <Link
+                  href="/user/memberships"
+                  className="mt-4 inline-block text-sm font-medium text-accent underline-offset-2 hover:underline"
+                >
+                  View memberships
+                </Link>
+              </div>
+            ) : null}
+          </div>
           {toc.length >= 2 ? (
             <nav
               aria-label="Table of contents"
