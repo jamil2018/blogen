@@ -7,10 +7,10 @@
 
 ## Verdict
 
-**Phase 1 code on `main`: COMPLETE for continuing product work.**  
-**Live email / paid journeys: DEFERRED to final deploy readiness** (not blockers for treating Phase 1 code as done).
+**Phase 1 foundation: COMPLETE for code + production deploy** (excluding live Resend/Stripe).  
+**Live email / paid journeys: DEFERRED to final deploy readiness** (not blockers for closing Phase 1 foundation).
 
-Reader, writer, publication, analytics, and monetization/email **code paths** are in place. Live Resend sends and Stripe checkout/Connect wait until all features are ready to deploy. Until then, email/payment paths **refuse without env** (no mocked success) — confirmed by code and e2e webhook status checks.
+Stages A–E code are on `main` and deployed to production (`https://blogen-eight.vercel.app`). Stage A–D SQL is applied on the linked Supabase project. Live Resend sends and Stripe checkout/Connect wait until final deploy readiness. Until then, email/payment paths **refuse without env** (no mocked success).
 
 ---
 
@@ -33,8 +33,10 @@ CI workflow (`.github/workflows/ci.yml`) runs lint → typecheck → vitest, the
 | `NEXT_PUBLIC_SUPABASE_URL` / publishable / service role | SET (`.env.local`) |
 | `RESEND_API_KEY` / `RESEND_FROM_EMAIL` / `RESEND_WEBHOOK_SECRET` | **Deferred to deploy** — do not provision now |
 | `STRIPE_*` / publishable | **Deferred to deploy** for live paid journeys (refuse-without-env until set) |
-| `CRON_SECRET` / `NEXT_PUBLIC_SITE_URL` | **Deferred to deploy** (manual) |
-| Vercel CLI `whoami` / project link | **OK** when linked |
+| `CRON_SECRET` / `NEXT_PUBLIC_SITE_URL` | **SET** on Vercel (Production/Preview/Development); synced in `.env.local` |
+| Stage A–D migrations (hosted Supabase) | **Applied** 2026-08-22 to project `tvotabzayhcuwzrsrokm` |
+| Production Phase 1 routes | **Live** — not 404; `/library` `/following` redirect to login |
+| Vercel CLI `whoami` / project link | **OK** (`blogen` / `jamil2018s-projects`) |
 | Marketplace install Resend / Stripe | **Deferred** until final deploy readiness (`docs/qa/ops-progress.md`) |
 
 ---
@@ -194,18 +196,18 @@ From `docs/product-roadmap/01-phase-1-ux-hardening.md`:
 
 ---
 
-## Remaining ops (deploy readiness — not Phase 1 code blockers)
+## Remaining ops (final deploy readiness — not Phase 1 foundation blockers)
 
 Live tracker: **`docs/qa/ops-progress.md`** (2026-08-22).
 
-**Product decision:** Skip configuring Resend and Stripe until all features are in place and the product is finally ready to deploy. Phase 1 code on `main` is complete for continuing product work.
+**Product decision:** Skip configuring Resend and Stripe until final deploy readiness. Phase 1 foundation (code + migrations + production routes + site URL/cron secret) is closed.
 
-1. ~~**Vercel login & link**~~ — done when needed for deploys (`jamil2018`, project `blogen`).
-2. **At final deploy readiness — Resend:** owned domain + Marketplace install → env pull → webhook (Checkpoint E / `docs/qa/ops-progress.md`). Until then, refuse-without-env stands.
-3. **At final deploy readiness — Stripe:** Marketplace (or confirm existing resource) → webhook secret → optional Connect (Checkpoint F). Until then, refuse-without-env stands.
-4. **At deploy — app env:** `CRON_SECRET`, `NEXT_PUBLIC_SITE_URL`; ensure `SUPABASE_SERVICE_ROLE_KEY` on the host for cron/admin.
-5. **When promoting an environment — apply DB migrations** A → B → C → D; run launch-readiness rehearsal.
-6. **Cron:** ensure `CRON_SECRET` on Vercel after deploy (`vercel.json` schedules `/api/cron/publish-scheduled`).
+1. ~~**Vercel login & link**~~ — done (`jamil2018`, project `blogen`).
+2. ~~**App env `CRON_SECRET` / `NEXT_PUBLIC_SITE_URL`**~~ — set on Vercel; site URL `https://blogen-eight.vercel.app`.
+3. ~~**Migrations A→D**~~ — applied on linked Supabase project.
+4. ~~**Production deploy of Phase 1 routes**~~ — live (Hobby cron limited to daily `0 0 * * *`).
+5. **At final deploy readiness — Resend:** owned domain + Marketplace install → env pull → webhook (Checkpoint E). Until then, refuse-without-env stands.
+6. **At final deploy readiness — Stripe:** confirm keys + webhook secret → optional Connect (Checkpoint F). Until then, refuse-without-env stands.
 7. **Re-run Checkpoints E & F** live only at deploy prep; sandbox newsletter send + Stripe test-mode checkout then.
 8. **Ops drills:** backup/restore, abuse/load smoke, Supabase advisors (`docs/qa/launch-readiness.md`).
 9. **Sign live email/paid journey evidence** after deploy provision flips deferred legs → PASS on production-like infra.
@@ -225,4 +227,4 @@ Live tracker: **`docs/qa/ops-progress.md`** (2026-08-22).
 
 ---
 
-*Stage E quality gate: Phase 1 code complete for product continuation. Live Resend + Stripe are deferred until final deploy readiness; refuse-without-env remains mandatory until then.*
+*Stage E quality gate: Phase 1 foundation closed (code + migrations + production deploy). Live Resend + Stripe remain deferred until final deploy readiness; refuse-without-env remains mandatory until then.*
