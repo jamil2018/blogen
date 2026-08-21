@@ -93,6 +93,12 @@ function getNavItems(variant: "user" | "admin"): NavItem[] {
       match: (p) => p.includes("/user/posts/portability"),
     },
     {
+      href: "/user/publications",
+      label: "Publications",
+      icon: <PenNib className="size-4" weight="duotone" />,
+      match: (p) => p.startsWith("/user/publications"),
+    },
+    {
       href: "/user/profile",
       label: "Profile",
       icon: <User className="size-4" weight="duotone" />,
