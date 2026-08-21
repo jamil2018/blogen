@@ -80,6 +80,12 @@ function getNavItems(variant: "user" | "admin"): NavItem[] {
       match: (p) => p.includes("/user/dashboard"),
     },
     {
+      href: "/user/analytics",
+      label: "Analytics",
+      icon: <ChartBar className="size-4" weight="duotone" />,
+      match: (p) => p.startsWith("/user/analytics"),
+    },
+    {
       href: "/user/posts",
       label: "Posts",
       icon: <Article className="size-4" weight="duotone" />,
@@ -97,6 +103,18 @@ function getNavItems(variant: "user" | "admin"): NavItem[] {
       label: "Publications",
       icon: <PenNib className="size-4" weight="duotone" />,
       match: (p) => p.startsWith("/user/publications"),
+    },
+    {
+      href: "/user/memberships",
+      label: "Memberships",
+      icon: <Ticket className="size-4" weight="duotone" />,
+      match: (p) => p.startsWith("/user/memberships"),
+    },
+    {
+      href: "/user/earnings",
+      label: "Earnings",
+      icon: <CurrencyDollar className="size-4" weight="duotone" />,
+      match: (p) => p.startsWith("/user/earnings"),
     },
     {
       href: "/user/profile",
