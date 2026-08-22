@@ -10,7 +10,10 @@ import PostCard from "../post/PostCard";
 import PageHero from "../layout/PageHero";
 import EmptyState from "../feedback/EmptyState";
 import ErrorState from "../feedback/ErrorState";
-import { ExpandedPostSkeletonList } from "../feedback/PageSkeleton";
+import {
+  CategorySkeletonGrid,
+  ExpandedPostSkeletonList,
+} from "../feedback/PageSkeleton";
 import {
   getLibraryPosts,
   mergeLocalLibraryBookmarks,
@@ -67,13 +70,21 @@ export default function LibraryPageView() {
     enabled: !migrating && tab === "saved",
   });
 
-  const { data: collections = [] } = useQuery({
+  const {
+    data: collections = [],
+    isLoading: collectionsLoading,
+    isFetching: collectionsFetching,
+  } = useQuery({
     queryKey: ["user-collections"],
     queryFn: getUserCollections,
     enabled: !migrating && tab === "collections",
   });
 
-  const { data: spaces = [] } = useQuery({
+  const {
+    data: spaces = [],
+    isLoading: spacesLoading,
+    isFetching: spacesFetching,
+  } = useQuery({
     queryKey: ["user-spaces"],
     queryFn: getUserKnowledgeSpaces,
     enabled: !migrating && tab === "spaces",
@@ -107,7 +118,7 @@ export default function LibraryPageView() {
         ))}
       </div>
 
-      {migrating || (tab === "saved" && isLoading) ? (
+      {tab === "saved" && (migrating || isLoading) ? (
         <ExpandedPostSkeletonList count={4} />
       ) : tab === "saved" && isError ? (
         <div className="space-y-3">
@@ -137,6 +148,8 @@ export default function LibraryPageView() {
             actionLabel="Explore posts"
           />
         )
+      ) : tab === "collections" && (collectionsLoading || collectionsFetching) ? (
+        <CategorySkeletonGrid count={4} className="sm:grid-cols-2 lg:grid-cols-2" />
       ) : tab === "collections" ? (
         collections.length ? (
           <div className="grid gap-3 sm:grid-cols-2">
@@ -162,6 +175,8 @@ export default function LibraryPageView() {
             actionLabel="Find sources"
           />
         )
+      ) : tab === "spaces" && (spacesLoading || spacesFetching) ? (
+        <CategorySkeletonGrid count={4} className="sm:grid-cols-2 lg:grid-cols-2" />
       ) : spaces.length ? (
         <div className="grid gap-3 sm:grid-cols-2">
           {spaces.map((space) => (

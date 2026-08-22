@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { ArrowLeft, NotePencil } from "@phosphor-icons/react";
-import { Button, TextArea, toast } from "@heroui/react";
+import { Button, Skeleton, TextArea, toast } from "@heroui/react";
 import PageHero from "../layout/PageHero";
 import PostCard from "../post/PostCard";
 import ErrorState from "../feedback/ErrorState";
@@ -27,14 +27,15 @@ export default function KnowledgeSpaceView({ collectionId }: KnowledgeSpaceViewP
   const [noteDraft, setNoteDraft] = useState("");
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
 
-  const { data: space, isLoading, isError } = useQuery({
+  const { data: space, isLoading: metaLoading, isError } = useQuery({
     queryKey: ["knowledge-space", collectionId],
     queryFn: () => getKnowledgeSpace(collectionId),
   });
 
-  const { data: posts = [] } = useQuery({
+  const { data: posts = [], isLoading: postsLoading } = useQuery({
     queryKey: ["collection-posts", collectionId],
     queryFn: () => getCollectionPosts(collectionId),
+    enabled: Boolean(collectionId) && !metaLoading,
   });
 
   const { data: annotations = [] } = useQuery({
@@ -67,8 +68,9 @@ export default function KnowledgeSpaceView({ collectionId }: KnowledgeSpaceViewP
     },
   });
 
-  if (isLoading) return <ExpandedPostSkeletonList count={3} />;
-  if (isError || !space) return <ErrorState message="Knowledge space not found" />;
+  if (isError || (!metaLoading && !space)) {
+    return <ErrorState message="Knowledge space not found" />;
+  }
 
   return (
     <>
@@ -82,12 +84,37 @@ export default function KnowledgeSpaceView({ collectionId }: KnowledgeSpaceViewP
         </Link>
       </div>
 
+      {metaLoading ? (
+        <>
+          <div className="mb-8 space-y-3">
+            <Skeleton className="h-3 w-28 rounded-full" />
+            <Skeleton className="h-10 w-2/3" />
+            <Skeleton className="h-4 w-full max-w-xl" />
+          </div>
+          <div className="mb-6 rounded-2xl border border-dashed border-border bg-zinc-50/80 p-4 dark:bg-zinc-900/40">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="mt-2 h-4 w-4/5" />
+          </div>
+          <div className="mb-8 grid gap-6 lg:grid-cols-3">
+            <section className="lg:col-span-2">
+              <Skeleton className="mb-3 h-6 w-32" />
+              <ExpandedPostSkeletonList count={3} />
+            </section>
+            <section className="space-y-4">
+              <Skeleton className="h-6 w-28" />
+              <Skeleton className="h-24 w-full rounded-lg" />
+              <Skeleton className="h-8 w-24 rounded-full" />
+            </section>
+          </div>
+        </>
+      ) : (
+        <>
       <PageHero
         eyebrow="Knowledge space"
-        title={space.name}
+        title={space!.name}
         description={
-          space.intent
-            ? space.intent
+          space!.intent
+            ? space!.intent
             : "Review your sources, notes, and revision-pinned references. Graph generation is not available yet."
         }
       />
@@ -99,21 +126,25 @@ export default function KnowledgeSpaceView({ collectionId }: KnowledgeSpaceViewP
 
       <div className="mb-8 grid gap-6 lg:grid-cols-3">
         <section className="lg:col-span-2 space-y-3">
-          <h2 className="text-lg font-medium">Sources ({space.itemCount})</h2>
-          {posts.map((post) => (
-            <div
-              key={post.id}
-              className={`rounded-xl border p-1 ${selectedPostId === post.id ? "border-accent" : "border-border"}`}
-            >
-              <button
-                type="button"
-                className="w-full text-left"
-                onClick={() => setSelectedPostId(post.id)}
+          <h2 className="text-lg font-medium">Sources ({space!.itemCount})</h2>
+          {postsLoading ? (
+            <ExpandedPostSkeletonList count={3} />
+          ) : (
+            posts.map((post) => (
+              <div
+                key={post.id}
+                className={`rounded-xl border p-1 ${selectedPostId === post.id ? "border-accent" : "border-border"}`}
               >
-                <PostCard post={post} variant="compact" />
-              </button>
-            </div>
-          ))}
+                <button
+                  type="button"
+                  className="w-full text-left"
+                  onClick={() => setSelectedPostId(post.id)}
+                >
+                  <PostCard post={post} variant="compact" />
+                </button>
+              </div>
+            ))
+          )}
         </section>
 
         <section className="space-y-4">
@@ -152,13 +183,15 @@ export default function KnowledgeSpaceView({ collectionId }: KnowledgeSpaceViewP
           <div>
             <h3 className="mb-2 text-sm font-medium">Activity</h3>
             <ul className="space-y-1 text-sm text-muted">
-              {space.activity.map((item) => (
+              {space!.activity.map((item) => (
                 <li key={item.id}>{item.summary}</li>
               ))}
             </ul>
           </div>
         </section>
       </div>
+        </>
+      )}
     </>
   );
 }

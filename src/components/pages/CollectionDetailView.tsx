@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Sparkle, Trash } from "@phosphor-icons/react";
-import { Button, Input, TextArea, toast } from "@heroui/react";
+import { Button, Input, Skeleton, TextArea, toast } from "@heroui/react";
 import PageHero from "../layout/PageHero";
 import PostCard from "../post/PostCard";
 import EmptyState from "../feedback/EmptyState";
@@ -91,8 +91,9 @@ export default function CollectionDetailView({
     },
   });
 
-  if (metaLoading) return <ExpandedPostSkeletonList count={3} />;
-  if (isError || !collection) return <ErrorState message="Collection not found" />;
+  if (isError || (!metaLoading && !collection)) {
+    return <ErrorState message="Collection not found" />;
+  }
 
   return (
     <>
@@ -103,11 +104,26 @@ export default function CollectionDetailView({
         </Link>
       </div>
 
+      {metaLoading ? (
+        <>
+          <div className="mb-8 space-y-3">
+            <Skeleton className="h-3 w-24 rounded-full" />
+            <Skeleton className="h-10 w-2/3" />
+            <Skeleton className="h-4 w-full max-w-xl" />
+          </div>
+          <div className="mb-8 grid gap-4 rounded-2xl border border-border bg-paper p-4 md:grid-cols-2">
+            <Skeleton className="h-10 w-full rounded-lg" />
+            <Skeleton className="h-24 w-full rounded-lg" />
+          </div>
+          <ExpandedPostSkeletonList count={3} />
+        </>
+      ) : (
+        <>
       <PageHero
         eyebrow="Collection"
-        title={collection.name}
+        title={collection!.name}
         description={
-          collection.intent ??
+          collection!.intent ??
           "Group related sources. Add an intent to clarify why these posts belong together."
         }
       />
@@ -120,7 +136,7 @@ export default function CollectionDetailView({
           <div className="flex gap-2">
             <Input
               id="collection-name"
-              defaultValue={collection.name}
+              defaultValue={collection!.name}
               onChange={(e) => setNameDraft(e.target.value)}
             />
             <Button
@@ -139,7 +155,7 @@ export default function CollectionDetailView({
           <TextArea
             id="collection-intent"
             placeholder="What question or goal connects these sources?"
-            defaultValue={collection.intent ?? ""}
+            defaultValue={collection!.intent ?? ""}
             onChange={(e) => setIntentDraft(e.target.value)}
           />
           <p className="text-xs text-muted">
@@ -157,10 +173,10 @@ export default function CollectionDetailView({
       </div>
 
       <div className="mb-6 flex flex-wrap gap-2">
-        {!collection.promotedToSpaceAt ? (
+        {!collection!.promotedToSpaceAt ? (
           <Button
             onPress={() => promoteMutation.mutate()}
-            isDisabled={promoteMutation.isPending || collection.itemCount < 1}
+            isDisabled={promoteMutation.isPending || collection!.itemCount < 1}
           >
             <Sparkle className="size-4" />
             Open knowledge space
@@ -204,6 +220,8 @@ export default function CollectionDetailView({
           actionHref="/"
           actionLabel="Explore posts"
         />
+      )}
+        </>
       )}
     </>
   );
