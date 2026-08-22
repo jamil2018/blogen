@@ -15,12 +15,12 @@ import {
   Button,
   Input,
   Modal,
-  Spinner,
   Table,
   Toast,
   toast,
 } from "@heroui/react";
 import ErrorState from "../feedback/ErrorState";
+import { TableSkeleton } from "../feedback/StudioSkeleton";
 import {
   getAllUsers,
   deleteMultipleUsersById,
@@ -95,15 +95,6 @@ export default function AdminUsersView() {
     return users;
   }, [data, search, roleFilter]);
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-12">
-        <Spinner />
-      </div>
-    );
-  }
-  if (isError) return <ErrorState />;
-
   return (
     <div className="space-y-4">
       <Toast.Provider placement="bottom end" />
@@ -168,73 +159,79 @@ export default function AdminUsersView() {
         </div>
       </div>
 
-      <Table>
-        <Table.ScrollContainer>
-          <Table.Content
-            aria-label="Users"
-            selectionMode="multiple"
-            selectedKeys={new Set(selected)}
-            onSelectionChange={(keys) =>
-              setSelected(selectionToIds(keys, rows.map((u: UserType) => u.id)))
-            }
-          >
-            <Table.Header>
-              <Table.Column isRowHeader>User</Table.Column>
-              <Table.Column>Email</Table.Column>
-              <Table.Column>Role</Table.Column>
-              <Table.Column>Posts</Table.Column>
-            </Table.Header>
-            <Table.Body items={rows}>
-              {(u: UserType) => {
-                const initials = getAuthorNameInitials(u.name)
-                  .filter(Boolean)
-                  .join("");
-                const postCount = postCountByAuthor.get(u.id) ?? 0;
+      {isError ? (
+        <ErrorState />
+      ) : isLoading ? (
+        <TableSkeleton rows={5} columns={4} />
+      ) : (
+        <Table>
+          <Table.ScrollContainer>
+            <Table.Content
+              aria-label="Users"
+              selectionMode="multiple"
+              selectedKeys={new Set(selected)}
+              onSelectionChange={(keys) =>
+                setSelected(selectionToIds(keys, rows.map((u: UserType) => u.id)))
+              }
+            >
+              <Table.Header>
+                <Table.Column isRowHeader>User</Table.Column>
+                <Table.Column>Email</Table.Column>
+                <Table.Column>Role</Table.Column>
+                <Table.Column>Posts</Table.Column>
+              </Table.Header>
+              <Table.Body items={rows}>
+                {(u: UserType) => {
+                  const initials = getAuthorNameInitials(u.name)
+                    .filter(Boolean)
+                    .join("");
+                  const postCount = postCountByAuthor.get(u.id) ?? 0;
 
-                return (
-                  <Table.Row id={u.id}>
-                    <Table.Cell>
-                      <div className="flex items-center gap-3">
-                        <Avatar size="sm">
-                          {u.imageURL ? (
-                            <Avatar.Image src={u.imageURL} alt={u.name} />
-                          ) : (
-                            <Avatar.Fallback>{initials}</Avatar.Fallback>
+                  return (
+                    <Table.Row id={u.id}>
+                      <Table.Cell>
+                        <div className="flex items-center gap-3">
+                          <Avatar size="sm">
+                            {u.imageURL ? (
+                              <Avatar.Image src={u.imageURL} alt={u.name} />
+                            ) : (
+                              <Avatar.Fallback>{initials}</Avatar.Fallback>
+                            )}
+                          </Avatar>
+                          <span className="font-medium">{u.name}</span>
+                        </div>
+                      </Table.Cell>
+                      <Table.Cell className="text-sm text-muted">{u.email}</Table.Cell>
+                      <Table.Cell>
+                        <span
+                          className={cn(
+                            "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium",
+                            u.isAdmin
+                              ? "bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300"
+                              : "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
                           )}
-                        </Avatar>
-                        <span className="font-medium">{u.name}</span>
-                      </div>
-                    </Table.Cell>
-                    <Table.Cell className="text-sm text-muted">{u.email}</Table.Cell>
-                    <Table.Cell>
-                      <span
-                        className={cn(
-                          "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium",
-                          u.isAdmin
-                            ? "bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300"
-                            : "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
-                        )}
-                      >
-                        {u.isAdmin ? (
-                          <ShieldCheck className="size-3" weight="fill" />
-                        ) : (
-                          <User className="size-3" />
-                        )}
-                        {u.isAdmin ? "Admin" : "Author"}
-                      </span>
-                    </Table.Cell>
-                    <Table.Cell>
-                      <span className="text-sm tabular-nums text-muted">
-                        {postCount}
-                      </span>
-                    </Table.Cell>
-                  </Table.Row>
-                );
-              }}
-            </Table.Body>
-          </Table.Content>
-        </Table.ScrollContainer>
-      </Table>
+                        >
+                          {u.isAdmin ? (
+                            <ShieldCheck className="size-3" weight="fill" />
+                          ) : (
+                            <User className="size-3" />
+                          )}
+                          {u.isAdmin ? "Admin" : "Author"}
+                        </span>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <span className="text-sm tabular-nums text-muted">
+                          {postCount}
+                        </span>
+                      </Table.Cell>
+                    </Table.Row>
+                  );
+                }}
+              </Table.Body>
+            </Table.Content>
+          </Table.ScrollContainer>
+        </Table>
+      )}
 
       <Modal isOpen={deleteOpen} onOpenChange={setDeleteOpen}>
         <Modal.Backdrop>

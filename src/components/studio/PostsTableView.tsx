@@ -21,13 +21,13 @@ import {
   ListBoxItem,
   Modal,
   Select,
-  Spinner,
   Table,
   Toast,
   toast,
 } from "@heroui/react";
-import ErrorState from "../feedback/ErrorState";
+import { AsyncSection } from "../feedback/AsyncSection";
 import EmptyState from "../feedback/EmptyState";
+import { TableSkeleton } from "../feedback/StudioSkeleton";
 import {
   getAllPosts,
   getMyPosts,
@@ -136,17 +136,8 @@ export default function PostsTableView({
     setDeleteOpen(true);
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-12">
-        <Spinner />
-      </div>
-    );
-  }
-
-  if (isError) return <ErrorState />;
-
   const hasPosts = (data as Post[] | undefined)?.length;
+  const columnCount = filterByAuthor ? 5 : 6;
 
   return (
     <div className="space-y-4">
@@ -211,148 +202,154 @@ export default function PostsTableView({
         ) : null}
       </div>
 
-      {!hasPosts ? (
-        <EmptyState
-          title="No stories yet"
-          description="Your archive is empty. Start writing and your posts will appear here."
-        >
-          <Link href={`${basePath}/create`}>
-            <Button className="rounded-full">
-              <PenNib className="mr-2 size-4" />
-              Write your first story
-            </Button>
-          </Link>
-        </EmptyState>
-      ) : rows.length === 0 ? (
-        <EmptyState
-          title="No matching posts"
-          description="Try adjusting your search or category filter."
-        />
-      ) : (
-        <Table>
-          <Table.ScrollContainer>
-            <Table.Content
-              aria-label="Posts"
-              selectionMode="multiple"
-              selectedKeys={new Set(selected)}
-              onSelectionChange={(keys) =>
-                setSelected(selectionToIds(keys, rows.map((p) => p.id)))
-              }
-            >
-              <Table.Header>
-                <Table.Column isRowHeader>Post</Table.Column>
-                {!filterByAuthor ? (
-                  <Table.Column>Author</Table.Column>
-                ) : null}
-                <Table.Column>Category</Table.Column>
-                <Table.Column>Published</Table.Column>
-                <Table.Column>Read time</Table.Column>
-                <Table.Column>Actions</Table.Column>
-              </Table.Header>
-              <Table.Body items={rows}>
-                {(post: Post) => {
-                  const readMinutes = calculateReadingTime(
-                    convertToText(post.description)
-                  );
-                  return (
-                    <Table.Row id={post.id}>
-                      <Table.Cell>
-                        <div className="flex items-center gap-3">
-                          {post.imageURL ? (
-                            <img
-                              src={post.imageURL}
-                              alt=""
-                              className="size-12 shrink-0 rounded-lg object-cover"
-                            />
-                          ) : (
-                            <div className="size-12 shrink-0 rounded-lg bg-zinc-100 dark:bg-zinc-800" />
-                          )}
-                          <div className="min-w-0">
-                            <p className="line-clamp-1 font-medium">{post.title}</p>
-                            {post.tags?.length ? (
-                              <p className="line-clamp-1 text-xs text-muted">
-                                {post.tags.slice(0, 3).join(", ")}
-                              </p>
-                            ) : null}
-                          </div>
-                        </div>
-                      </Table.Cell>
-                      {!filterByAuthor ? (
-                        <Table.Cell>{authorName(post)}</Table.Cell>
-                      ) : null}
-                      <Table.Cell>
-                        <span className="inline-flex rounded-full bg-teal-50 px-2 py-0.5 text-xs font-medium capitalize text-teal-800 dark:bg-teal-950 dark:text-teal-300">
-                          {categoryTitle(post)}
-                        </span>
-                      </Table.Cell>
-                      <Table.Cell className="text-sm text-muted">
-                        <div className="flex flex-col gap-1">
-                          <span
-                            className={cn(
-                              "inline-flex w-fit rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide",
-                              post.status === "published"
-                                ? "bg-teal-50 text-teal-800 dark:bg-teal-950 dark:text-teal-300"
-                                : post.status === "archived"
-                                  ? "bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
-                                  : "bg-amber-50 text-amber-800 dark:bg-amber-950 dark:text-amber-200"
+      <AsyncSection
+        isLoading={isLoading}
+        isError={isError}
+        skeleton={<TableSkeleton rows={5} columns={columnCount} />}
+      >
+        {!hasPosts ? (
+          <EmptyState
+            title="No stories yet"
+            description="Your archive is empty. Start writing and your posts will appear here."
+          >
+            <Link href={`${basePath}/create`}>
+              <Button className="rounded-full">
+                <PenNib className="mr-2 size-4" />
+                Write your first story
+              </Button>
+            </Link>
+          </EmptyState>
+        ) : rows.length === 0 ? (
+          <EmptyState
+            title="No matching posts"
+            description="Try adjusting your search or category filter."
+          />
+        ) : (
+          <Table>
+            <Table.ScrollContainer>
+              <Table.Content
+                aria-label="Posts"
+                selectionMode="multiple"
+                selectedKeys={new Set(selected)}
+                onSelectionChange={(keys) =>
+                  setSelected(selectionToIds(keys, rows.map((p) => p.id)))
+                }
+              >
+                <Table.Header>
+                  <Table.Column isRowHeader>Post</Table.Column>
+                  {!filterByAuthor ? (
+                    <Table.Column>Author</Table.Column>
+                  ) : null}
+                  <Table.Column>Category</Table.Column>
+                  <Table.Column>Published</Table.Column>
+                  <Table.Column>Read time</Table.Column>
+                  <Table.Column>Actions</Table.Column>
+                </Table.Header>
+                <Table.Body items={rows}>
+                  {(post: Post) => {
+                    const readMinutes = calculateReadingTime(
+                      convertToText(post.description)
+                    );
+                    return (
+                      <Table.Row id={post.id}>
+                        <Table.Cell>
+                          <div className="flex items-center gap-3">
+                            {post.imageURL ? (
+                              <img
+                                src={post.imageURL}
+                                alt=""
+                                className="size-12 shrink-0 rounded-lg object-cover"
+                              />
+                            ) : (
+                              <div className="size-12 shrink-0 rounded-lg bg-zinc-100 dark:bg-zinc-800" />
                             )}
-                          >
-                            {post.status ?? "draft"}
+                            <div className="min-w-0">
+                              <p className="line-clamp-1 font-medium">{post.title}</p>
+                              {post.tags?.length ? (
+                                <p className="line-clamp-1 text-xs text-muted">
+                                  {post.tags.slice(0, 3).join(", ")}
+                                </p>
+                              ) : null}
+                            </div>
+                          </div>
+                        </Table.Cell>
+                        {!filterByAuthor ? (
+                          <Table.Cell>{authorName(post)}</Table.Cell>
+                        ) : null}
+                        <Table.Cell>
+                          <span className="inline-flex rounded-full bg-teal-50 px-2 py-0.5 text-xs font-medium capitalize text-teal-800 dark:bg-teal-950 dark:text-teal-300">
+                            {categoryTitle(post)}
                           </span>
-                          {post.publishedAt
-                            ? getPostFormattedDate(post.publishedAt)
-                            : post.createdAt
-                              ? getPostFormattedDate(post.createdAt)
-                              : null}
-                        </div>
-                      </Table.Cell>
-                      <Table.Cell>
-                        <span className="inline-flex items-center gap-1 text-xs text-muted">
-                          <Clock className="size-3.5" />
-                          {readMinutes} min
-                        </span>
-                      </Table.Cell>
-                      <Table.Cell>
-                        <div className="flex items-center gap-1">
-                          <Link href={`${basePath}/edit/${post.id}`}>
+                        </Table.Cell>
+                        <Table.Cell className="text-sm text-muted">
+                          <div className="flex flex-col gap-1">
+                            <span
+                              className={cn(
+                                "inline-flex w-fit rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide",
+                                post.status === "published"
+                                  ? "bg-teal-50 text-teal-800 dark:bg-teal-950 dark:text-teal-300"
+                                  : post.status === "archived"
+                                    ? "bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+                                    : "bg-amber-50 text-amber-800 dark:bg-amber-950 dark:text-amber-200"
+                              )}
+                            >
+                              {post.status ?? "draft"}
+                            </span>
+                            {post.publishedAt
+                              ? getPostFormattedDate(post.publishedAt)
+                              : post.createdAt
+                                ? getPostFormattedDate(post.createdAt)
+                                : null}
+                          </div>
+                        </Table.Cell>
+                        <Table.Cell>
+                          <span className="inline-flex items-center gap-1 text-xs text-muted">
+                            <Clock className="size-3.5" />
+                            {readMinutes} min
+                          </span>
+                        </Table.Cell>
+                        <Table.Cell>
+                          <div className="flex items-center gap-1">
+                            <Link href={`${basePath}/edit/${post.id}`}>
+                              <Button
+                                isIconOnly
+                                size="sm"
+                                variant="ghost"
+                                aria-label={`Edit ${post.title}`}
+                              >
+                                <PencilSimple className="size-4" />
+                              </Button>
+                            </Link>
+                            <Link href={`/posts/${post.id}`} target="_blank">
+                              <Button
+                                isIconOnly
+                                size="sm"
+                                variant="ghost"
+                                aria-label={`View ${post.title}`}
+                              >
+                                <Eye className="size-4" />
+                              </Button>
+                            </Link>
                             <Button
                               isIconOnly
                               size="sm"
                               variant="ghost"
-                              aria-label={`Edit ${post.title}`}
+                              aria-label={`Delete ${post.title}`}
+                              onPress={() => openDelete([post.id])}
                             >
-                              <PencilSimple className="size-4" />
+                              <Trash className="size-4 text-red-600" />
                             </Button>
-                          </Link>
-                          <Link href={`/posts/${post.id}`} target="_blank">
-                            <Button
-                              isIconOnly
-                              size="sm"
-                              variant="ghost"
-                              aria-label={`View ${post.title}`}
-                            >
-                              <Eye className="size-4" />
-                            </Button>
-                          </Link>
-                          <Button
-                            isIconOnly
-                            size="sm"
-                            variant="ghost"
-                            aria-label={`Delete ${post.title}`}
-                            onPress={() => openDelete([post.id])}
-                          >
-                            <Trash className="size-4 text-red-600" />
-                          </Button>
-                        </div>
-                      </Table.Cell>
-                    </Table.Row>
-                  );
-                }}
-              </Table.Body>
-            </Table.Content>
-          </Table.ScrollContainer>
-        </Table>
-      )}
+                          </div>
+                        </Table.Cell>
+                      </Table.Row>
+                    );
+                  }}
+                </Table.Body>
+              </Table.Content>
+            </Table.ScrollContainer>
+          </Table>
+        )}
+      </AsyncSection>
 
       {selected.length > 0 ? (
         <div

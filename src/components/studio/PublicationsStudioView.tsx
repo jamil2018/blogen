@@ -10,10 +10,13 @@ import {
   ListBox,
   ListBoxItem,
   Select,
+  Skeleton,
   TextArea,
   TextField,
   toast,
 } from "@heroui/react";
+import { AsyncSection } from "../feedback/AsyncSection";
+import { PublicationPanelSkeleton } from "../feedback/StudioSkeleton";
 import Link from "next/link";
 import {
   createMyPublication,
@@ -62,7 +65,7 @@ export default function PublicationsStudioView() {
 
   const activeId = selectedId || pubs?.[0]?.id || "";
 
-  const { data: studio } = useQuery({
+  const { data: studio, isLoading: studioLoading } = useQuery({
     queryKey: ["studio-publication", activeId],
     queryFn: () => getStudioPublication(activeId),
     enabled: Boolean(activeId),
@@ -239,39 +242,55 @@ export default function PublicationsStudioView() {
         </div>
       </section>
 
-      {isLoading ? (
-        <p className="text-sm text-muted">Loading…</p>
-      ) : !pubs?.length ? (
-        <p className="text-sm text-muted">No publications yet.</p>
-      ) : (
-        <section className="space-y-2">
-          <Label>Your publications</Label>
-          <Select
-            aria-label="Select publication"
-            selectedKey={activeId}
-            onSelectionChange={(key) => setSelectedId(String(key))}
-          >
-            <ListBox>
-              {pubs.map((p) => (
-                <ListBoxItem key={p.id} id={p.id} textValue={p.name}>
-                  {p.name}
-                </ListBoxItem>
-              ))}
-            </ListBox>
-          </Select>
-          {studio ? (
-            <p className="text-sm text-muted">
-              Role: {studio.role} ·{" "}
-              <Link
-                href={`/pubs/${studio.publication.slug}`}
-                className="underline"
-              >
-                View public page
-              </Link>
-            </p>
-          ) : null}
-        </section>
-      )}
+      <AsyncSection
+        isLoading={isLoading}
+        skeleton={
+          <section className="space-y-2">
+            <Skeleton className="h-4 w-36 rounded-md" />
+            <Skeleton className="h-10 w-full max-w-md rounded-lg" />
+          </section>
+        }
+      >
+        {!pubs?.length ? (
+          <p className="text-sm text-muted">No publications yet.</p>
+        ) : (
+          <section className="space-y-2">
+            <Label>Your publications</Label>
+            <Select
+              aria-label="Select publication"
+              selectedKey={activeId}
+              onSelectionChange={(key) => setSelectedId(String(key))}
+            >
+              <ListBox>
+                {pubs.map((p) => (
+                  <ListBoxItem key={p.id} id={p.id} textValue={p.name}>
+                    {p.name}
+                  </ListBoxItem>
+                ))}
+              </ListBox>
+            </Select>
+            {studio ? (
+              <p className="text-sm text-muted">
+                Role: {studio.role} ·{" "}
+                <Link
+                  href={`/pubs/${studio.publication.slug}`}
+                  className="underline"
+                >
+                  View public page
+                </Link>
+              </p>
+            ) : null}
+          </section>
+        )}
+      </AsyncSection>
+
+      {studioLoading && activeId && !isLoading && pubs?.length ? (
+        <div className="space-y-10">
+          <PublicationPanelSkeleton fields={6} />
+          <PublicationPanelSkeleton fields={4} />
+          <PublicationPanelSkeleton fields={4} />
+        </div>
+      ) : null}
 
       {studio && canEdit ? (
         <section className="space-y-3">

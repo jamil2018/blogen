@@ -10,13 +10,13 @@ import {
   Input,
   Label,
   Modal,
-  Spinner,
   Table,
   TextField,
   Toast,
   toast,
 } from "@heroui/react";
 import ErrorState from "../feedback/ErrorState";
+import { TableSkeleton } from "../feedback/StudioSkeleton";
 import {
   getAllCategories,
   createCategory,
@@ -102,15 +102,6 @@ export default function AdminCategoriesView() {
     );
   }, [data, search]);
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-12">
-        <Spinner />
-      </div>
-    );
-  }
-  if (isError) return <ErrorState />;
-
   return (
     <div className="space-y-4">
       <Toast.Provider placement="bottom end" />
@@ -149,56 +140,62 @@ export default function AdminCategoriesView() {
         />
       </div>
 
-      <Table>
-        <Table.ScrollContainer>
-          <Table.Content
-            aria-label="Categories"
-            selectionMode="multiple"
-            selectedKeys={new Set(selected)}
-            onSelectionChange={(keys) =>
-              setSelected(selectionToIds(keys, rows.map((c: Category) => c.id)))
-            }
-          >
-            <Table.Header>
-              <Table.Column isRowHeader>Category</Table.Column>
-              <Table.Column>Posts</Table.Column>
-              <Table.Column>Created</Table.Column>
-            </Table.Header>
-            <Table.Body items={rows}>
-              {(cat: Category) => {
-                const count = postCountByCategory.get(cat.title) ?? 0;
-                const hue = categoryHue(cat.title);
-                return (
-                  <Table.Row id={cat.id}>
-                    <Table.Cell>
-                      <div className="flex items-center gap-3">
-                        <span
-                          className="size-3 shrink-0 rounded-full"
-                          style={{
-                            backgroundColor: `oklch(0.62 0.14 ${hue})`,
-                          }}
-                          aria-hidden
-                        />
-                        <span className="font-medium capitalize">{cat.title}</span>
-                      </div>
-                    </Table.Cell>
-                    <Table.Cell>
-                      <span className="inline-flex rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium tabular-nums text-ink dark:bg-zinc-800">
-                        {count} {count === 1 ? "post" : "posts"}
-                      </span>
-                    </Table.Cell>
-                    <Table.Cell className="text-sm text-muted">
-                      {cat.createdAt
-                        ? new Date(cat.createdAt).toLocaleDateString()
-                        : "N/A"}
-                    </Table.Cell>
-                  </Table.Row>
-                );
-              }}
-            </Table.Body>
-          </Table.Content>
-        </Table.ScrollContainer>
-      </Table>
+      {isError ? (
+        <ErrorState />
+      ) : isLoading ? (
+        <TableSkeleton rows={5} columns={3} />
+      ) : (
+        <Table>
+          <Table.ScrollContainer>
+            <Table.Content
+              aria-label="Categories"
+              selectionMode="multiple"
+              selectedKeys={new Set(selected)}
+              onSelectionChange={(keys) =>
+                setSelected(selectionToIds(keys, rows.map((c: Category) => c.id)))
+              }
+            >
+              <Table.Header>
+                <Table.Column isRowHeader>Category</Table.Column>
+                <Table.Column>Posts</Table.Column>
+                <Table.Column>Created</Table.Column>
+              </Table.Header>
+              <Table.Body items={rows}>
+                {(cat: Category) => {
+                  const count = postCountByCategory.get(cat.title) ?? 0;
+                  const hue = categoryHue(cat.title);
+                  return (
+                    <Table.Row id={cat.id}>
+                      <Table.Cell>
+                        <div className="flex items-center gap-3">
+                          <span
+                            className="size-3 shrink-0 rounded-full"
+                            style={{
+                              backgroundColor: `oklch(0.62 0.14 ${hue})`,
+                            }}
+                            aria-hidden
+                          />
+                          <span className="font-medium capitalize">{cat.title}</span>
+                        </div>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <span className="inline-flex rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium tabular-nums text-ink dark:bg-zinc-800">
+                          {count} {count === 1 ? "post" : "posts"}
+                        </span>
+                      </Table.Cell>
+                      <Table.Cell className="text-sm text-muted">
+                        {cat.createdAt
+                          ? new Date(cat.createdAt).toLocaleDateString()
+                          : "N/A"}
+                      </Table.Cell>
+                    </Table.Row>
+                  );
+                }}
+              </Table.Body>
+            </Table.Content>
+          </Table.ScrollContainer>
+        </Table>
+      )}
 
       <Modal isOpen={createOpen} onOpenChange={setCreateOpen}>
         <Modal.Backdrop>

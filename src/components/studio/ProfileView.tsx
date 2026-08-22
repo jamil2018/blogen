@@ -20,7 +20,6 @@ import {
   Checkbox,
   Input,
   Label,
-  Spinner,
   TextArea,
   TextField,
 } from "@heroui/react";
@@ -42,6 +41,8 @@ import {
   USER_DATA,
 } from "../../definitions/reactQueryConstants/queryConstants";
 import { getAuthorNameInitials, sanitizeSocialURL } from "../../utils/dataFormat";
+import { AsyncSection } from "../feedback/AsyncSection";
+import { FormSkeleton } from "../feedback/StudioSkeleton";
 import { useCurrentUser } from "../auth/AuthProvider";
 import { cn } from "../../lib/cn";
 
@@ -247,14 +248,6 @@ export default function ProfileView({ admin = false, userId }: ProfileViewProps)
     [avatarPreview, formik]
   );
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-12">
-        <Spinner />
-      </div>
-    );
-  }
-
   const initials = getAuthorNameInitials(formik.values.name).filter(Boolean).join("");
 
   return (
@@ -279,6 +272,10 @@ export default function ProfileView({ admin = false, userId }: ProfileViewProps)
         </Alert>
       ) : null}
 
+      <AsyncSection
+        isLoading={isLoading}
+        skeleton={<FormSkeleton fields={6} className="mt-6" />}
+      >
       <div className="mt-6 grid gap-8 lg:grid-cols-[320px_1fr]">
         <div className="space-y-4">
           <LiveAuthorPreview
@@ -453,6 +450,7 @@ export default function ProfileView({ admin = false, userId }: ProfileViewProps)
           {!isAdminUserEdit ? <AccountPrivacySection /> : null}
         </div>
       </div>
+      </AsyncSection>
     </form>
   );
 }
