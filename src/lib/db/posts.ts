@@ -7,6 +7,15 @@ import {
   computeTotalPages,
   paginationRange,
 } from "../posts/contracts";
+import {
+  scoreRelatedIdeas,
+  type RelatedIdea,
+} from "../phase-2/contracts";
+import { getPathLinksForPost } from "./reading-paths";
+import {
+  getLatestStructuralMetadata,
+  listMetadataReferencedPosts,
+} from "./phase2-content";
 
 export type ListPostsFilters = {
   page?: number;
@@ -263,40 +272,133 @@ export async function searchPostTitles(
   return result ?? [];
 }
 
-export async function listRelatedPosts(
+export type RelatedPostResult = {
+  post: Post;
+  idea: RelatedIdea;
+};
+
+export async function listRelatedIdeas(
   post: Post,
   limit = 3
-): Promise<Post[]> {
+): Promise<RelatedPostResult[]> {
   const result = await safeQuery(async () => {
     const supabase = await createClient();
     const categoryId =
-      typeof post.category === "object" ? post.category.id : post.category;
+      typeof post.category === "object" ? post.category.id : undefined;
+
+    const [pathLinks, metadata] = await Promise.all([
+      getPathLinksForPost(post.id),
+      getLatestStructuralMetadata(post.id),
+    ]);
+
+    const citationPostIds = new Set<string>(metadata?.referencedPostIds ?? []);
+    if (citationPostIds.size) {
+      const { data: reverseRefs } = await supabase
+        .from("post_structural_metadata")
+        .select("post_id")
+        .contains("referenced_post_ids", [post.id])
+        .neq("post_id", post.id)
+        .limit(10);
+      for (const row of reverseRefs ?? []) {
+        citationPostIds.add(row.post_id);
+      }
+    }
+
+    const citationLinks = [...citationPostIds].map((postId) => ({ postId }));
+
     let query = supabase
       .from("posts")
       .select(POST_LIST_SELECT)
       .eq("status", "published")
       .neq("id", post.id)
-      .limit(limit * 3);
+      .limit(Math.max(limit * 5, 15));
 
     if (categoryId) {
       query = query.eq("category_id", categoryId);
     }
 
-    const { data, error } = await query
-      .order("published_at", { ascending: false, nullsFirst: false });
+    const { data, error } = await query.order("published_at", {
+      ascending: false,
+      nullsFirst: false,
+    });
     if (error) throw error;
 
     const mapped = (data as PostRow[]).map(mapPost);
-    const tagSet = new Set(post.tags ?? []);
-    const scored = mapped
-      .map((candidate) => {
-        const overlap = candidate.tags.filter((t) => tagSet.has(t)).length;
-        return { candidate, overlap };
+
+    const metadataLinks: { postId: string; sharedSections: string[] }[] = [];
+    if (metadata?.sections.length) {
+      const sectionTexts = metadata.sections.map((s) => s.text.toLowerCase());
+      for (const candidate of mapped.slice(0, 10)) {
+        const candidateMeta = await getLatestStructuralMetadata(candidate.id);
+        if (!candidateMeta?.sections.length) continue;
+        const shared = candidateMeta.sections
+          .map((s) => s.text)
+          .filter((text) =>
+            sectionTexts.some(
+              (source) =>
+                source.includes(text.toLowerCase()) ||
+                text.toLowerCase().includes(source)
+            )
+          );
+        if (shared.length) {
+          metadataLinks.push({ postId: candidate.id, sharedSections: shared });
+        }
+      }
+    }
+
+    const ideas = scoreRelatedIdeas({
+      sourcePostId: post.id,
+      candidates: mapped.map((c) => ({
+        postId: c.id,
+        tags: c.tags,
+        categoryId:
+          typeof c.category === "object" ? c.category.id : undefined,
+      })),
+      sourceTags: post.tags ?? [],
+      sourceCategoryId: categoryId,
+      pathLinks,
+      citationLinks,
+      metadataLinks,
+      limit,
+    });
+
+    const postsById = new Map(mapped.map((p) => [p.id, p]));
+    const resolved = ideas
+      .map((idea) => {
+        const related = postsById.get(idea.postId);
+        return related ? { post: related, idea } : null;
       })
-      .sort((a, b) => b.overlap - a.overlap);
-    return scored.slice(0, limit).map((s) => s.candidate);
+      .filter((row): row is RelatedPostResult => Boolean(row));
+
+    if (resolved.length >= limit) return resolved;
+
+    const seen = new Set(resolved.map((r) => r.post.id));
+    for (const candidate of mapped) {
+      if (resolved.length >= limit) break;
+      if (seen.has(candidate.id)) continue;
+      seen.add(candidate.id);
+      resolved.push({
+        post: candidate,
+        idea: {
+          postId: candidate.id,
+          basis: "category_tag_fallback",
+          kind: "suggested",
+          explanation: "Related by shared category or tags.",
+        },
+      });
+    }
+
+    return resolved.slice(0, limit);
   });
   return result ?? [];
+}
+
+export async function listRelatedPosts(
+  post: Post,
+  limit = 3
+): Promise<Post[]> {
+  const related = await listRelatedIdeas(post, limit);
+  return related.map((r) => r.post);
 }
 
 export async function listCuratedPosts(authorId?: string) {
@@ -348,7 +450,7 @@ export async function getAuthorPostCounts(authorId?: string) {
   const result = await safeQuery(async () => {
     const supabase = await createClient();
     const { data, error } = await supabase.rpc("public_post_counts_by_author", {
-      p_author_id: authorId ?? null,
+      p_author_id: authorId,
     });
     if (error) throw error;
     return (data ?? []).map((row) => ({
@@ -363,7 +465,7 @@ export async function getCategoryPostCounts(categoryId?: string) {
   const result = await safeQuery(async () => {
     const supabase = await createClient();
     const { data, error } = await supabase.rpc("public_post_counts_by_category", {
-      p_category_id: categoryId ?? null,
+      p_category_id: categoryId,
     });
     if (error) throw error;
     return (data ?? []).map((row) => ({

@@ -21,7 +21,7 @@ import ShareBar from "../layout/ShareBar";
 import Reveal from "../motion/Reveal";
 import ErrorState from "../feedback/ErrorState";
 import { PostDetailSkeleton } from "../feedback/PageSkeleton";
-import { getPostById, getAllPostsByAuthorId, getRelatedPostsForId } from "../../data/postQueryFunctions";
+import { getPostById, getAllPostsByAuthorId, getRelatedIdeasForId } from "../../data/postQueryFunctions";
 import { getUserById } from "../../data/userQueryFunctions";
 import { getCommentsByPostId } from "../../data/commentQueryFunctions";
 import {
@@ -96,8 +96,8 @@ export default function PostDetailView({
   });
 
   const { data: relatedFromApi } = useQuery({
-    queryKey: ["related-posts", postId],
-    queryFn: () => getRelatedPostsForId(postId),
+    queryKey: ["related-ideas", postId],
+    queryFn: () => getRelatedIdeasForId(postId),
     enabled: Boolean(postId),
     refetchOnWindowFocus: false,
   });
@@ -110,9 +110,22 @@ export default function PostDetailView({
   });
 
   const relatedPosts = useMemo(() => {
-    if (relatedFromApi?.length) return relatedFromApi.slice(0, 3);
+    if (relatedFromApi?.length) {
+      return relatedFromApi.slice(0, 3);
+    }
     return (
-      authorPosts?.filter((p) => p.id !== postId).slice(0, 2) ?? []
+      authorPosts
+        ?.filter((p) => p.id !== postId)
+        .slice(0, 2)
+        .map((post) => ({
+          post,
+          idea: {
+            postId: post.id,
+            basis: "category_tag_fallback" as const,
+            kind: "suggested" as const,
+            explanation: "More from this author.",
+          },
+        })) ?? []
     );
   }, [relatedFromApi, authorPosts, postId]);
 
@@ -296,11 +309,29 @@ export default function PostDetailView({
         {relatedPosts.length > 0 ? (
           <Reveal delay={0.06} className="mt-10">
             <h2 className="mb-4 text-lg font-semibold tracking-tight text-ink">
-              Related reading
+              Related ideas
             </h2>
             <div className="grid gap-6 sm:grid-cols-2">
-              {relatedPosts.map((relatedPost) => (
-                <PostCard key={relatedPost.id} post={relatedPost} variant="featured" />
+              {relatedPosts.map(({ post: relatedPost, idea }) => (
+                <div key={relatedPost.id} className="space-y-2">
+                  <span
+                    className={`inline-block rounded-full px-2 py-0.5 text-xs ${
+                      idea.kind === "curated"
+                        ? "bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-200"
+                        : idea.kind === "declared"
+                          ? "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200"
+                          : "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+                    }`}
+                  >
+                    {idea.kind === "curated"
+                      ? "Curated path"
+                      : idea.kind === "declared"
+                        ? "Citation"
+                        : "Suggested"}
+                  </span>
+                  <p className="text-xs text-muted">{idea.explanation}</p>
+                  <PostCard post={relatedPost} variant="featured" showCollectionAction />
+                </div>
               ))}
             </div>
           </Reveal>

@@ -13,6 +13,7 @@ import {
   listPaginatedPosts,
   listPostsByAuthor,
   listRelatedPosts,
+  listRelatedIdeas,
   searchPostTitles,
   searchPosts as searchPostsQuery,
 } from "../lib/db/posts";
@@ -27,6 +28,7 @@ import type { TablesInsert, TablesUpdate } from "../lib/supabase/database.types"
 import type { Post, PostStatus } from "../types/post";
 import { slugifyTitle } from "../lib/posts/contracts";
 import { logAppEvent } from "../lib/observability";
+import { upsertPostStructuralMetadata } from "../lib/db/phase2-content";
 
 export type PostInput = {
   title: string;
@@ -140,8 +142,38 @@ async function appendRevision(
     published_at: row.published_at,
     created_by: actorId,
   };
-  const { error } = await supabase.from("post_revisions").insert(insert);
-  if (error) throw new Error(error.message);
+  const { data: inserted, error } = await supabase
+    .from("post_revisions")
+    .insert(insert)
+    .select("id, revision_number")
+    .single();
+  if (error || !inserted) throw new Error(error?.message ?? "Failed to append revision");
+
+  try {
+    const { data: postRow } = await supabase
+      .from("posts")
+      .select("author_id, tags")
+      .eq("id", postId)
+      .maybeSingle();
+    if (postRow) {
+      await upsertPostStructuralMetadata({
+        postId,
+        revisionId: inserted.id,
+        revisionNumber: inserted.revision_number,
+        html: row.description,
+        tags: row.tags,
+        authorId: postRow.author_id,
+        publishedAt: row.published_at,
+      });
+    }
+  } catch (metaError) {
+    logAppEvent("warn", "post.structure_metadata_failed", {
+      postId,
+      message: metaError instanceof Error ? metaError.message : "unknown",
+    });
+  }
+
+  return inserted;
 }
 
 async function recordSlugRedirect(
@@ -219,6 +251,12 @@ export async function getRelatedPosts(postId: string) {
   const post = await getPostByIdQuery(postId);
   if (!post) return [];
   return listRelatedPosts(post);
+}
+
+export async function getRelatedIdeas(postId: string) {
+  const post = await getPostByIdQuery(postId);
+  if (!post) return [];
+  return listRelatedIdeas(post);
 }
 
 export async function getCuratedPosts() {

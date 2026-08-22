@@ -28,6 +28,23 @@ Anonymous clients may emit only `view` and `read_complete`.
 | `membership_refund` | Charge refunded | webhook |
 | `email_open` / `email_click` | Reserved for Resend engagement (when wired) | email pipeline |
 
+### Phase 2 workflow events
+
+Privacy-safe funnel events for save → collection → intent → space. See [phase-2-funnel.md](./phase-2-funnel.md) for proceed criteria.
+
+| Event | Meaning | Typical source |
+|---|---|---|
+| `library_save` | Post saved to library | `toggleLibrarySave` |
+| `collection_created` | User created a collection | `createUserCollection` |
+| `source_added_to_collection` | Post added to a collection | `addToCollection` |
+| `collection_intent_set` | Collection purpose/intent updated | `updateCollectionIntent` |
+| `annotation_created` | Passage annotation saved | `createPassageAnnotation` |
+| `space_promoted` | Collection promoted to knowledge space | `promoteCollectionToSpace` |
+| `reading_path_saved` | Full path saved to a collection | `saveReadingPathToCollection` |
+| `reading_path_started` | Reading path detail viewed | `recordReadingPathStarted` |
+
+Phase 2 payloads may include opaque ids (`post_id`, `collection_id`, `path_id`, `space_id`, `source_count`) only — never intent text, annotation bodies, or passage quotes.
+
 ## Rollup scopes
 
 Daily counters by `scope_type`:

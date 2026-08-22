@@ -133,7 +133,7 @@ export default function FollowingPageView() {
       ) : (
         <div className="space-y-6">
           {posts.map((post) => (
-            <PostCard key={post.id} post={post} variant="featured" />
+            <PostCard key={post.id} post={post} variant="featured" showCollectionAction />
           ))}
         </div>
       )}

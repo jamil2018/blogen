@@ -199,7 +199,7 @@ export default function SearchResultsView({
         <div className="grid gap-6 sm:grid-cols-2">
           {filtered.map((post, index) => (
             <Reveal key={post.id} delay={index * 0.03}>
-              <PostCard post={post} variant="featured" />
+              <PostCard post={post} variant="featured" showCollectionAction />
             </Reveal>
           ))}
         </div>
