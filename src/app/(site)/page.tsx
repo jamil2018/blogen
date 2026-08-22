@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { HomePageFallback } from "../../components/feedback/PublicRouteFallbacks";
 import HomePageView from "../../components/pages/HomePageView";
 import {
   fetchAllCategories,
@@ -37,7 +38,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     page === 1 ? firstPage : await fetchPaginatedPosts(page, limit);
 
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<HomePageFallback />}>
       <HomePageView
         latestPosts={latestPosts}
         paginatedPosts={paginatedPosts}
