@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { Alert, Button, Card, Input, Label, TextField, toast } from "@heroui/react";
+import { Alert, Button, Card, Input, Label, Skeleton, TextField, toast } from "@heroui/react";
 import {
   createMembershipTier,
   getMembershipTiers,
@@ -13,6 +13,27 @@ import {
 import { useCurrentUser } from "../auth/AuthProvider";
 import { readerMembershipLabel } from "../../lib/posts/stage-d-contracts";
 import type { MembershipStatus } from "../../lib/posts/stage-d-contracts";
+import {
+  KPICardSkeletonRow,
+} from "../feedback/StudioSkeleton";
+
+function CreateTierSkeleton() {
+  return (
+    <Card className="space-y-3 p-4">
+      <Skeleton className="h-4 w-28 rounded-md" />
+      <Skeleton className="h-10 w-full rounded-lg" />
+      <Skeleton className="h-10 w-full rounded-lg" />
+      <div className="flex gap-2">
+        <Skeleton className="h-8 w-20 rounded-full" />
+        <Skeleton className="h-8 w-20 rounded-full" />
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <Skeleton className="h-9 w-32 rounded-full" />
+        <Skeleton className="h-9 w-28 rounded-full" />
+      </div>
+    </Card>
+  );
+}
 
 export default function MembershipsStudioView() {
   const user = useCurrentUser();
@@ -28,9 +49,13 @@ export default function MembershipsStudioView() {
   const [name, setName] = useState("Supporters");
   const [amount, setAmount] = useState("500");
   const [interval, setInterval] = useState<"month" | "year">("month");
+  const [initialLoading, setInitialLoading] = useState(true);
 
-  const reload = () => {
-    if (!user?.id) return;
+  const reload = (isInitial = false) => {
+    if (!user?.id) {
+      if (isInitial) startTransition(() => setInitialLoading(false));
+      return;
+    }
     startTransition(async () => {
       const [status, t, m] = await Promise.all([
         getStripeStatus(),
@@ -41,11 +66,14 @@ export default function MembershipsStudioView() {
       setStripeMsg(status.message);
       setTiers(t);
       setMemberships(m);
+      if (isInitial) setInitialLoading(false);
     });
   };
 
   useEffect(() => {
-    reload();
+    startTransition(() => {
+      reload(true);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
@@ -108,6 +136,16 @@ export default function MembershipsStudioView() {
 
       <section className="space-y-4">
         <h2 className="text-lg font-medium">Your tiers</h2>
+        {initialLoading ? (
+          <>
+            <KPICardSkeletonRow
+              count={2}
+              className="gap-3 sm:grid-cols-2 xl:grid-cols-2"
+            />
+            <CreateTierSkeleton />
+          </>
+        ) : (
+        <>
         <div className="grid gap-3 sm:grid-cols-2">
           {tiers.map((t) => (
             <Card key={t.id} className="space-y-2 p-4">
@@ -185,6 +223,8 @@ export default function MembershipsStudioView() {
             </Button>
           </div>
         </Card>
+        </>
+        )}
       </section>
 
       <section className="space-y-3">
