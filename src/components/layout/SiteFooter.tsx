@@ -17,7 +17,7 @@ export default function SiteFooter() {
           <span className="text-base font-medium tracking-tight">Blogen</span>
         </Link>
         <nav className="flex flex-wrap justify-center gap-4 text-sm text-muted sm:gap-6">
-          <Link href="/" className="hover:text-ink">
+          <Link href="/explore" className="hover:text-ink">
             Explore
           </Link>
           <Link href="/library" className="hover:text-ink">

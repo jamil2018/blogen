@@ -23,6 +23,34 @@ function revealTransition(index: number) {
   };
 }
 
+function EmptyHeroBackdrop({ animate }: { animate: boolean | null }) {
+  const layers = (
+    <>
+      <div className="hero-empty absolute inset-0" />
+      <div className="hero-empty-texture pointer-events-none absolute inset-0" />
+      <div
+        className="hero-empty-rings pointer-events-none absolute -right-20 top-10 size-[min(46vw,22rem)] md:-right-6 md:top-6 md:size-[30rem]"
+        aria-hidden
+      />
+    </>
+  );
+
+  if (animate) {
+    return (
+      <motion.div
+        className="absolute inset-0"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, ease: revealEase }}
+      >
+        {layers}
+      </motion.div>
+    );
+  }
+
+  return <div className="absolute inset-0">{layers}</div>;
+}
+
 export default function HomeHero({ post, className }: HomeHeroProps) {
   const prefersReducedMotion = useReducedMotion();
   const [heroImageFailed, setHeroImageFailed] = useState(false);
@@ -68,6 +96,8 @@ export default function HomeHero({ post, className }: HomeHeroProps) {
             />
           </motion.div>
         )
+      ) : !post ? (
+        <EmptyHeroBackdrop animate={prefersReducedMotion ? null : true} />
       ) : (
         <div className="absolute inset-0 bg-gradient-to-br from-zinc-200 to-zinc-300 dark:from-zinc-800 dark:to-zinc-900" />
       )}

@@ -91,6 +91,86 @@
   );
 }
 
+/* Empty home hero — fresh app with no published posts yet */
+.hero-empty {
+  background:
+    radial-gradient(
+      ellipse 80% 55% at 88% 12%,
+      oklch(0.55 0.12 175 / 0.42),
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse 65% 50% at 8% 88%,
+      oklch(0.62 0.16 55 / 0.32),
+      transparent 52%
+    ),
+    linear-gradient(
+      165deg,
+      oklch(0.34 0.04 286) 0%,
+      oklch(0.27 0.045 175) 48%,
+      oklch(0.21 0.035 286) 100%
+    );
+}
+
+.dark .hero-empty {
+  background:
+    radial-gradient(
+      ellipse 80% 55% at 88% 12%,
+      oklch(0.42 0.1 175 / 0.5),
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse 65% 50% at 8% 88%,
+      oklch(0.52 0.14 55 / 0.28),
+      transparent 52%
+    ),
+    linear-gradient(
+      165deg,
+      oklch(0.17 0.012 286) 0%,
+      oklch(0.13 0.022 175) 48%,
+      oklch(0.11 0.018 286) 100%
+    );
+}
+
+.hero-empty-texture {
+  opacity: 0.28;
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    oklch(1 0 0 / 0.12) 1px,
+    transparent 0
+  );
+  background-size: 28px 28px;
+}
+
+.dark .hero-empty-texture {
+  opacity: 0.22;
+}
+
+.hero-empty-rings {
+  border-radius: 50%;
+  border: 1px solid oklch(0.68 0.15 55 / 0.28);
+  box-shadow:
+    0 0 0 28px oklch(0.68 0.15 55 / 0.1),
+    0 0 0 56px oklch(0.68 0.15 55 / 0.05),
+    0 0 0 84px oklch(0.68 0.15 55 / 0.025);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes hero-empty-drift {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+      transform: translate3d(-1.5%, 1%, 0) scale(1.03);
+    }
+  }
+
+  .hero-empty-rings {
+    animation: hero-empty-drift 18s ease-in-out infinite;
+  }
+}
+
 /* Full-bleed breakout from max-w shell */
 .full-bleed {
   position: relative;

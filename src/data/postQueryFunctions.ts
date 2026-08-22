@@ -13,6 +13,7 @@ import {
   getPublicAuthorPostCounts,
   getPublicCategoryPostCounts,
   getPublicPlatformStats,
+  getPublicTags,
   getRelatedPosts,
   getRelatedIdeas,
   findPosts,
@@ -35,17 +36,28 @@ export const searchPostResults = searchPostResultsAction;
 export const getPlatformStats = getPublicPlatformStats;
 export const getAuthorPostCounts = getPublicAuthorPostCounts;
 export const getCategoryPostCounts = getPublicCategoryPostCounts;
+export const getPublicTagList = getPublicTags;
 export const getRelatedPostsForId = getRelatedPosts;
 export const getRelatedIdeasForId = getRelatedIdeas;
 
 export function getPaginatedPosts({
   page,
   limit,
+  q,
+  categories,
+  tag,
+  authors,
+  sort,
 }: {
   page: number;
   limit: number;
+  q?: string;
+  categories?: string[];
+  tag?: string;
+  authors?: string[];
+  sort?: "newest" | "oldest";
 }) {
-  return getPaginatedPostsAction({ page, limit });
+  return getPaginatedPostsAction({ page, limit, q, categories, tag, authors, sort });
 }
 
 export function getMyPosts() {

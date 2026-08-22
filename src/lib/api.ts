@@ -7,8 +7,10 @@ import {
   listLatestPosts,
   listPaginatedPosts,
   listPostsByAuthor,
+  listPublicTags,
   listRelatedPosts,
   searchPosts,
+  type ListPostsFilters,
 } from "./db/posts";
 import { listCategories } from "./db/categories";
 import { getProfileById } from "./db/auth";
@@ -21,6 +23,14 @@ export async function fetchLatestPosts() {
 
 export async function fetchPaginatedPosts(page = 1, limit = 5) {
   return listPaginatedPosts(page, limit) as Promise<PaginatedPosts | undefined>;
+}
+
+export async function fetchExplorePosts(
+  page = 1,
+  limit = 10,
+  filters: Omit<ListPostsFilters, "page" | "limit"> = {},
+) {
+  return listPaginatedPosts(page, limit, filters) as Promise<PaginatedPosts | undefined>;
 }
 
 export async function fetchPostById(postId: string) {
@@ -70,6 +80,10 @@ export async function fetchPlatformStats() {
 
 export async function fetchAuthorPostCounts() {
   return getAuthorPostCounts();
+}
+
+export async function fetchPublicTags() {
+  return listPublicTags();
 }
 
 export async function fetchCategoryPostCounts() {

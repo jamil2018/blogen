@@ -5,7 +5,7 @@ test.describe("Stage A smoke", () => {
   test("home explore loads", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("header").first()).toBeVisible();
-    await expect(page.getByText("Blogen").first()).toBeVisible();
+    await expect(page.locator("header").getByLabel("Blogen")).toBeVisible();
   });
 
   test("policy pages are reachable", async ({ page }) => {

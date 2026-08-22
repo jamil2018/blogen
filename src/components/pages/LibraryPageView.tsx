@@ -144,7 +144,7 @@ export default function LibraryPageView() {
           <EmptyState
             title="Your Library is empty"
             description="Save published posts while reading to build your list."
-            actionHref="/"
+            actionHref="/explore"
             actionLabel="Explore posts"
           />
         )
@@ -171,7 +171,7 @@ export default function LibraryPageView() {
           <EmptyState
             title="No collections yet"
             description="Use Add to collection on any post to create your first source set."
-            actionHref="/"
+            actionHref="/explore"
             actionLabel="Find sources"
           />
         )

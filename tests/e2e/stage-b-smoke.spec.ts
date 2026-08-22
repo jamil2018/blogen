@@ -8,11 +8,17 @@ test.describe("Stage B smoke", () => {
     expect(page.url()).toContain("next=");
   });
 
-  test("site header exposes Following nav", async ({ page }) => {
+  test("site header hides personal nav when signed out", async ({ page }) => {
     await page.goto("/");
-    await expect(
-      page.getByRole("button", { name: "Following" }).first()
-    ).toBeVisible();
+    await expect(page.getByRole("link", { name: "Following" })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Library" })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Explore" })).toBeVisible();
+  });
+
+  test("explore page loads with filterable catalog", async ({ page }) => {
+    await page.goto("/explore");
+    await expect(page.getByRole("heading", { name: "Explore" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Filters" })).toBeVisible();
   });
 
   test("policy and explore remain reachable after Stage B", async ({ page }) => {

@@ -11,7 +11,7 @@ import { clampPage, computeTotalPages } from "../../lib/posts/contracts";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "Explore | Blogen",
+    title: "Blogen",
     description:
       "Discover published writing on Blogen — a knowledge-oriented publishing community.",
   };

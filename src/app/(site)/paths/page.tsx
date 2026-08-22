@@ -48,7 +48,7 @@ export default function ReadingPathsIndexPage() {
         <EmptyState
           title="No reading paths yet"
           description="Published paths will appear here as editors curate them."
-          actionHref="/"
+          actionHref="/explore"
           actionLabel="Explore posts"
         />
       )}

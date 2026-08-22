@@ -1,11 +1,11 @@
 "use client";
 
 import Link, { useLinkStatus } from "next/link";
-import { useRouter } from "next/navigation";
-import { useState, type ComponentProps, type ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, type ComponentProps, type MouseEvent, type ReactNode } from "react";
 import { debounce } from "lodash";
 import { useQuery } from "@tanstack/react-query";
-import { List as MenuIcon } from "@phosphor-icons/react";
+import { CaretDown, List as MenuIcon, SignIn, UserPlus } from "@phosphor-icons/react";
 import {
   Avatar,
   Button,
@@ -23,21 +23,36 @@ import { getAuthorNameInitials } from "../../utils/dataFormat";
 import type { Post } from "../../types";
 import { cn } from "../../lib/cn";
 import AppIcon from "../../assets/appIcon.svg";
-import { SignIn, UserPlus } from "@phosphor-icons/react";
 
-const navLinks = [
-  { href: "/", label: "Explore" },
+const publicNavLinks = [{ href: "/explore", label: "Explore" }];
+
+const authenticatedNavLinks = [
   { href: "/following", label: "Following" },
   { href: "/library", label: "Library" },
+];
+
+const browseNavLinks = [
   { href: "/paths", label: "Paths" },
   { href: "/categories", label: "Categories" },
   { href: "/authors", label: "Authors" },
 ];
 
-function NavLinkIndicator({ children }: { children: ReactNode }) {
+const navLinkClassName =
+  "rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:bg-zinc-100 hover:text-ink dark:hover:bg-zinc-800";
+
+function NavLinkIndicator({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   const { pending } = useLinkStatus();
   return (
-    <span className={cn(pending && "opacity-50")} aria-busy={pending || undefined}>
+    <span
+      className={cn(pending && "opacity-50", className)}
+      aria-busy={pending || undefined}
+    >
       {children}
     </span>
   );
@@ -50,9 +65,30 @@ type HeaderNavLinkProps = {
   onNavigate?: () => void;
 };
 
+function useSameRouteClick(href: string, onNavigate?: () => void) {
+  const pathname = usePathname();
+  const router = useRouter();
+
+  return (event: MouseEvent<HTMLAnchorElement>) => {
+    onNavigate?.();
+
+    const [targetPath] = href.split("?");
+    if (pathname !== targetPath) return;
+
+    event.preventDefault();
+    if (typeof window !== "undefined" && window.location.search) {
+      router.push(href);
+      return;
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+}
+
 function HeaderNavLink({ href, children, className, onNavigate }: HeaderNavLinkProps) {
+  const handleClick = useSameRouteClick(href, onNavigate);
+
   return (
-    <Link href={href} className={className} onClick={onNavigate}>
+    <Link href={href} className={className} onClick={handleClick}>
       <NavLinkIndicator>{children}</NavLinkIndicator>
     </Link>
   );
@@ -62,6 +98,26 @@ type NavButtonProps = Omit<ComponentProps<typeof Button>, "onPress"> & {
   href: string;
   onNavigate?: () => void;
 };
+
+function BrowseNavDropdown() {
+  return (
+    <Dropdown>
+      <Dropdown.Trigger aria-label="Browse" className={cn(navLinkClassName, "inline-flex items-center gap-0.5")}>
+        Browse
+        <CaretDown className="size-3.5 opacity-70" aria-hidden />
+      </Dropdown.Trigger>
+      <Dropdown.Popover>
+        <Dropdown.Menu aria-label="Browse">
+          {browseNavLinks.map((link) => (
+            <Dropdown.Item key={link.href} id={link.href} href={link.href}>
+              {link.label}
+            </Dropdown.Item>
+          ))}
+        </Dropdown.Menu>
+      </Dropdown.Popover>
+    </Dropdown>
+  );
+}
 
 function NavButton({ href, onNavigate, className, children, ...props }: NavButtonProps) {
   return (
@@ -79,6 +135,8 @@ function SearchBar({ className }: { className?: string }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const expanded = focused || open;
 
   const { isLoading, data, isError } = useQuery({
     queryKey: [SEARCH_POST_DATA, query],
@@ -97,11 +155,17 @@ function SearchBar({ className }: { className?: string }) {
   };
 
   return (
-    <div className={cn("relative", className)}>
+    <div
+      className={cn(
+        "relative w-full transition-[max-width] duration-300 ease-out",
+        expanded ? "max-w-md" : "max-w-56",
+        className,
+      )}
+    >
       <SearchField
         aria-label="Search posts"
         onSubmit={goToSearch}
-        className="max-w-xs"
+        className="w-full"
       >
         <SearchField.Group>
           <SearchField.SearchIcon />
@@ -111,8 +175,14 @@ function SearchBar({ className }: { className?: string }) {
               debouncedSet(e.target.value);
               setOpen(Boolean(e.target.value));
             }}
-            onFocus={() => query && setOpen(true)}
-            onBlur={() => setTimeout(() => setOpen(false), 150)}
+            onFocus={() => {
+              setFocused(true);
+              if (query) setOpen(true);
+            }}
+            onBlur={() => {
+              setFocused(false);
+              setTimeout(() => setOpen(false), 150);
+            }}
           />
         </SearchField.Group>
       </SearchField>
@@ -239,15 +309,24 @@ function UserMenu() {
 
 export default function SiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const user = useCurrentUser();
+  const handleLogoClick = useSameRouteClick("/");
+  const primaryNavLinks = user?.id
+    ? [...publicNavLinks, ...authenticatedNavLinks]
+    : publicNavLinks;
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-paper/95 backdrop-blur supports-[backdrop-filter]:bg-paper/80">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
-        <Link href="/" className="flex shrink-0 items-center gap-2">
-          <NavLinkIndicator>
-            <img src={AppIcon} alt="" className="size-8" />
-            <span className="hidden font-medium tracking-wide sm:inline">
-              Blogen
+        <Link href="/" className="shrink-0" onClick={handleLogoClick}>
+          <NavLinkIndicator className="inline-flex items-end gap-2">
+            <img src={AppIcon} alt="" className="size-8 shrink-0" />
+            <span
+              aria-label="Blogen"
+              className="hidden text-lg font-semibold lowercase leading-none tracking-tight sm:inline"
+            >
+              <span className="text-ink/90">blog</span>
+              <span className="text-orange-600 dark:text-orange-500">en</span>
             </span>
           </NavLinkIndicator>
         </Link>
@@ -256,19 +335,23 @@ export default function SiteHeader() {
           <SearchBar />
         </div>
 
-        <nav className="hidden items-center gap-1 md:flex">
-          {navLinks.map((link) => (
-            <HeaderNavLink
-              key={link.href}
-              href={link.href}
-              className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:bg-zinc-100 hover:text-ink dark:hover:bg-zinc-800"
-            >
-              {link.label}
-            </HeaderNavLink>
-          ))}
-          <ThemeToggle />
-          <UserMenu />
-        </nav>
+        <div className="hidden items-center gap-3 md:flex">
+          <nav className="flex items-center gap-1">
+            {primaryNavLinks.map((link) => (
+              <HeaderNavLink key={link.href} href={link.href} className={navLinkClassName}>
+                {link.label}
+              </HeaderNavLink>
+            ))}
+            <BrowseNavDropdown />
+          </nav>
+          <div
+            className="flex items-center gap-1 border-l border-border pl-3"
+            aria-label="Account and settings"
+          >
+            <ThemeToggle />
+            <UserMenu />
+          </div>
+        </div>
 
         <div className="flex items-center gap-2 md:hidden">
           <ThemeToggle />
@@ -293,16 +376,31 @@ export default function SiteHeader() {
               </Drawer.Header>
               <Drawer.Body className="space-y-4">
                 <SearchBar />
-                {navLinks.map((link) => (
-                  <Link
+                {primaryNavLinks.map((link) => (
+                  <HeaderNavLink
                     key={link.href}
                     href={link.href}
                     className="block py-2 text-sm font-medium"
-                    onClick={() => setMobileOpen(false)}
+                    onNavigate={() => setMobileOpen(false)}
                   >
-                    <NavLinkIndicator>{link.label}</NavLinkIndicator>
-                  </Link>
+                    {link.label}
+                  </HeaderNavLink>
                 ))}
+                <div className="space-y-1 border-t border-border pt-4">
+                  <p className="px-1 text-xs font-medium uppercase tracking-wide text-muted">
+                    Browse
+                  </p>
+                  {browseNavLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="block py-2 pl-2 text-sm font-medium"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      <NavLinkIndicator>{link.label}</NavLinkIndicator>
+                    </Link>
+                  ))}
+                </div>
                 <MobileAuthLinks onClose={() => setMobileOpen(false)} />
               </Drawer.Body>
             </Drawer.Dialog>

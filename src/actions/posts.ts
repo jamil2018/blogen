@@ -12,6 +12,7 @@ import {
   listLatestPosts,
   listPaginatedPosts,
   listPostsByAuthor,
+  listPublicTags,
   listRelatedPosts,
   listRelatedIdeas,
   searchPostTitles,
@@ -200,11 +201,27 @@ export async function getPublicPosts() {
 export async function getPaginatedPosts({
   page = 1,
   limit = 10,
+  q,
+  categories,
+  tag,
+  authors,
+  sort = "newest",
 }: {
   page?: number;
   limit?: number;
+  q?: string;
+  categories?: string[];
+  tag?: string;
+  authors?: string[];
+  sort?: "newest" | "oldest";
 }) {
-  const result = await listPaginatedPosts(page, limit);
+  const result = await listPaginatedPosts(page, limit, {
+    q,
+    categories,
+    tag,
+    authors,
+    sort,
+  });
   if (!result) {
     return { data: [], count: 0, page, limit, totalPages: 1 };
   }
@@ -278,6 +295,10 @@ export async function getPublicAuthorPostCounts() {
 
 export async function getPublicCategoryPostCounts() {
   return getCategoryPostCounts();
+}
+
+export async function getPublicTags() {
+  return listPublicTags();
 }
 
 async function assertCanEditPost(

@@ -21,9 +21,9 @@ export type ListPostsFilters = {
   page?: number;
   limit?: number;
   sort?: "newest" | "oldest";
-  category?: string;
+  categories?: string[];
   tag?: string;
-  author?: string;
+  authors?: string[];
   q?: string;
   /** When true, do not force status=published (studio / owner lists rely on RLS). */
   includeNonPublic?: boolean;
@@ -94,17 +94,16 @@ export async function listPaginatedPosts(
       query = query.contains("tags", [filters.tag]);
       countQuery = countQuery.contains("tags", [filters.tag]);
     }
-    if (filters.author) {
-      query = query.eq("author_id", filters.author);
-      countQuery = countQuery.eq("author_id", filters.author);
+    if (filters.authors?.length) {
+      query = query.in("author_id", filters.authors);
+      countQuery = countQuery.in("author_id", filters.authors);
     }
-    if (filters.category) {
-      const { data: category } = await supabase
+    if (filters.categories?.length) {
+      const { data: categoryRows } = await supabase
         .from("categories")
         .select("id")
-        .eq("title", filters.category)
-        .maybeSingle();
-      if (!category) {
+        .in("title", filters.categories);
+      if (!categoryRows?.length) {
         return {
           data: [],
           count: 0,
@@ -113,8 +112,9 @@ export async function listPaginatedPosts(
           totalPages: 1,
         };
       }
-      query = query.eq("category_id", category.id);
-      countQuery = countQuery.eq("category_id", category.id);
+      const categoryIds = categoryRows.map((category) => category.id);
+      query = query.in("category_id", categoryIds);
+      countQuery = countQuery.in("category_id", categoryIds);
     }
 
     const { count: rawCount, error: countError } = await countQuery;
@@ -472,6 +472,28 @@ export async function getCategoryPostCounts(categoryId?: string) {
       categoryId: row.category_id as string,
       postCount: Number(row.post_count),
     }));
+  });
+  return result ?? [];
+}
+
+export async function listPublicTags(): Promise<string[]> {
+  const result = await safeQuery(async () => {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("posts")
+      .select("tags")
+      .eq("status", "published")
+      .neq("distribution_mode", "email_only");
+    if (error) throw error;
+
+    const tagSet = new Set<string>();
+    for (const row of data ?? []) {
+      for (const tag of (row.tags as string[] | null) ?? []) {
+        const trimmed = tag.trim();
+        if (trimmed) tagSet.add(trimmed);
+      }
+    }
+    return Array.from(tagSet).sort((a, b) => a.localeCompare(b));
   });
   return result ?? [];
 }

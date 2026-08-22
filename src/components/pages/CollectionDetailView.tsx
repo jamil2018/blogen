@@ -217,7 +217,7 @@ export default function CollectionDetailView({
         <EmptyState
           title="No sources yet"
           description="Add posts from reading surfaces with Add to collection."
-          actionHref="/"
+          actionHref="/explore"
           actionLabel="Explore posts"
         />
       )}
