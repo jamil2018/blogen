@@ -16,7 +16,6 @@ import {
   ListBox,
   ListBoxItem,
   Select,
-  Spinner,
   TextArea,
   TextField,
   toast,
@@ -48,6 +47,7 @@ import {
   convertToText,
   countWords,
 } from "../../utils/dataFormat";
+import { FormSkeleton } from "../feedback/StudioSkeleton";
 
 const draftSchema = yup.object({
   title: yup.string().required("This field is required"),
@@ -408,13 +408,9 @@ export default function PostForm({
     });
   };
 
-  if (categoriesLoading || (Boolean(savedPostId) && postLoading && mode === "edit")) {
-    return (
-      <div className="flex justify-center py-12">
-        <Spinner />
-      </div>
-    );
-  }
+  const isInitialLoading =
+    categoriesLoading ||
+    (Boolean(savedPostId) && postLoading && mode === "edit");
 
   const categoryList = (categories ?? []) as Category[];
   const status = existingPost?.status ?? "draft";
@@ -499,6 +495,9 @@ export default function PostForm({
         </div>
       </div>
 
+      {isInitialLoading ? (
+        <FormSkeleton className="grid-cols-1 lg:grid-cols-1" fields={8} />
+      ) : (
       <div className="space-y-5">
         {mutation.isError ? (
           <Alert status="danger">
@@ -808,6 +807,7 @@ export default function PostForm({
           ) : null}
         </div>
       </div>
+      )}
     </form>
   );
 }
