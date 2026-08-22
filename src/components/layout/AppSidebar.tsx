@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import {
@@ -22,6 +22,16 @@ import { cn } from "../../lib/cn";
 import { getAuthorNameInitials } from "../../utils/dataFormat";
 import { useCurrentUser } from "../auth/AuthProvider";
 import ThemeToggle from "../theme/ThemeToggle";
+import NavigationProgress from "../feedback/NavigationProgress";
+
+function NavLinkIndicator({ children }: { children: ReactNode }) {
+  const { pending } = useLinkStatus();
+  return (
+    <span className={cn(pending && "opacity-50")} aria-busy={pending || undefined}>
+      {children}
+    </span>
+  );
+}
 
 type NavItem = {
   href: string;
@@ -158,14 +168,16 @@ function SidebarNav({
         className="mb-6 block text-center text-lg font-semibold tracking-tight"
         onClick={onNavigate}
       >
-        Blogen
+        <NavLinkIndicator>Blogen</NavLinkIndicator>
       </Link>
 
       <Link href={createHref} onClick={onNavigate} className="mb-4 block">
-        <Button className="w-full rounded-full" size="sm">
-          <PenNib className="mr-2 size-4" weight="bold" />
-          New Story
-        </Button>
+        <NavLinkIndicator>
+          <Button className="w-full rounded-full" size="sm">
+            <PenNib className="mr-2 size-4" weight="bold" />
+            New Story
+          </Button>
+        </NavLinkIndicator>
       </Link>
 
       <ul className="flex-1 space-y-1">
@@ -183,8 +195,10 @@ function SidebarNav({
                     : "text-muted hover:bg-zinc-100 hover:text-ink dark:hover:bg-zinc-800"
                 )}
               >
-                {item.icon}
-                {item.label}
+                <NavLinkIndicator>
+                  {item.icon}
+                  {item.label}
+                </NavLinkIndicator>
               </Link>
             </li>
           );
@@ -245,6 +259,7 @@ export default function AppSidebar({
 
   return (
     <div className="flex min-h-screen">
+      <NavigationProgress />
       <aside className="hidden w-64 shrink-0 border-r border-border p-4 md:block">
         <SidebarNav variant={variant} />
       </aside>

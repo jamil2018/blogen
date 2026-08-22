@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type ComponentProps } from "react";
+import { useState, type ComponentProps, type ReactNode } from "react";
 import { debounce } from "lodash";
 import { useQuery } from "@tanstack/react-query";
 import { List as MenuIcon } from "@phosphor-icons/react";
@@ -34,22 +34,44 @@ const navLinks = [
   { href: "/authors", label: "Authors" },
 ];
 
+function NavLinkIndicator({ children }: { children: ReactNode }) {
+  const { pending } = useLinkStatus();
+  return (
+    <span className={cn(pending && "opacity-50")} aria-busy={pending || undefined}>
+      {children}
+    </span>
+  );
+}
+
+type HeaderNavLinkProps = {
+  href: string;
+  children: ReactNode;
+  className?: string;
+  onNavigate?: () => void;
+};
+
+function HeaderNavLink({ href, children, className, onNavigate }: HeaderNavLinkProps) {
+  return (
+    <Link href={href} className={className} onClick={onNavigate}>
+      <NavLinkIndicator>{children}</NavLinkIndicator>
+    </Link>
+  );
+}
+
 type NavButtonProps = Omit<ComponentProps<typeof Button>, "onPress"> & {
   href: string;
   onNavigate?: () => void;
 };
 
-function NavButton({ href, onNavigate, ...props }: NavButtonProps) {
-  const router = useRouter();
-
+function NavButton({ href, onNavigate, className, children, ...props }: NavButtonProps) {
   return (
-    <Button
-      {...props}
-      onPress={() => {
-        onNavigate?.();
-        router.push(href);
-      }}
-    />
+    <Link href={href} onClick={onNavigate}>
+      <NavLinkIndicator>
+        <Button {...props} className={className}>
+          {children}
+        </Button>
+      </NavLinkIndicator>
+    </Link>
   );
 }
 
@@ -116,7 +138,7 @@ function SearchBar({ className }: { className?: string }) {
                     onClick={() => setOpen(false)}
                     role="option"
                   >
-                    {post.title}
+                    <NavLinkIndicator>{post.title}</NavLinkIndicator>
                   </Link>
                 </li>
               ))}
@@ -222,10 +244,12 @@ export default function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-border bg-paper/95 backdrop-blur supports-[backdrop-filter]:bg-paper/80">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
         <Link href="/" className="flex shrink-0 items-center gap-2">
-          <img src={AppIcon} alt="" className="size-8" />
-          <span className="hidden font-medium tracking-wide sm:inline">
-            Blogen
-          </span>
+          <NavLinkIndicator>
+            <img src={AppIcon} alt="" className="size-8" />
+            <span className="hidden font-medium tracking-wide sm:inline">
+              Blogen
+            </span>
+          </NavLinkIndicator>
         </Link>
 
         <div className="hidden flex-1 justify-center md:flex">
@@ -234,9 +258,13 @@ export default function SiteHeader() {
 
         <nav className="hidden items-center gap-1 md:flex">
           {navLinks.map((link) => (
-            <NavButton key={link.href} variant="ghost" size="sm" href={link.href}>
+            <HeaderNavLink
+              key={link.href}
+              href={link.href}
+              className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:bg-zinc-100 hover:text-ink dark:hover:bg-zinc-800"
+            >
               {link.label}
-            </NavButton>
+            </HeaderNavLink>
           ))}
           <ThemeToggle />
           <UserMenu />
@@ -272,7 +300,7 @@ export default function SiteHeader() {
                     className="block py-2 text-sm font-medium"
                     onClick={() => setMobileOpen(false)}
                   >
-                    {link.label}
+                    <NavLinkIndicator>{link.label}</NavLinkIndicator>
                   </Link>
                 ))}
                 <MobileAuthLinks onClose={() => setMobileOpen(false)} />
@@ -297,21 +325,21 @@ function MobileAuthLinks({ onClose }: { onClose: () => void }) {
           className="block py-2 text-sm"
           onClick={onClose}
         >
-          Dashboard
+          <NavLinkIndicator>Dashboard</NavLinkIndicator>
         </Link>
         <Link
           href={user.isAdmin ? "/admin/posts" : "/user/posts"}
           className="block py-2 text-sm"
           onClick={onClose}
         >
-          Posts
+          <NavLinkIndicator>Posts</NavLinkIndicator>
         </Link>
         <Link
           href={user.isAdmin ? "/admin/profile" : "/user/profile"}
           className="block py-2 text-sm"
           onClick={onClose}
         >
-          Profile
+          <NavLinkIndicator>Profile</NavLinkIndicator>
         </Link>
         <Button
           variant="ghost"
