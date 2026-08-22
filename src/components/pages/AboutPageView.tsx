@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Spinner } from "@heroui/react";
+import { Button, Skeleton } from "@heroui/react";
 import { motion, useReducedMotion } from "motion/react";
 import AuthorCard from "../post/AuthorCard";
 import Reveal from "../motion/Reveal";
 import ErrorState from "../feedback/ErrorState";
+import { AuthorCardSkeletonGrid } from "../feedback/PageSkeleton";
 import { getLatestUsers } from "../../data/userQueryFunctions";
 import { getPlatformStats } from "../../data/postQueryFunctions";
 import { DETAILED_USER_DATA } from "../../definitions/reactQueryConstants/queryConstants";
@@ -43,7 +44,7 @@ export default function AboutPageView({ users }: { users?: User[] }) {
   });
   const userList = hasUsers ? users : data;
 
-  const { data: stats } = useQuery({
+  const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ["platform-stats"],
     queryFn: getPlatformStats,
     refetchOnWindowFocus: false,
@@ -52,15 +53,15 @@ export default function AboutPageView({ users }: { users?: User[] }) {
   const metrics = [
     {
       label: "Community of Writers",
-      value: stats?.authorsWithPosts ?? 0,
+      value: stats?.authorsWithPosts,
     },
     {
       label: "Articles Published",
-      value: stats?.publishedPosts ?? 0,
+      value: stats?.publishedPosts,
     },
     {
       label: "Topics Covered",
-      value: stats?.categoriesWithPosts ?? 0,
+      value: stats?.categoriesWithPosts,
     },
   ];
 
@@ -85,7 +86,11 @@ export default function AboutPageView({ users }: { users?: User[] }) {
             className="rounded-xl border border-border bg-paper p-4 text-center"
           >
             <p className="text-2xl font-semibold text-accent sm:text-3xl">
-              {metric.value}
+              {statsLoading ? (
+                <Skeleton className="mx-auto h-8 w-12 sm:h-9" />
+              ) : (
+                metric.value ?? 0
+              )}
             </p>
             <p className="mt-1 text-xs text-muted">{metric.label}</p>
           </div>
@@ -177,9 +182,7 @@ export default function AboutPageView({ users }: { users?: User[] }) {
           </p>
           <div className="mt-8">
             {isLoading ? (
-              <div className="flex justify-center py-12">
-                <Spinner />
-              </div>
+              <AuthorCardSkeletonGrid count={6} />
             ) : isError ? (
               <ErrorState />
             ) : (
