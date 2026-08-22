@@ -9,6 +9,7 @@ import {
   removeLibraryItem,
   saveLibraryItem,
 } from "../lib/db/library";
+import { trackPhase2Event } from "../lib/db/phase2-analytics";
 import { logAppEvent } from "../lib/observability";
 
 export async function getLibraryPosts() {
@@ -33,6 +34,7 @@ export async function toggleLibrarySave(postId: string) {
       await removeLibraryItem(user.id, postId);
     } else {
       await saveLibraryItem(user.id, postId);
+      await trackPhase2Event("library_save", { postId });
     }
     revalidatePath("/library");
     revalidatePath(`/posts/${postId}`);

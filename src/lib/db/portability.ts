@@ -277,7 +277,7 @@ export async function buildAccountDataExport(
       .select("*")
       .eq("user_id", userId)
       .maybeSingle(),
-    supabase.from("library_items").select("post_id").eq("user_id", userId),
+    supabase.from("library_items").select("bound_post_id").eq("user_id", userId),
     supabase
       .from("follows")
       .select("target_type, target_id, created_at")
@@ -292,7 +292,7 @@ export async function buildAccountDataExport(
     exportedAt: new Date().toISOString(),
     profile: (profile as Record<string, unknown>) ?? {},
     preferences: (prefs as Record<string, unknown>) ?? {},
-    libraryPostIds: (library ?? []).map((r) => r.post_id),
+    libraryPostIds: (library ?? []).map((r) => r.bound_post_id),
     follows: (follows ?? []).map((f) => ({
       targetType: f.target_type,
       targetId: f.target_id,

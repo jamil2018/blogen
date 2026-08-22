@@ -147,6 +147,7 @@ export default function HomePageView({
                   key={post.id}
                   post={post}
                   variant={index === 0 ? "lead" : "featured"}
+                  showCollectionAction
                 />
               ))}
             </div>
@@ -184,7 +185,7 @@ export default function HomePageView({
                 <>
                   <div>
                     {archivePosts.map((post: Post) => (
-                      <PostCard key={post.id} post={post} />
+                      <PostCard key={post.id} post={post} showCollectionAction />
                     ))}
                   </div>
                   {paginated && paginated.totalPages > 1 ? (

@@ -23,6 +23,12 @@ import {
 } from "@heroui/react";
 import TiptapEditor from "../editor/TiptapEditor";
 import PostCoverUpload from "../editor/PostCoverUpload";
+import ReusePermissionsFields from "./ReusePermissionsFields";
+import {
+  getPostReusePermissionsForEdit,
+  savePostReusePermissions,
+} from "../../actions/phase2";
+import { DEFAULT_REUSE_PERMISSIONS } from "../../lib/phase-2/contracts";
 import { getAllCategories } from "../../data/categoryQueryFunctions";
 import {
   createPost,
@@ -173,6 +179,23 @@ export default function PostForm({
     queryKey: [SINGLE_POST_DATA, savedPostId],
     queryFn: () => getPostById(savedPostId!),
     enabled: Boolean(savedPostId),
+  });
+
+  const { data: reusePermissions } = useQuery({
+    queryKey: ["post-reuse-permissions", savedPostId],
+    queryFn: () => getPostReusePermissionsForEdit(savedPostId!),
+    enabled: Boolean(savedPostId),
+  });
+
+  const reuseMutation = useMutation({
+    mutationFn: (permissions: typeof DEFAULT_REUSE_PERMISSIONS) =>
+      savePostReusePermissions(savedPostId!, permissions),
+    onSuccess: () => {
+      toast("Reuse permissions updated", { variant: "success" });
+    },
+    onError: () => {
+      toast("Could not update reuse permissions", { variant: "danger" });
+    },
   });
 
   const mutation = useMutation({
@@ -739,6 +762,13 @@ export default function PostForm({
               </Checkbox>
             ) : null}
           </fieldset>
+        ) : null}
+
+        {savedPostId && reusePermissions ? (
+          <ReusePermissionsFields
+            value={reusePermissions}
+            onChange={(value) => reuseMutation.mutate(value)}
+          />
         ) : null}
 
         {savedPostId && (revisions as PostRevision[] | undefined)?.length ? (

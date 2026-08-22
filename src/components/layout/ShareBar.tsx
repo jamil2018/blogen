@@ -19,6 +19,7 @@ import {
   getIsPostSaved,
   toggleLibrarySave,
 } from "../../actions/library";
+import AddToCollectionMenu from "../collections/AddToCollectionMenu";
 import { createReport } from "../../actions/reports";
 
 type ShareBarProps = {
@@ -159,6 +160,7 @@ export default function ShareBar({
           weight={bookmarked ? "fill" : "regular"}
         />
       </Button>
+      <AddToCollectionMenu postId={postId} />
       <Button
         isIconOnly
         variant="ghost"

@@ -14,6 +14,7 @@ import {
   getPublicCategoryPostCounts,
   getPublicPlatformStats,
   getRelatedPosts,
+  getRelatedIdeas,
   findPosts,
   publishPost as publishPostAction,
   searchPostResults as searchPostResultsAction,
@@ -35,6 +36,7 @@ export const getPlatformStats = getPublicPlatformStats;
 export const getAuthorPostCounts = getPublicAuthorPostCounts;
 export const getCategoryPostCounts = getPublicCategoryPostCounts;
 export const getRelatedPostsForId = getRelatedPosts;
+export const getRelatedIdeasForId = getRelatedIdeas;
 
 export function getPaginatedPosts({
   page,

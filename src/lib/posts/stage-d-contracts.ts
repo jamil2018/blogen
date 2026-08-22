@@ -14,7 +14,15 @@ export type AnalyticsEventName =
   | "membership_cancel"
   | "membership_refund"
   | "email_open"
-  | "email_click";
+  | "email_click"
+  | "library_save"
+  | "collection_created"
+  | "source_added_to_collection"
+  | "collection_intent_set"
+  | "annotation_created"
+  | "space_promoted"
+  | "reading_path_saved"
+  | "reading_path_started";
 
 export type PostAccessLevel = "public" | "members" | "paid";
 

@@ -137,13 +137,13 @@ export default function PostsByCategoryView({
         <>
           {lead ? (
             <Reveal>
-              <PostCard post={lead} variant="lead" className="mb-8" />
+              <PostCard post={lead} variant="lead" className="mb-8" showCollectionAction />
             </Reveal>
           ) : null}
           <div className="grid gap-6 sm:grid-cols-2">
             {rest.map((post, index) => (
               <Reveal key={post.id} delay={index * 0.03}>
-                <PostCard post={post} variant="featured" />
+                <PostCard post={post} variant="featured" showCollectionAction />
               </Reveal>
             ))}
           </div>
