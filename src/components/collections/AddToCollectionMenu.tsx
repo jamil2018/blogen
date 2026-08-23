@@ -8,6 +8,7 @@ import {
   Button,
   Input,
   Modal,
+  Tooltip,
   toast,
 } from "@heroui/react";
 import { useCurrentUser } from "../auth/AuthProvider";
@@ -118,16 +119,21 @@ export default function AddToCollectionMenu({
         Add to collection
       </Button>
     ) : (
-      <Button
-        isIconOnly
-        variant="ghost"
-        size="sm"
-        aria-label="Add to collection"
-        className={className}
-        onPress={handleOpen}
-      >
-        <FolderPlus className="size-4" />
-      </Button>
+      <Tooltip delay={400}>
+        <Tooltip.Trigger>
+          <Button
+            isIconOnly
+            variant="ghost"
+            size="sm"
+            aria-label="Add to collection"
+            className={className}
+            onPress={handleOpen}
+          >
+            <FolderPlus className="size-4" />
+          </Button>
+        </Tooltip.Trigger>
+        <Tooltip.Content placement="right">Add to collection</Tooltip.Content>
+      </Tooltip>
     );
 
   return (
