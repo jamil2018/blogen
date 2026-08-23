@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Button, Separator } from "@heroui/react";
@@ -45,6 +45,7 @@ export default function HomePageView({
 }: HomePageViewProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isPagePending, startPageTransition] = useTransition();
   const currentPage = Number(searchParams.get("page") ?? initialPage) || 1;
 
   const hasLatestPosts = latestPosts !== undefined;
@@ -78,6 +79,8 @@ export default function HomePageView({
     placeholderData: keepPreviousData,
   });
   const paginated = usePrefetchedPage ? paginatedPosts : queriedPaginated;
+  const isArchiveLoading =
+    isPagePending || paginatedLoading || paginatedFetching;
 
   const hasCategories = categories !== undefined;
   const {
@@ -108,16 +111,19 @@ export default function HomePageView({
 
   const handlePageChange = useCallback(
     (page: number) => {
+      if (page === currentPage || isPagePending) return;
       const params = new URLSearchParams(searchParams.toString());
       if (page <= 1) params.delete("page");
       else params.set("page", String(page));
       const qs = params.toString();
-      router.push(qs ? `/?${qs}` : "/", { scroll: false });
       document
         .getElementById("all-posts")
         ?.scrollIntoView({ behavior: "smooth" });
+      startPageTransition(() => {
+        router.push(qs ? `/?${qs}` : "/", { scroll: false });
+      });
     },
-    [router, searchParams]
+    [currentPage, isPagePending, router, searchParams]
   );
 
   const featuredPost = latest?.[0];
@@ -176,9 +182,34 @@ export default function HomePageView({
           </div>
 
           <div className="grid gap-8 lg:grid-cols-3">
-            <div className="lg:col-span-2">
-              {paginatedLoading || paginatedFetching ? (
-                <ExpandedPostSkeletonList count={5} />
+            <div className="lg:col-span-2" aria-busy={isArchiveLoading || undefined}>
+              {isArchiveLoading ? (
+                <>
+                  <ExpandedPostSkeletonList count={5} />
+                  {paginated && paginated.totalPages > 1 ? (
+                    <div className="mt-8 flex items-center justify-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="active:scale-[0.98]"
+                        isDisabled
+                      >
+                        Previous
+                      </Button>
+                      <span className="text-sm text-muted" aria-live="polite">
+                        Loading page…
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="active:scale-[0.98]"
+                        isDisabled
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  ) : null}
+                </>
               ) : paginatedError ? (
                 <ErrorState />
               ) : archivePosts.length ? (
