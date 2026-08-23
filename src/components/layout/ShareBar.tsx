@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -11,7 +11,7 @@ import {
   LinkedinLogo,
   TwitterLogo,
 } from "@phosphor-icons/react";
-import { Button, toast } from "@heroui/react";
+import { Button, Tooltip, toast } from "@heroui/react";
 import { motion, useReducedMotion } from "motion/react";
 import { cn } from "../../lib/cn";
 import { useCurrentUser } from "../auth/AuthProvider";
@@ -21,6 +21,21 @@ import {
 } from "../../actions/library";
 import AddToCollectionMenu from "../collections/AddToCollectionMenu";
 import { createReport } from "../../actions/reports";
+
+function ActionTooltip({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <Tooltip delay={400}>
+      <Tooltip.Trigger>{children}</Tooltip.Trigger>
+      <Tooltip.Content placement="right">{label}</Tooltip.Content>
+    </Tooltip>
+  );
+}
 
 type ShareBarProps = {
   postId: string;
@@ -117,74 +132,88 @@ export default function ShareBar({
     document.getElementById("comments")?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
+  const bookmarkLabel = bookmarked ? "Remove from Library" : "Save to Library";
+
   const actions = (
-    <div className="flex items-center gap-0.5 rounded-full border border-border bg-paper/95 p-1 shadow-lg backdrop-blur-sm">
-      <Button
-        isIconOnly
-        variant="ghost"
-        size="sm"
-        aria-label="Copy link"
-        onPress={copyLink}
-      >
-        <Copy className="size-4" />
-      </Button>
-      <Button
-        isIconOnly
-        variant="ghost"
-        size="sm"
-        aria-label="Share on Twitter"
-        onPress={shareTwitter}
-      >
-        <TwitterLogo className="size-4" />
-      </Button>
-      <Button
-        isIconOnly
-        variant="ghost"
-        size="sm"
-        aria-label="Share on LinkedIn"
-        onPress={shareLinkedIn}
-      >
-        <LinkedinLogo className="size-4" />
-      </Button>
-      <Button
-        isIconOnly
-        variant="ghost"
-        size="sm"
-        aria-label={bookmarked ? "Remove from Library" : "Save to Library"}
-        onPress={toggleBookmark}
-        isDisabled={toggleMutation.isPending}
-        className={bookmarked ? "text-accent" : undefined}
-      >
-        <BookmarkSimple
-          className="size-4"
-          weight={bookmarked ? "fill" : "regular"}
-        />
-      </Button>
+    <div className="flex flex-col items-center gap-0.5 rounded-full border border-border bg-paper/95 p-1 shadow-lg backdrop-blur-sm">
+      <ActionTooltip label="Copy link">
+        <Button
+          isIconOnly
+          variant="ghost"
+          size="sm"
+          aria-label="Copy link"
+          onPress={copyLink}
+        >
+          <Copy className="size-4" />
+        </Button>
+      </ActionTooltip>
+      <ActionTooltip label="Share on Twitter">
+        <Button
+          isIconOnly
+          variant="ghost"
+          size="sm"
+          aria-label="Share on Twitter"
+          onPress={shareTwitter}
+        >
+          <TwitterLogo className="size-4" />
+        </Button>
+      </ActionTooltip>
+      <ActionTooltip label="Share on LinkedIn">
+        <Button
+          isIconOnly
+          variant="ghost"
+          size="sm"
+          aria-label="Share on LinkedIn"
+          onPress={shareLinkedIn}
+        >
+          <LinkedinLogo className="size-4" />
+        </Button>
+      </ActionTooltip>
+      <ActionTooltip label={bookmarkLabel}>
+        <Button
+          isIconOnly
+          variant="ghost"
+          size="sm"
+          aria-label={bookmarkLabel}
+          onPress={toggleBookmark}
+          isDisabled={toggleMutation.isPending}
+          className={bookmarked ? "text-accent" : undefined}
+        >
+          <BookmarkSimple
+            className="size-4"
+            weight={bookmarked ? "fill" : "regular"}
+          />
+        </Button>
+      </ActionTooltip>
       <AddToCollectionMenu postId={postId} />
-      <Button
-        isIconOnly
-        variant="ghost"
-        size="sm"
-        aria-label="Report post"
-        onPress={reportPost}
-      >
-        <Flag className="size-4" />
-      </Button>
-      <Button
-        isIconOnly
-        variant="ghost"
-        size="sm"
-        aria-label="Jump to comments"
-        onPress={jumpToComments}
-        className="relative"
-      >
-        <ChatCircle className="size-4" />
-        {commentCount > 0 ? (
-          <span className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-accent text-[10px] font-medium text-accent-foreground">
-            {commentCount > 99 ? "99+" : commentCount}
-          </span>
-        ) : null}
-      </Button>
+      <ActionTooltip label="Report post">
+        <Button
+          isIconOnly
+          variant="ghost"
+          size="sm"
+          aria-label="Report post"
+          onPress={reportPost}
+        >
+          <Flag className="size-4" />
+        </Button>
+      </ActionTooltip>
+      <ActionTooltip label="Jump to comments">
+        <Button
+          isIconOnly
+          variant="ghost"
+          size="sm"
+          aria-label="Jump to comments"
+          onPress={jumpToComments}
+          className="relative"
+        >
+          <ChatCircle className="size-4" />
+          {commentCount > 0 ? (
+            <span className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-accent text-[10px] font-medium text-accent-foreground">
+              {commentCount > 99 ? "99+" : commentCount}
+            </span>
+          ) : null}
+        </Button>
+      </ActionTooltip>
     </div>
   );
 
